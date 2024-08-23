@@ -104,9 +104,18 @@ namespace important_game.ui.Domain.ImportantMatch
             //fixture Number (fixtureNumber / total Fixtures)
 
             //0.2×(Form of Team A+Form of Team B / 2 )
-            double homeLastFixtures = await CalculateTeamLastFeaturesFormAsync(fixture.HomeTeam.Id, 5);
-            double awayLastFixtures = await CalculateTeamLastFeaturesFormAsync(fixture.AwayTeam.Id, 5);
-            double teamsLastFixtureFormValue = ((homeLastFixtures + awayLastFixtures) / 2d) * 0.2d;
+            var homeLastFixturesData = await ExtractTeamLastFixtureFormAsync(fixture.HomeTeam.Id, 5);
+            var awayLastFixturesData = await ExtractTeamLastFixtureFormAsync(fixture.AwayTeam.Id, 5);
+
+            var homeLastFixturesScoreValue = CalculateTeamLastFixturesForm(homeLastFixturesData);
+            var awaitLastFixturesScoreValue = CalculateTeamLastFixturesForm(awayLastFixturesData);
+
+            double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.2d;
+
+            var homeGoalsFormScoreValue = CalculateTeamGoalsForm(homeLastFixturesData);
+            var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
+
+            double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.18d;
 
             //0.2×TPD
             //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
@@ -118,7 +127,7 @@ namespace important_game.ui.Domain.ImportantMatch
             // 0.15×RL
 
 
-            double matchImportance = competitionRankValue + teamsLastFixtureFormValue + h2hValue;
+            double matchImportance = competitionRankValue + teamsLastFixtureFormValue + teamsGoalsFormValue + h2hValue;
 
 
             return new MatchImportance
@@ -140,38 +149,64 @@ namespace important_game.ui.Domain.ImportantMatch
             return (3d / difTeamWins) + (double)fixtureH2H.TeamDuel.Draws.Value;
         }
 
-        private async Task<double> CalculateTeamLastFeaturesFormAsync(int teamId, int lastFixtureAmount)
+        private async Task<TeamFixtureData> ExtractTeamLastFixtureFormAsync(int teamId, int lastFixtureAmount)
         {
             var teamPreviousEvents = await _sofaScoreIntegration.GetTeamPreviousEventsAsync(teamId);
 
             if (teamPreviousEvents == null || teamPreviousEvents.Events.Count == 0)
-                return 0d;
+                return null;
 
-            double formLastGames = 0d;
+            var fixtureScore = new TeamFixtureData();
+
             foreach (var previousEvent in teamPreviousEvents.Events.Take(lastFixtureAmount))
             {
-                var eventResult = GetEventResultStatus(teamId, previousEvent);
+                var eventResultData = GetEventResultStatus(teamId, previousEvent);
 
-                formLastGames += eventResult switch
+                if (eventResultData.EventResult == null)
+                    continue;
+
+                _ = eventResultData.EventResult switch
                 {
-                    EventResultStatusEnum.Win => 3,
-                    EventResultStatusEnum.Draw => 1,
-                    EventResultStatusEnum.Lost => 0,
+                    EventResultStatusEnum.Win => fixtureScore.Wins += 1,
+                    EventResultStatusEnum.Draw => fixtureScore.Draws += 1,
+                    EventResultStatusEnum.Lost => fixtureScore.Lost += 1,
                     _ => 0,
                 };
 
+                fixtureScore.GoalsFor += eventResultData.GoalsFor;
+                fixtureScore.GoalsAgainst += eventResultData.GoalsAgainst;
+
+                fixtureScore.AmountOfGames += 1;
             }
 
-            return formLastGames / 15d;
+            return fixtureScore;
         }
 
-        private EventResultStatusEnum? GetEventResultStatus(int teamId, SSEvent previousEvent)
+        private double CalculateTeamLastFixturesForm(TeamFixtureData teamFixtureData)
+        {
+            if (teamFixtureData == null)
+                return 0d;
+
+            return ((teamFixtureData.Wins * 3) + (teamFixtureData.Draws)) / 15d;
+        }
+
+        private object CalculateTeamGoalsForm(TeamFixtureData teamFixtureData)
+        {
+
+            if (teamFixtureData == null || teamFixtureData.AmountOfGames == 0)
+                return 0;
+
+            return (teamFixtureData.GoalsAgainst + teamFixtureData.GoalsFor) / teamFixtureData.AmountOfGames;
+
+        }
+
+        private (EventResultStatusEnum? EventResult, int GoalsFor, int GoalsAgainst) GetEventResultStatus(int teamId, SSEvent previousEvent)
         {
             var teamScore = 0;
             var oppositeTeamScore = 0;
 
             if (!previousEvent.HomeScore.Current.HasValue || !previousEvent.AwayScore.Current.HasValue)
-                return null;
+                return (null, 0, 0);
 
             if (previousEvent.HomeTeam.Id == teamId)
             {
@@ -185,15 +220,17 @@ namespace important_game.ui.Domain.ImportantMatch
             }
             else
             {
-                return null;
+                return (null, 0, 0);
             }
 
-            if (teamScore > oppositeTeamScore)
-                return EventResultStatusEnum.Win;
-            else if (oppositeTeamScore > teamScore)
-                return EventResultStatusEnum.Lost;
+            var eventScore = EventResultStatusEnum.Draw;
 
-            return EventResultStatusEnum.Draw;
+            if (teamScore > oppositeTeamScore)
+                eventScore = EventResultStatusEnum.Win;
+            else if (oppositeTeamScore > teamScore)
+                eventScore = EventResultStatusEnum.Lost;
+
+            return (eventScore, teamScore, oppositeTeamScore);
         }
     }
 }

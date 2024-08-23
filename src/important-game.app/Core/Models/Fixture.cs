@@ -1,6 +1,5 @@
 ﻿namespace important_game.ui.Core.Models
 {
-
     public class Fixture
     {
         public int SSEventId { get; set; }

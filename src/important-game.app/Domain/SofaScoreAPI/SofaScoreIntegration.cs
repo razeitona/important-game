@@ -19,6 +19,12 @@ namespace important_game.ui.Domain.SofaScoreAPI
             return await Invoke<SSTournamentSeasons>(url);
         }
 
+        public async Task<SSTournamentTable> GetTournamentSeasonsTableAsync(int tournamentId, int seasonId)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/standings/total";
+            return await Invoke<SSTournamentTable>(url);
+        }
+
         //https://www.sofascore.com/api/v1/unique-tournament/238/season/63670/events/next/0
         public async Task<SSTournamentEvents> GetTournamentUpcomingSeasonEventsAsync(int tournamentId, int seasonId)
         {
