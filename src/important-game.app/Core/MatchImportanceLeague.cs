@@ -1,8 +1,8 @@
 ﻿namespace important_game.ui.Core
 {
-    public class SofaScoreLeagueOption
+    public class MatchImportanceLeague
     {
-        public SofaScoreLeagueOption(int leagueId, string name, double importance)
+        public MatchImportanceLeague(int leagueId, string name, double importance)
         {
             LeagueId = leagueId;
             Name = name;
@@ -14,6 +14,6 @@
         public double Importance { get; private set; }
     }
 
-   
+
 
 }

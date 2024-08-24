@@ -7,10 +7,11 @@ namespace important_game.ui.Core.SofaScoreDto
         [property: JsonPropertyName("hasNextPage")] bool? HasNextPage
     );
     public record SSEvent(
-        [property: JsonPropertyName("id")] int? Id,
+        [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("detailId")] int? DetailId,
+        [property: JsonPropertyName("customId")] string CustomId,
         //[property: JsonPropertyName("tournament")] SSTournament Tournament,
-        //[property: JsonPropertyName("season")] SSSeason Season,
+        [property: JsonPropertyName("season")] SSSeason Season,
         [property: JsonPropertyName("winnerCode")] int? WinnerCode,
         [property: JsonPropertyName("roundInfo")] SSEventRoundInfo RoundInfo,
         [property: JsonPropertyName("status")] SSEventStatus Status,
@@ -18,7 +19,7 @@ namespace important_game.ui.Core.SofaScoreDto
         [property: JsonPropertyName("homeScore")] SSEventScore HomeScore,
         [property: JsonPropertyName("awayTeam")] SSTeam AwayTeam,
         [property: JsonPropertyName("awayScore")] SSEventScore AwayScore,
-        [property: JsonPropertyName("startTimestamp")] long? StartTimestamp,
+        [property: JsonPropertyName("startTimestamp")] long StartTimestamp,
         [property: JsonPropertyName("slug")] string Slug,
         [property: JsonPropertyName("time")] SSEventTime Time,
         [property: JsonPropertyName("finalResultOnly")] bool? FinalResultOnly,
@@ -45,7 +46,7 @@ namespace important_game.ui.Core.SofaScoreDto
     );
 
     public record SSEventScore(
-    [property: JsonPropertyName("current")] int? Current,
+    [property: JsonPropertyName("current")] int Current,
     [property: JsonPropertyName("display")] int? Display,
     [property: JsonPropertyName("period1")] int? Period1,
     [property: JsonPropertyName("period2")] int? Period2,

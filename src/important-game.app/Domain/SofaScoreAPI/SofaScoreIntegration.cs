@@ -19,30 +19,33 @@ namespace important_game.ui.Domain.SofaScoreAPI
             return await Invoke<SSTournamentSeasons>(url);
         }
 
-        public async Task<SSTournamentTable> GetTournamentSeasonsTableAsync(int tournamentId, int seasonId)
+        public async Task<SSTournamentStandings> GetTournamentSeasonsTableAsync(int tournamentId, int seasonId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/standings/total";
-            return await Invoke<SSTournamentTable>(url);
+            return await Invoke<SSTournamentStandings>(url);
         }
 
-        //https://www.sofascore.com/api/v1/unique-tournament/238/season/63670/events/next/0
         public async Task<SSTournamentEvents> GetTournamentUpcomingSeasonEventsAsync(int tournamentId, int seasonId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/events/next/0";
             return await Invoke<SSTournamentEvents>(url);
         }
 
-        //https://www.sofascore.com/api/v1/team/3001/events/last/0
+        public async Task<SSTournamentSeasonRound> GetTournamentSeasonRoundsAsync(int tournamentId, int seasonId)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/rounds";
+            return await Invoke<SSTournamentSeasonRound>(url);
+        }
+
         public async Task<SSTournamentEvents> GetTeamPreviousEventsAsync(int teamId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/team/{teamId}/events/last/0";
             return await Invoke<SSTournamentEvents>(url);
         }
 
-        //https://www.sofascore.com/api/v1/event/12513997/h2h
-        public async Task<SSHeadToHead> GetEventH2HAsync(int eventId)
+        public async Task<SSHeadToHead> GetEventH2HAsync(string customEventId)
         {
-            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{eventId}/h2h";
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{customEventId}/h2h/events";
             return await Invoke<SSHeadToHead>(url);
         }
 

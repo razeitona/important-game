@@ -6,10 +6,11 @@ namespace important_game.ui.Domain.SofaScoreAPI
     {
         Task<SSTournament> GetTournamentAsync(int tournamentId);
         Task<SSTournamentSeasons> GetTournamentSeasonsAsync(int tournamentId);
-        Task<SSTournamentTable> GetTournamentSeasonsTableAsync(int tournamentId, int seasonId);
+        Task<SSTournamentStandings> GetTournamentSeasonsTableAsync(int tournamentId, int seasonId);
+        Task<SSTournamentSeasonRound> GetTournamentSeasonRoundsAsync(int tournamentId, int seasonId);
 
         Task<SSTournamentEvents> GetTournamentUpcomingSeasonEventsAsync(int tournamentId, int seasonId);
         Task<SSTournamentEvents> GetTeamPreviousEventsAsync(int teamId);
-        Task<SSHeadToHead> GetEventH2HAsync(int eventId);
+        Task<SSHeadToHead> GetEventH2HAsync(string customEventId);
     }
 }

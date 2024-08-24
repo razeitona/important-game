@@ -12,7 +12,7 @@ namespace important_game.ui.Core.SofaScoreDto
         //public string Name { get; set; }
         //public List<SSPlayer> Players { get; set; }
 
-        [property: JsonPropertyName("id")] int? Id,
+        [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("slug")] string Slug,
         [property: JsonPropertyName("shortName")] string ShortName

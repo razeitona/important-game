@@ -2,7 +2,7 @@
 
 namespace important_game.ui.Core.SofaScoreDto
 {
-    public record SSTournamentTable(
+    public record SSTournamentStandings(
         [property: JsonPropertyName("standings")] IReadOnlyList<SSTeamStanding> Standings
     );
 
