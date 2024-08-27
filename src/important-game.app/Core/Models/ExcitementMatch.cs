@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace important_game.ui.Core.Models
+﻿namespace important_game.ui.Core.Models
 {
 
     public class ExcitementMatch

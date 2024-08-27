@@ -1,6 +1,4 @@
 ﻿using BetterConsoleTables;
-using important_game.ui.Core;
-using important_game.ui.Core.Models;
 using important_game.ui.Domain.ImportantMatch;
 using important_game.ui.Domain.LeagueInformation;
 using important_game.ui.Domain.SofaScoreAPI;
@@ -30,7 +28,10 @@ var table = new Table("League", "Date", "Match", "Importance");
 
 foreach (var match in excitementMatches.OrderByDescending(c => c.ExcitementScore).ThenBy(c => c.MatchDate))
 {
-    table.AddRow(match.League.Name, match.MatchDate.ToString("yyyy-MM-dd HH:mm"), $"{match.HomeTeam.Name} v {match.AwayTeam.Name}", Math.Round(match.ExcitementScore, 3));
+    table.AddRow(match.League.Name
+        , match.MatchDate.ToString("yyyy-MM-dd HH:mm")
+        , $"{match.HomeTeam.Name} v {match.AwayTeam.Name}"
+        , Math.Round(match.ExcitementScore, 3));
 }
 
 Console.Write(table.ToString());

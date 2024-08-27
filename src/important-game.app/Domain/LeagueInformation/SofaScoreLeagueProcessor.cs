@@ -51,7 +51,7 @@ namespace important_game.ui.Domain.LeagueInformation
 
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
-                if (gameStartTime > currentDate && currentDate.AddDays(2) > gameStartTime)
+                if (gameStartTime > currentDate && currentDate.AddDays(10) > gameStartTime)
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
@@ -87,9 +87,8 @@ namespace important_game.ui.Domain.LeagueInformation
         public async Task<LeagueStanding> GetLeagueTableAsync(int leagueId, int seasonId)
         {
             var leagueTableData = await _sofaScoreIntegration.GetTournamentSeasonsTableAsync(leagueId, seasonId);
-            if (leagueTableData == null)
+            if (leagueTableData == null || leagueTableData.Standings == null)
                 return null;
-
 
             var standingData = leagueTableData.Standings.FirstOrDefault();
 
@@ -110,23 +109,31 @@ namespace important_game.ui.Domain.LeagueInformation
                 TotalRounds = leagueRoundsData.Rounds.Count
             };
 
-            foreach (var standingRow in standingData.Rows)
+            try
             {
-                leagueStanding.Standings.Add(new Standing
+                foreach (var standingRow in standingData.Rows)
                 {
-                    Team = new Team
+                    leagueStanding.Standings.Add(new Standing
                     {
-                        Id = standingRow.Team.Id,
-                        Name = standingRow.Team.Name,
-                    },
-                    Matches = standingRow.Matches!.Value,
-                    Wins = standingRow.Wins!.Value,
-                    Draws = standingRow.Draws!.Value,
-                    Losses = standingRow.Losses!.Value,
-                    GoalsFor = standingRow.ScoresFor!.Value,
-                    GoalsAgainst = standingRow.ScoresAgainst!.Value,
-                    Points = standingRow.Points!.Value,
-                });
+                        Team = new Team
+                        {
+                            Id = standingRow.Team.Id,
+                            Name = standingRow.Team.Name,
+                        },
+                        Matches = standingRow.Matches!.Value,
+                        Wins = standingRow.Wins!.Value,
+                        Draws = standingRow.Draws!.Value,
+                        Losses = standingRow.Losses!.Value,
+                        GoalsFor = standingRow.ScoresFor!.Value,
+                        GoalsAgainst = standingRow.ScoresAgainst!.Value,
+                        Points = standingRow.Points!.Value,
+                        Position = standingRow.Position!.Value,
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
 
             return leagueStanding;

@@ -82,6 +82,9 @@ namespace important_game.ui.Domain.ImportantMatch
             {
                 var matchImportance = await CalculateMatchImportanceAsync(matchCalculatorOptions, fixture, leagueTable);
 
+                if (matchImportance == null)
+                    continue;
+
                 matchImportance.League = new League
                 {
                     Id = league.LeagueId,
@@ -97,15 +100,21 @@ namespace important_game.ui.Domain.ImportantMatch
         private async Task<ExcitementMatch> CalculateMatchImportanceAsync(
             ImportantMatchCalculatorOption options, UpcomingFixture fixture, LeagueStanding leagueTable)
         {
-            if (fixture == null || fixture.HomeTeam == null || fixture.AwayTeam == null || leagueTable == null)
+            if (fixture == null || fixture.HomeTeam == null || fixture.AwayTeam == null)
                 return null;
 
 
             // 0.2×CR
-            double competitionRankValue = options.CompetitionRanking * 0.2d;
+            double competitionRankValue = options.CompetitionRanking * 0.15d;
             // 0.1×FN
             //fixture Number (fixtureNumber / total Fixtures)
-            double fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.1d;
+            double fixtureValue = 0d;
+            if (leagueTable != null)
+            {
+                fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.15d;
+            }
+
+            //double fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.2d;
 
             //0.2×(Form of Team A+Form of Team B / 2 )
             var homeLastFixturesData = fixture.HomeTeam.LastFixtures;
@@ -115,12 +124,16 @@ namespace important_game.ui.Domain.ImportantMatch
             var awaitLastFixturesScoreValue = CalculateTeamLastFixturesForm(awayLastFixturesData);
 
             double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.22d;
+            //double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.7d;
 
             //0.18×(Goals of Team A+Goals of Team B / 2 )
             var homeGoalsFormScoreValue = CalculateTeamGoalsForm(homeLastFixturesData);
             var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
 
             double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.18d;
+            //double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.3d;
+
+            //double teamsFormValue = (teamsLastFixtureFormValue + teamsGoalsFormValue) * 0.3d;
 
             //0.2×TPD
             //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
@@ -136,15 +149,15 @@ namespace important_game.ui.Domain.ImportantMatch
             double excitementScore =
                 competitionRankValue + fixtureValue +
                 teamsLastFixtureFormValue + teamsGoalsFormValue +
+                //teamsFormValue +
                 leagueTableValue + h2hValue;
-
 
             return new ExcitementMatch
             {
                 MatchDate = fixture.MatchDate,
                 HomeTeam = fixture.HomeTeam,
                 AwayTeam = fixture.AwayTeam,
-                ExcitementScore = excitementScore
+                ExcitementScore = excitementScore,
             };
         }
 
@@ -164,9 +177,24 @@ namespace important_game.ui.Domain.ImportantMatch
                 return 0;
 
 
-            var positionDiff = Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position);
+            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position);
+            var totalTeams = (double)leagueTable.Standings.Count;
 
-            return 1d - ((double)positionDiff / ((double)leagueTable.Standings.Count - 1d));
+            //var positionValue = 1d - ((double)positionDiff / ((double)leagueTable.Standings.Count - 1d));
+            var positionValue = 1d / (1 + ((positionDiff / (totalTeams - 1d))));
+
+
+            var averageTeamPosition = ((double)homeTeamPosition.Position + (double)awayTeamPosition.Position) / 2d;
+
+            var topBottomMatchupValue = 1d - ((averageTeamPosition - 1d) / (totalTeams - 1d));
+
+            var pointDifference = (double)Math.Abs(homeTeamPosition.Points - awayTeamPosition.Points);
+
+            var maxPointDifference = (double)(leagueTable.TotalRounds - Math.Max(homeTeamPosition.Matches, awayTeamPosition.Matches)) * 3d;
+
+            var pointImpactValue = 1d / (1 + ((pointDifference / (maxPointDifference - 1d))));
+
+            return positionValue * topBottomMatchupValue * pointImpactValue;
 
         }
 
