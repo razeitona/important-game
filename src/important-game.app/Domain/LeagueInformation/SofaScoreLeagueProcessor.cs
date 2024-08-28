@@ -39,7 +39,7 @@ namespace important_game.ui.Domain.LeagueInformation
 
             var upcomingSeasonFixturesData = await _sofaScoreIntegration.GetTournamentUpcomingSeasonEventsAsync(leagueId, seasonId);
 
-            if (upcomingSeasonFixturesData == null || upcomingSeasonFixturesData.Events.Count == 0)
+            if (upcomingSeasonFixturesData?.Events == null || upcomingSeasonFixturesData.Events.Count == 0)
                 return upcomingFixtures;
 
             var currentDate = DateTime.UtcNow;

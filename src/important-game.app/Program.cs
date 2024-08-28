@@ -1,15 +1,11 @@
 ﻿using BetterConsoleTables;
-using important_game.ui.Domain.ImportantMatch;
-using important_game.ui.Domain.LeagueInformation;
-using important_game.ui.Domain.SofaScoreAPI;
+using important_game.ui;
 using important_game.ui.Infrastructure.ImportantMatch;
 using Microsoft.Extensions.DependencyInjection;
 
 IServiceCollection services = new ServiceCollection();
-services.AddHttpClient<ISofaScoreIntegration, SofaScoreIntegration>();
-services.AddScoped<ILeagueProcessor, SofaScoreLeagueProcessor>();
-services.AddScoped<IExcitmentMatchProcessor, ExcitementMatchProcessor>();
 
+services.MatchImportanceDependency();
 
 var serviceProvider = services.BuildServiceProvider();
 var matchProcessor = serviceProvider.GetService<IExcitmentMatchProcessor>();
