@@ -1,5 +1,6 @@
 ﻿$background-color: #FFFAFA;
 $text-color: #525360;
+$fire-color: linear-gradient(to top, #ff0000, #ff6a00);
 
 html {
     background-color: $background-color;
@@ -32,12 +33,10 @@ body {
     > .match-card {
         margin: 0.5rem;
     }
-
-   
 }
 
 .match-card {
-    width: 25rem;
+    width: 19rem;
     display: flex;
     flex-direction: column;
     background-color: #2a2a33;
@@ -45,9 +44,25 @@ body {
 
 
     .match-header {
-        background-color:#640b0b;
-        font-size:10px;
-        padding:0.1rem 0.8rem;
+        padding: 0.1rem 0.8rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: $background-color;
+
+        div {
+        }
+
+        img {
+            width: 1.5rem;
+        }
+
+        .match-header-title {
+            padding: 0 0.2rem;
+            font-size: 14px;
+            color: $text-color;
+            font-weight: bold;
+        }
     }
 
 
@@ -76,8 +91,8 @@ body {
                     width: 10rem;
 
                     img {
-                        width: 80px;
-                        max-width: 80px;
+                        width: 60px;
+                        max-width: 60px;
                     }
 
                     p {
@@ -85,11 +100,73 @@ body {
                         overflow: hidden;
                         text-align: center;
                     }
+
+                    .match-card-team-lastfixtures {
+                        font-size: 10px;
+
+                        .match-result-w {
+                            color: #146d13;
+                        }
+
+                        .match-result-d {
+                            color: $text-color;
+                        }
+
+                        .match-result-l {
+                            color: #ff0000;
+                        }
+                    }
+                }
+            }
+        }
+
+        .match-card-content {
+            display: flex;
+            flex-grow: 1;
+
+            .match-card-data {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex-grow: 1;
+
+                .match-card-data-title {
+                    font-size: 16px;
+                    font-weight: lighter;
+
+
+                    span {
+                        font-size: 12px;
+                    }
+
+                    i {
+                        font-size: 18px;
+                    }
+                }
+
+                .match-card-data-value {
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+
+                &.match-card-data-es {
+                    .match-card-data-title {
+                        i {
+                            font-size: 8px;
+                            background: $fire-color;
+                            -webkit-background-clip: text;
+                            -moz-background-clip: text;
+                            background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        }
+                    }
                 }
             }
         }
 
         .match-card-watch {
+            display: none;
+
             label {
                 font-size: 10px;
                 color: #FFFAFA;

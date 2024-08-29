@@ -13,13 +13,25 @@
     {
         <div class="card match-card">
             <div class="card-header match-header">
-                @match.League.Name
+                <div>
+                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
+                </div>
+                <div class="match-header-title" style="color:@(match.League.PrimaryColor)">
+                    @match.League.Name
+                </div>
             </div>
             <div class="card-body match-card-body">
                 <div class="match-card-teams">
                     <div class="match-card-teams-item match-card-team">
                         <img src="@("https://api.sofascore.app/api/v1/team/" + match.HomeTeam.Id + "/image")" alt="@(match.HomeTeam.Name)" />
                         <p>@match.HomeTeam.Name</p>
+                        <div class="match-card-team-lastfixtures">
+                            @for (int i = match.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                            {
+                                var fixtureResult = match.HomeTeam.LastFixtures.FixtureResult[i];
+                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                            }
+                        </div>
                     </div>
                     <div class="match-card-teams-item">
                         <p>@match.MatchDate.ToString("dd/MM/yyyy")</p>
@@ -28,8 +40,53 @@
                     <div class="match-card-teams-item match-card-team">
                         <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
                         <p>@match.AwayTeam.Name</p>
+                        <div class="match-card-team-lastfixtures">
+                            @for (int i = match.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                            {
+                                var fixtureResult = match.AwayTeam.LastFixtures.FixtureResult[i];
+                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                            }
+                        </div>
                     </div>
                 </div>
+                <div class="match-card-content">
+
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">
+                            <i class="es-table"></i>
+                        </div>
+                        <div class="match-card-data-value">
+                            @(match.HomeTeam.Position)º-@(match.AwayTeam.Position)º
+                        </div>
+                    </div>
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">H<span>2</span>H</div>
+                        <div class="match-card-data-value">
+                            @match.HomeTeam.H2hWins-@match.AwayTeam.H2hWins
+                        </div>
+                    </div>
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">
+                            <i class="es-football"></i>
+                        </div>
+                        <div class="match-card-data-value">
+                            @match.HomeTeam.Goals-@match.AwayTeam.Goals
+                        </div>
+                    </div>
+                    <div class="match-card-data match-card-data-es">
+                        <div class="match-card-data-title">
+                            ES
+                            @if (match.ExcitementScore > 0.7d)
+                            {
+                                <i class="es-fire"></i>
+                            }
+                        </div>
+                        <div class="match-card-data-value" title="Excitement Score">
+                            @(Math.Round(match.ExcitementScore * 100, 0))
+                        </div>
+                    </div>
+                </div>
+
                 <div class="match-card-watch">
                     <label>Worth To Watch</label>
                     <div class="progress">

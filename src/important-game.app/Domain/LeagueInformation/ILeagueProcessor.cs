@@ -1,4 +1,5 @@
-﻿using important_game.ui.Core.Models;
+﻿using important_game.ui.Core;
+using important_game.ui.Core.Models;
 
 namespace important_game.ui.Domain.LeagueInformation
 {
@@ -9,7 +10,7 @@ namespace important_game.ui.Domain.LeagueInformation
         /// </summary>
         /// <param name="leagueId">League Identifier</param>
         /// <returns>League data structure</returns>
-        Task<League> GetLeagueDataAsync(int leagueId);
+        Task<League> GetLeagueDataAsync(MatchImportanceLeague league);
 
         /// <summary>
         /// Get upcoming league fixtures

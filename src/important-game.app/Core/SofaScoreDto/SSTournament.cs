@@ -2,32 +2,24 @@
 
 namespace important_game.ui.Core.SofaScoreDto
 {
-    public class SSTournament
-    {
-        [JsonPropertyName("uniqueTournament")]
-        public UniqueTournament UniqueTournament { get; set; }
-    }
+    public record SSTournament
+    (
+        [property: JsonPropertyName("uniqueTournament")] UniqueTournament UniqueTournament
+    );
 
-    public class UniqueTournament
-    {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
+    public record UniqueTournament
+    (
+        [property: JsonPropertyName("id")] int Id,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("titleHolder")] TournamentTitleHolder TitleHolder,
+        [property: JsonPropertyName("primaryColorHex")] string PrimaryColor,
+        [property: JsonPropertyName("secondaryColorHex")] string SecondaryColor
+    );
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+    public record TournamentTitleHolder
+    (
+        [property: JsonPropertyName("id")] int Id,
+        [property: JsonPropertyName("name")] string Name
+    );
 
-        [JsonPropertyName("titleHolder")]
-        public TournamentTitleHolder TitleHolder { get; set; }
-
-    }
-
-    public class TournamentTitleHolder
-    {
-
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-    }
 }

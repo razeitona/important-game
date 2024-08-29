@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'excitmentscore';
+  src:  url('fonts/excitmentscore.eot?reuua5');
+  src:  url('fonts/excitmentscore.eot?reuua5#iefix') format('embedded-opentype'),
+    url('fonts/excitmentscore.ttf?reuua5') format('truetype'),
+    url('fonts/excitmentscore.woff?reuua5') format('woff'),
+    url('fonts/excitmentscore.svg?reuua5#excitmentscore') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="es-"], [class*=" es-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'excitmentscore' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.es-circle-fill:before {
+  content: "\e900";
+}
+.es-football:before {
+  content: "\1f323";
+}
+.es-table:before {
+  content: "\e901";
+}
+.es-fire:before {
+  content: "\e9a9";
+}

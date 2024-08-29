@@ -1,4 +1,5 @@
-﻿using important_game.ui.Core.Models;
+﻿using important_game.ui.Core;
+using important_game.ui.Core.Models;
 using important_game.ui.Core.SofaScoreDto;
 using important_game.ui.Domain.SofaScoreAPI;
 
@@ -7,9 +8,9 @@ namespace important_game.ui.Domain.LeagueInformation
     internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
     {
 
-        public async Task<League> GetLeagueDataAsync(int leagueId)
+        public async Task<League> GetLeagueDataAsync(MatchImportanceLeague configLeague)
         {
-            var tournament = await _sofaScoreIntegration.GetTournamentAsync(leagueId);
+            var tournament = await _sofaScoreIntegration.GetTournamentAsync(configLeague.LeagueId);
 
             if (tournament?.UniqueTournament == null) { return null; }
 
@@ -19,14 +20,24 @@ namespace important_game.ui.Domain.LeagueInformation
 
             var currentSeason = tournamentSeasons.Seasons.First();
 
+            var uniqueTournament = tournament.UniqueTournament;
+
             var league = new League
             {
-                Id = tournament.UniqueTournament.Id,
-                Name = tournament.UniqueTournament.Name,
+                Id = uniqueTournament.Id,
+                Name = uniqueTournament.Name,
+                LeagueRanking = configLeague.Importance,
                 CurrentSeason = new LeagueSeason
                 {
                     Id = currentSeason.Id,
                     Name = currentSeason.Name
+                },
+                PrimaryColor = uniqueTournament.PrimaryColor,
+                SecondaryColor = uniqueTournament.SecondaryColor,
+                TitleHolder = new Team
+                {
+                    Id = uniqueTournament.TitleHolder.Id,
+                    Name = uniqueTournament.TitleHolder.Name
                 }
             };
 
@@ -193,20 +204,31 @@ namespace important_game.ui.Domain.LeagueInformation
 
             var fixtureScore = new TeamFixtureData();
 
-            foreach (var previousEvent in teamPreviousEvents.Events.Take(lastFixtureAmount))
+            foreach (var previousEvent in teamPreviousEvents.Events.OrderByDescending(c => c.StartTimestamp).Take(lastFixtureAmount))
             {
                 var eventResultData = GetEventResultStatus(teamId, previousEvent);
 
                 if (eventResultData.EventResult == null)
                     continue;
 
-                _ = eventResultData.EventResult switch
+                switch (eventResultData.EventResult)
                 {
-                    EventResultStatusEnum.Win => fixtureScore.Wins += 1,
-                    EventResultStatusEnum.Draw => fixtureScore.Draws += 1,
-                    EventResultStatusEnum.Lost => fixtureScore.Lost += 1,
-                    _ => 0,
-                };
+                    case EventResultStatusEnum.Win:
+                        fixtureScore.FixtureResult.Add("w");
+                        fixtureScore.Wins += 1;
+                        break;
+                    case EventResultStatusEnum.Draw:
+                        fixtureScore.FixtureResult.Add("d");
+                        fixtureScore.Draws += 1;
+                        break;
+                    case EventResultStatusEnum.Lost:
+                        fixtureScore.FixtureResult.Add("l");
+                        fixtureScore.Lost += 1;
+                        break;
+
+                    default:
+                        break;
+                }
 
                 fixtureScore.GoalsFor += eventResultData.GoalsFor;
                 fixtureScore.GoalsAgainst += eventResultData.GoalsAgainst;

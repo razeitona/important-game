@@ -8,5 +8,7 @@
         public Team HomeTeam { get; set; }
         public Team AwayTeam { get; set; }
         public double ExcitementScore { get; set; }
+
+        public Dictionary<string, double> Score { get; set; }
     }
 }
