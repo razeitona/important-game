@@ -21,18 +21,20 @@ namespace important_game.web.Pages
 
         public async Task OnGet()
         {
+
+            List<ExcitementMatch> excitementMatches = null;
             if (System.IO.File.Exists("data.json"))
             {
                 var rawData = await System.IO.File.ReadAllTextAsync("data.json");
                 if (!string.IsNullOrWhiteSpace(rawData))
                 {
-                    Matches = JsonSerializer.Deserialize<ExcitmentMatchResponse>(rawData);
-                    return;
+                    excitementMatches = JsonSerializer.Deserialize<List<ExcitementMatch>>(rawData);
                 }
             }
 
+            if (excitementMatches == null)
+                excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
 
-            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
             if (excitementMatches == null)
                 return;
 
@@ -49,9 +51,7 @@ namespace important_game.web.Pages
 
             Matches.UpcomingMatch = allMatches.OrderByDescending(c => c.ExcitementScore).ToList();
 
-            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(Matches));
-
-
+            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
 
         }
 

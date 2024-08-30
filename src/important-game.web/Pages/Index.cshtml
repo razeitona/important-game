@@ -6,7 +6,13 @@
 @{
     ViewData["Title"] = "Home page";
 }
+<div class="watch-explanation">
+    <p>
+        <b><i>Exciment Score (ES)</i></b> is an indication of how enthusiastic and excited the match might be worth to watch. It takes into consideration different factors such as league table, <i>head to head</i> and many others.
+    </p>
+    <p> With values closer to <i>100</i> it's expected to be an interesting match to watch, while a value closer to <i>0</i> might not be so excited to watch.</p>
 
+</div>
 <div class="match-filter">
     @foreach (var item in Model.Matches.Leagues)
     {
@@ -232,7 +238,7 @@
             var leagueId = $(this).data("league");
             var checked = $(this).data("checked");
 
-            
+
 
             if (checked === undefined) {
                 checked = true;
@@ -256,7 +262,7 @@
                     selectedLeagues.push(leagueId);
                 }
             });
-            
+
             $('.match-card').each(function () {
                 if (selectedLeagues.length > 0) {
                     if ($.inArray($(this).data("league"), selectedLeagues) >= 0) {
