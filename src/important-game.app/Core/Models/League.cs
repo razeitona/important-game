@@ -7,7 +7,7 @@
         public LeagueSeason CurrentSeason { get; set; }
         public Team TitleHolder { get; set; }
         public string PrimaryColor { get; set; }
-        public string SecondaryColor { get; set; }
+        public string BackgroundColor { get; set; }
         public double LeagueRanking { get; set; }
     }
 

@@ -1,4 +1,5 @@
 ﻿@page
+@using System.Globalization
 @using important_game.ui.Core.Models
 
 @model IndexModel
@@ -6,13 +7,28 @@
     ViewData["Title"] = "Home page";
 }
 
+<div class="match-filter">
+    @foreach (var item in Model.Matches.Leagues)
+    {
+        <div class="match-filter-item" data-league="@item.Value.Id">
+            <div>
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + item.Value.Id + "/image")" />
+            </div>
+            <div>
+                @item.Value.Name
+            </div>
+        </div>
+    }
+</div>
 
 <div class="match-content">
 
-    @foreach (var match in Model.Excitements)
+    @if (Model.Matches.TodaysMatch != null)
     {
-        <div class="card match-card">
-            <div class="card-header match-header">
+        var match = Model.Matches.TodaysMatch;
+
+        <div class="card match-card" data-league="@match.League.Id">
+            <div class="card-header match-header" style="background-color:@(match.League.BackgroundColor)">
                 <div>
                     <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
                 </div>
@@ -34,8 +50,101 @@
                         </div>
                     </div>
                     <div class="match-card-teams-item">
-                        <p>@match.MatchDate.ToString("dd/MM/yyyy")</p>
-                        <p>@match.MatchDate.ToString("HH:mm")</p>
+                        <p class="match-card-today">Today's Match</p>
+                        <time>
+                            @match.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                        </time>
+                    </div>
+                    <div class="match-card-teams-item match-card-team">
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
+                        <p>@match.AwayTeam.Name</p>
+                        <div class="match-card-team-lastfixtures">
+                            @for (int i = match.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                            {
+                                var fixtureResult = match.AwayTeam.LastFixtures.FixtureResult[i];
+                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="match-card-content">
+
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">
+                            <i class="es-table"></i>
+                        </div>
+                        <div class="match-card-data-value">
+                            @(match.HomeTeam.Position)º-@(match.AwayTeam.Position)º
+                        </div>
+                    </div>
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">H<span>2</span>H</div>
+                        <div class="match-card-data-value">
+                            @match.HomeTeam.H2hWins-@match.AwayTeam.H2hWins
+                        </div>
+                    </div>
+                    <div class="match-card-data">
+                        <div class="match-card-data-title">
+                            <i class="es-football"></i>
+                        </div>
+                        <div class="match-card-data-value">
+                            @match.HomeTeam.Goals-@match.AwayTeam.Goals
+                        </div>
+                    </div>
+                    <div class="match-card-data match-card-data-es">
+                        <div class="match-card-data-title">
+                            ES
+                            @if (match.ExcitementScore > 0.7d)
+                            {
+                                <i class="es-fire"></i>
+                            }
+                        </div>
+                        <div class="match-card-data-value" title="Excitement Score">
+                            @(Math.Round(match.ExcitementScore * 100, 0))
+                        </div>
+                    </div>
+                </div>
+
+                <div class="match-card-watch">
+                    <label>Worth To Watch</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Math.Round(match.ExcitementScore*100, 0))%" aria-valuenow="@(Math.Round(match.ExcitementScore*100, 0))" aria-valuemin="0" aria-valuemax="100">
+                            @(Math.Round(match.ExcitementScore * 100, 0))%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @foreach (var match in Model.Matches.UpcomingMatch)
+    {
+        <div class="card match-card" data-league="@match.League.Id">
+            <div class="card-header match-header" style="background-color:@(match.League.BackgroundColor)">
+                <div>
+                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
+                </div>
+                <div class="match-header-title" style="color:@(match.League.PrimaryColor)">
+                    @match.League.Name
+                </div>
+            </div>
+            <div class="card-body match-card-body">
+                <div class="match-card-teams">
+                    <div class="match-card-teams-item match-card-team">
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.HomeTeam.Id + "/image")" alt="@(match.HomeTeam.Name)" />
+                        <p>@match.HomeTeam.Name</p>
+                        <div class="match-card-team-lastfixtures">
+                            @for (int i = match.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                            {
+                                var fixtureResult = match.HomeTeam.LastFixtures.FixtureResult[i];
+                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                            }
+                        </div>
+                    </div>
+                    <div class="match-card-teams-item">
+                        <time>
+                            @match.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                        </time>
                     </div>
                     <div class="match-card-teams-item match-card-team">
                         <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
@@ -100,3 +209,65 @@
     }
 </div>
 
+@section Scripts {
+
+    <script>
+
+        $("time").each(function (elem) {
+            var utctimeval = $(this).html().trim();
+            var date = new Date(utctimeval);
+            var optionsDate = {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            };
+            var optionsTime = {
+                hour: "numeric",
+                minute: "numeric",
+            };
+            $(this).html(date.toLocaleString("pt", optionsDate) + "<br/>" + date.toLocaleString("pt", optionsTime));
+        })
+
+        $(".match-filter-item").on("click", function (elem) {
+            var leagueId = $(this).data("league");
+            var checked = $(this).data("checked");
+
+            
+
+            if (checked === undefined) {
+                checked = true;
+            } else {
+                checked = !checked;
+            }
+
+            if (checked) {
+                $(this).addClass("filter-active");
+            } else {
+                $(this).removeClass("filter-active");
+            }
+            $(this).data("checked", checked);
+
+            var selectedLeagues = [];
+
+            $(".match-filter-item").each(function () {
+                var checked = $(this).data("checked");
+                var leagueId = $(this).data("league");
+                if (checked === true) {
+                    selectedLeagues.push(leagueId);
+                }
+            });
+            
+            $('.match-card').each(function () {
+                if (selectedLeagues.length > 0) {
+                    if ($.inArray($(this).data("league"), selectedLeagues) >= 0) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                } else {
+                    $(this).show();
+                }
+            });
+        });
+    </script>
+}

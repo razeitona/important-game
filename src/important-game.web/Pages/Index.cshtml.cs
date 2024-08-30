@@ -1,5 +1,6 @@
 using important_game.ui.Core.Models;
 using important_game.ui.Infrastructure.ImportantMatch;
+using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace important_game.web.Pages
@@ -8,7 +9,7 @@ namespace important_game.web.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IExcitmentMatchProcessor _excitmentMatchProcessor;
-        public List<ExcitementMatch> Excitements { get; private set; } = new List<ExcitementMatch>();
+        public ExcitmentMatchResponse Matches { get; private set; } = new ExcitmentMatchResponse();
 
         public IndexModel(ILogger<IndexModel> logger, IExcitmentMatchProcessor excitmentMatchProcessor)
         {
@@ -21,7 +22,29 @@ namespace important_game.web.Pages
         {
             var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
 
-            Excitements = excitementMatches.OrderByDescending(c => c.ExcitementScore).ThenBy(c => c.MatchDate).ToList();
+            if (excitementMatches == null)
+                return;
+
+            var allMatches = excitementMatches!.Where(c => c.MatchDate > DateTime.UtcNow).OrderBy(c => c.MatchDate).ToList();
+
+            Matches.Leagues = PrepareLeagues(allMatches);
+
+            Matches.TodaysMatch = allMatches?
+                .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(32))?
+                .OrderByDescending(c => c.ExcitementScore)?
+                .FirstOrDefault();
+
+            allMatches.Remove(Matches.TodaysMatch);
+
+            Matches.UpcomingMatch = allMatches.OrderByDescending(c => c.ExcitementScore).ToList();
+
+
+
+        }
+
+        private Dictionary<int, League> PrepareLeagues(List<ExcitementMatch> allMatches)
+        {
+            return allMatches.GroupBy(c => c.League.Id).Select(c => new KeyValuePair<int, League>(c.Key, c.First().League)).ToDictionary();
         }
     }
 }

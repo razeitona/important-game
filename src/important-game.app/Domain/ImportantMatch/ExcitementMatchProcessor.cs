@@ -88,7 +88,7 @@ namespace important_game.ui.Domain.ImportantMatch
                     Id = league.Id,
                     Name = league.Name,
                     PrimaryColor = league.PrimaryColor,
-                    SecondaryColor = league.SecondaryColor,
+                    BackgroundColor = league.BackgroundColor,
                 };
 
                 matchImportanceResult.Add(matchImportance);

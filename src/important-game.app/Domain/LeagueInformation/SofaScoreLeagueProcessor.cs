@@ -32,8 +32,8 @@ namespace important_game.ui.Domain.LeagueInformation
                     Id = currentSeason.Id,
                     Name = currentSeason.Name
                 },
-                PrimaryColor = uniqueTournament.PrimaryColor,
-                SecondaryColor = uniqueTournament.SecondaryColor,
+                PrimaryColor = configLeague.PrimaryColor,
+                BackgroundColor = configLeague.BackgroundColor,
                 TitleHolder = new Team
                 {
                     Id = uniqueTournament.TitleHolder.Id,
@@ -62,7 +62,7 @@ namespace important_game.ui.Domain.LeagueInformation
 
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
-                if (gameStartTime > currentDate && currentDate.AddDays(10) > gameStartTime)
+                if (gameStartTime > currentDate && currentDate.AddDays(5) > gameStartTime)
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
