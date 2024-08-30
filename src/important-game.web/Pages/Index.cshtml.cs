@@ -2,6 +2,7 @@ using important_game.ui.Core.Models;
 using important_game.ui.Infrastructure.ImportantMatch;
 using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace important_game.web.Pages
 {
@@ -20,8 +21,18 @@ namespace important_game.web.Pages
 
         public async Task OnGet()
         {
-            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
+            if (System.IO.File.Exists("data.json"))
+            {
+                var rawData = await System.IO.File.ReadAllTextAsync("data.json");
+                if (!string.IsNullOrWhiteSpace(rawData))
+                {
+                    Matches = JsonSerializer.Deserialize<ExcitmentMatchResponse>(rawData);
+                    return;
+                }
+            }
 
+
+            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
             if (excitementMatches == null)
                 return;
 
@@ -37,6 +48,8 @@ namespace important_game.web.Pages
             allMatches.Remove(Matches.TodaysMatch);
 
             Matches.UpcomingMatch = allMatches.OrderByDescending(c => c.ExcitementScore).ToList();
+
+            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(Matches));
 
 
 
