@@ -43,11 +43,28 @@ namespace important_game.web.Pages
             Matches.Leagues = PrepareLeagues(allMatches);
 
             Matches.TodaysMatch = allMatches?
-                .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(32))?
+                .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(4))?
                 .OrderByDescending(c => c.ExcitementScore)?
                 .FirstOrDefault();
 
-            allMatches.Remove(Matches.TodaysMatch);
+            if (Matches.TodaysMatch == null)
+            {
+                Matches.TodaysMatch = allMatches?
+                .Where(c => c.MatchDate.Date == DateTime.UtcNow.Date)?
+                .OrderByDescending(c => c.ExcitementScore)?
+                .FirstOrDefault();
+            }
+
+            if (Matches.TodaysMatch == null)
+            {
+                Matches.TodaysMatch = allMatches?
+                .Where(c => c.MatchDate.Date <= DateTime.UtcNow.AddHours(32))?
+                .OrderByDescending(c => c.ExcitementScore)?
+                .FirstOrDefault();
+            }
+
+            if (Matches.TodaysMatch != null)
+                allMatches.Remove(Matches.TodaysMatch);
 
             Matches.UpcomingMatch = allMatches.OrderByDescending(c => c.ExcitementScore).ToList();
 
