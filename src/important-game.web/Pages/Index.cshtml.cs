@@ -33,48 +33,73 @@ namespace important_game.web.Pages
             }
 
             if (excitementMatches == null)
+            {
                 excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
 
-            if (excitementMatches == null)
-                return;
+                if (excitementMatches == null)
+                    return;
+                else
+                    await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
+            }
 
-            var allMatches = excitementMatches!.Where(c => c.MatchDate > DateTime.UtcNow).OrderBy(c => c.MatchDate).ToList();
+
+            var allMatches = excitementMatches!.OrderBy(c => c.MatchDate.Date >= DateTime.UtcNow.Date).OrderBy(c => c.MatchDate).ToList();
 
             Matches.Leagues = PrepareLeagues(allMatches);
 
-            Matches.TodaysMatch = allMatches?
-                .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(4))?
-                .OrderByDescending(c => c.ExcitementScore)?
-                .FirstOrDefault();
+            SetLiveGames(allMatches);
+            SetTodaysBestMatch(allMatches);
 
-            if (Matches.TodaysMatch == null)
+            Matches.UpcomingMatch = allMatches.Where(c => c.MatchDate > DateTime.UtcNow).OrderByDescending(c => c.ExcitementScore).ToList();
+
+
+        }
+
+        private void SetLiveGames(List<ExcitementMatch> allMatches)
+        {
+            Matches.LiveGames = allMatches?
+             .Where(c => c.MatchDate < DateTime.UtcNow && c.MatchDate > DateTime.UtcNow.AddMinutes(-110))
+             .OrderByDescending(c => c.ExcitementScore).ToList();
+
+            allMatches.RemoveAll(c => Matches.LiveGames.Contains(c));
+        }
+
+        private void SetTodaysBestMatch(List<ExcitementMatch>? allMatches)
+        {
+            var upcomingMatches = allMatches.Where(c => c.MatchDate > DateTime.UtcNow).ToList();
+
+            Matches.TodaysBestMatch = upcomingMatches?
+             .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(4))?
+             .OrderByDescending(c => c.ExcitementScore)?
+             .FirstOrDefault();
+
+            if (Matches.TodaysBestMatch == null)
             {
-                Matches.TodaysMatch = allMatches?
-                .Where(c => c.MatchDate.Date == DateTime.UtcNow.Date)?
-                .OrderByDescending(c => c.ExcitementScore)?
-                .FirstOrDefault();
+                Matches.TodaysBestMatch = upcomingMatches?
+               .Where(c => c.MatchDate.Date == DateTime.UtcNow.Date)?
+               .OrderByDescending(c => c.ExcitementScore)?
+               .FirstOrDefault();
             }
 
-            if (Matches.TodaysMatch == null)
+            if (Matches.TodaysBestMatch == null)
             {
-                Matches.TodaysMatch = allMatches?
+                Matches.TodaysBestMatch = upcomingMatches?
                 .Where(c => c.MatchDate.Date <= DateTime.UtcNow.AddHours(32))?
                 .OrderByDescending(c => c.ExcitementScore)?
                 .FirstOrDefault();
             }
 
-            if (Matches.TodaysMatch != null)
-                allMatches.Remove(Matches.TodaysMatch);
-
-            Matches.UpcomingMatch = allMatches.OrderByDescending(c => c.ExcitementScore).ToList();
-
-            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
-
+            if (Matches.TodaysBestMatch != null)
+                allMatches.Remove(Matches.TodaysBestMatch);
         }
 
         private Dictionary<int, League> PrepareLeagues(List<ExcitementMatch> allMatches)
         {
-            return allMatches.GroupBy(c => c.League.Id).Select(c => new KeyValuePair<int, League>(c.Key, c.First().League)).ToDictionary();
+            return allMatches
+                .GroupBy(c => c.League.Id)
+                .Select(c => new KeyValuePair<int, League>(c.Key, c.First().League))
+                .OrderBy(c => c.Key)
+                .ToDictionary();
         }
     }
 }

@@ -20,14 +20,14 @@ html {
 }
 
 .page-title {
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
+
     span {
 
-        &.subtitle{
-        font-size: 10px;
-        align-self: flex-end;
-
+        &.subtitle {
+            font-size: 10px;
+            align-self: flex-end;
         }
     }
 }
@@ -38,7 +38,6 @@ html {
 }
 
 body {
-
     margin-bottom: 60px;
 }
 
@@ -50,11 +49,13 @@ body {
         margin: 0.5rem;
     }
 }
-.watch-explanation{
-    font-size:10px;
-    margin:0 8px 10px;
-    p{
-        margin:2px 0;
+
+.watch-explanation {
+    font-size: 10px;
+    margin: 0 0 10px;
+
+    p {
+        margin: 2px 0;
     }
 }
 
@@ -62,6 +63,24 @@ body {
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 10px;
+
+    .match-filter-type-item {
+        cursor: pointer;
+        display: flex;
+        margin: 5px;
+        border: 2px solid $text-color;
+        border-radius: 5px;
+        padding: 0 8px;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+
+        &.filter-active {
+            background-color: #2a901d;
+            color: $background-color;
+        }
+    }
 
     .match-filter-item {
         cursor: pointer;
@@ -73,6 +92,7 @@ body {
         align-content: center;
         align-items: center;
         justify-content: center;
+        font-size: 12px;
 
         div {
             display: flex;
@@ -148,6 +168,10 @@ body {
                         font-size: 10px;
                         text-align: center;
                         margin: 5px !important;
+
+                        &.match-live {
+                            color: #ff0000;
+                        }
                     }
                 }
 

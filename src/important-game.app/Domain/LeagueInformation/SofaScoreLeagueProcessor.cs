@@ -62,7 +62,7 @@ namespace important_game.ui.Domain.LeagueInformation
 
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
-                if (gameStartTime > currentDate && currentDate.AddDays(5) > gameStartTime)
+                if (gameStartTime > currentDate.AddHours(-3) && currentDate.AddDays(5) > gameStartTime)
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
