@@ -3,7 +3,7 @@
 namespace important_game.ui.Core.SofaScoreDto
 {
     public record SSTournamentEvents(
-        [property: JsonPropertyName("events")] IReadOnlyList<SSEvent> Events,
+        [property: JsonPropertyName("events")] List<SSEvent> Events,
         [property: JsonPropertyName("hasNextPage")] bool? HasNextPage
     );
     public record SSEvent(

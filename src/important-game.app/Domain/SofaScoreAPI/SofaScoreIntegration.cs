@@ -6,6 +6,18 @@ namespace important_game.ui.Domain.SofaScoreAPI
 {
     internal class SofaScoreIntegration(HttpClient httpClient) : ISofaScoreIntegration
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sportId"></param>
+        /// <param name="date">yyyy-MM</param>
+        /// <returns></returns>
+        public async Task<SSSportTournaments> GetSportTournamentAsync(string sportId, DateTime date)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/calendar/{date.ToString("yyyy-MM")}/3600/{sportId}/unique-tournaments";
+            return await Invoke<SSSportTournaments>(url);
+        }
+
 
         public async Task<SSTournament> GetTournamentAsync(int tournamentId)
         {
@@ -28,6 +40,12 @@ namespace important_game.ui.Domain.SofaScoreAPI
         public async Task<SSTournamentEvents> GetTournamentUpcomingSeasonEventsAsync(int tournamentId, int seasonId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/events/next/0";
+            return await Invoke<SSTournamentEvents>(url);
+        }
+
+        public async Task<SSTournamentEvents> GetTournamentOngoingSeasonEventsAsync(int tournamentId, int seasonId)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}/season/{seasonId}/events/last/0";
             return await Invoke<SSTournamentEvents>(url);
         }
 

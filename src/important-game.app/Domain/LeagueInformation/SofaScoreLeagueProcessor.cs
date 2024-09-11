@@ -8,6 +8,43 @@ namespace important_game.ui.Domain.LeagueInformation
     internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
     {
 
+
+        public async Task<List<int>> GetUpcomingTournamentsAsync(string sportEvent, DateTime upcomingStartDate, DateTime upcomingEndDate)
+        {
+            List<int> upcomingEvents = new List<int>();
+
+            var ongoingEvents = await _sofaScoreIntegration.GetSportTournamentAsync(sportEvent, upcomingStartDate);
+
+            HashSet<DateTime> upcomingDates = new HashSet<DateTime>();
+
+            //Prepare upcoming dates
+            while (true)
+            {
+                upcomingDates.Add(upcomingStartDate);
+
+                if (upcomingStartDate.Date >= upcomingEndDate)
+                {
+                    break;
+                }
+
+                upcomingStartDate = upcomingStartDate.AddDays(1);
+            }
+
+
+            if (ongoingEvents?.DailyUniqueTournaments != null)
+            {
+                foreach (var validDate in upcomingDates)
+                {
+                    upcomingEvents.AddRange(ongoingEvents.DailyUniqueTournaments
+                        .Where(c => c.Date == validDate.ToString("yyyy-MM-dd"))
+                        .SelectMany(c => c.UniqueTournamentIds));
+                }
+            }
+
+            return upcomingEvents.Distinct().ToList();
+
+        }
+
         public async Task<League> GetLeagueDataAsync(MatchImportanceLeague configLeague)
         {
             var tournament = await _sofaScoreIntegration.GetTournamentAsync(configLeague.LeagueId);
@@ -16,7 +53,7 @@ namespace important_game.ui.Domain.LeagueInformation
 
             var tournamentSeasons = await _sofaScoreIntegration.GetTournamentSeasonsAsync(tournament.UniqueTournament.Id);
 
-            if (tournamentSeasons?.Seasons.Count == 0) { return null; }
+            if (tournamentSeasons?.Seasons?.Count == 0) { return null; }
 
             var currentSeason = tournamentSeasons.Seasons.First();
 
@@ -34,12 +71,17 @@ namespace important_game.ui.Domain.LeagueInformation
                 },
                 PrimaryColor = configLeague.PrimaryColor,
                 BackgroundColor = configLeague.BackgroundColor,
-                TitleHolder = new Team
+            };
+
+            if (uniqueTournament.TitleHolder != null)
+            {
+
+                league.TitleHolder = new Team
                 {
                     Id = uniqueTournament.TitleHolder.Id,
                     Name = uniqueTournament.TitleHolder.Name
-                }
-            };
+                };
+            }
 
             return league;
         }
@@ -53,6 +95,10 @@ namespace important_game.ui.Domain.LeagueInformation
             if (upcomingSeasonFixturesData?.Events == null || upcomingSeasonFixturesData.Events.Count == 0)
                 return upcomingFixtures;
 
+            var onGoingEventsFixtureData = await _sofaScoreIntegration.GetTournamentOngoingSeasonEventsAsync(leagueId, seasonId);
+            if (onGoingEventsFixtureData?.Events != null || onGoingEventsFixtureData.Events?.Count > 0)
+                upcomingSeasonFixturesData.Events.AddRange(onGoingEventsFixtureData.Events);
+
             var currentDate = DateTime.UtcNow;
 
             foreach (var leagueEvent in upcomingSeasonFixturesData.Events)
@@ -62,7 +108,8 @@ namespace important_game.ui.Domain.LeagueInformation
 
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
-                if (gameStartTime > currentDate.AddHours(-3) && currentDate.AddDays(5) > gameStartTime)
+                //AddDays(5)
+                if (gameStartTime > currentDate.AddHours(-3) && currentDate.AddDays(2) > gameStartTime)
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
@@ -116,8 +163,8 @@ namespace important_game.ui.Domain.LeagueInformation
             {
                 LeagueId = leagueId,
                 Standings = new List<Standing>(),
-                CurrentRound = leagueRoundsData.CurrentRound.Round,
-                TotalRounds = leagueRoundsData.Rounds.Count
+                CurrentRound = leagueRoundsData.CurrentRound?.Round ?? 0,
+                TotalRounds = leagueRoundsData.Rounds?.Count ?? 0
             };
 
             try
@@ -199,7 +246,7 @@ namespace important_game.ui.Domain.LeagueInformation
         {
             var teamPreviousEvents = await _sofaScoreIntegration.GetTeamPreviousEventsAsync(teamId);
 
-            if (teamPreviousEvents == null || teamPreviousEvents.Events.Count == 0)
+            if (teamPreviousEvents == null || teamPreviousEvents.Events?.Count == 0)
                 return null;
 
             var fixtureScore = new TeamFixtureData();
@@ -268,7 +315,6 @@ namespace important_game.ui.Domain.LeagueInformation
 
             return (eventScore, teamScore, oppositeTeamScore);
         }
-
 
     }
 }

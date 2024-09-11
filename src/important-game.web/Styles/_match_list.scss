@@ -1,0 +1,96 @@
+﻿.match-block {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    width: 100%;
+
+    .match-block-header {
+        display: flex;
+        flex-direction: row;
+        font-weight: bold;
+        background-color: $background-color;
+        border: 1px solid rgba(0, 0, 0, .125);
+        border-radius: .25rem .25rem 0rem 0rem;
+        padding: 5px;
+
+        img {
+            width: 24px;
+            margin: 0px 10px 0px 0px;
+        }
+    }
+
+    .match-block-content {
+        display: flex;
+        flex-direction: row;
+        font-size: 12px;
+        background-color: #2a2a33;
+        color: #FFFAFA;
+        padding: 5px 10px 5px 0px;
+        border-radius: 0rem 0rem .25rem .25rem;
+        font-weight: 400;
+
+        .match-block-time {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+            text-align: center;
+        }
+
+        .match-block-item {
+            padding: 0px 10px 0px 0px;
+            align-content: center;
+
+            .match-block-team {
+                display: flex;
+                flex-direction: row;
+                padding: 5px 0px;
+                font-size: 14px;
+
+                img {
+                    width: 24px;
+                    margin: 0 10px;
+                }
+
+
+                .match-card-team-lastfixtures {
+                    font-size: 12px;
+
+
+
+
+                    .match-result-w {
+                        color: #146d13;
+                    }
+
+                    .match-result-d {
+                        color: $text-color;
+                    }
+
+                    .match-result-l {
+                        color: #ff0000;
+                    }
+                }
+            }
+        }
+
+        .match-block-data-es {
+            display: flex;
+            align-items: flex-end;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+
+            i {
+                background: $fire-color;
+                -webkit-background-clip: text;
+                -moz-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .match-block-data-value {
+                text-align: center;
+            }
+        }
+    }
+}

@@ -30,4 +30,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Styles\_card.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Styles\_match_list.scss" />
+  </ItemGroup>
+
 </Project>

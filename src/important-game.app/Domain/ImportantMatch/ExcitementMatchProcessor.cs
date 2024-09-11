@@ -19,13 +19,28 @@ namespace important_game.ui.Domain.ImportantMatch
 
             List<Task> leagueTasks = new List<Task>();
 
-            //Process all the leagues to identify the excitement match rating for each
-            foreach (var configLeague in options.Leagues)
+            var upcomingStartDate = DateTime.UtcNow;
+            var upcomingEndDate = DateTime.UtcNow.AddDays(2);
+            var upcomingTournaments = await leagueProcessor.GetUpcomingTournamentsAsync("football", upcomingStartDate, upcomingEndDate);
+
+            foreach (var tournamentId in upcomingTournaments)
             {
+                MatchImportanceLeague configLeague = null;
+
+                if (options.Leagues.ContainsKey(tournamentId))
+                    configLeague = options.Leagues[tournamentId];
+                else
+                    configLeague = options.Leagues[0];
+
+                //Process all the leagues to identify the excitement match rating for each
                 Console.WriteLine($"{configLeague.Name}");
 
-                leagueTasks.Add(ProcessLeagueExcitmentMatchAsync(configLeague, matches));
+                var newConfigLeague = new MatchImportanceLeague(tournamentId, configLeague.Name, configLeague.Importance, configLeague.PrimaryColor, configLeague.BackgroundColor);
+
+                leagueTasks.Add(ProcessLeagueExcitmentMatchAsync(newConfigLeague, matches));
+
             }
+
 
             await Task.WhenAll(leagueTasks);
 
@@ -36,7 +51,6 @@ namespace important_game.ui.Domain.ImportantMatch
         {
             try
             {
-
                 var league = await leagueProcessor.GetLeagueDataAsync(configLeague);
 
                 Console.WriteLine($"Start to process {league.Name} for season {league.CurrentSeason.Name}");
@@ -117,9 +131,13 @@ namespace important_game.ui.Domain.ImportantMatch
             // 0.1×FN
             //fixture Number (fixtureNumber / total Fixtures)
             double fixtureValue = 1d;
-            if (leagueTable != null)
+            if (leagueTable != null && leagueTable.TotalRounds > 0)
             {
                 fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * fixtureCoef;
+            }
+            else
+            {
+                fixtureValue = fixtureValue * fixtureCoef;
             }
 
             //double fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.2d;

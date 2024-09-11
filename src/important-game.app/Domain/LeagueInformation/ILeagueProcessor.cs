@@ -6,6 +6,14 @@ namespace important_game.ui.Domain.LeagueInformation
     public interface ILeagueProcessor
     {
         /// <summary>
+        /// Fetch upcoming tournaments in event based date
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="upcomingStartDate"></param>
+        /// <param name="upcomingEndDate"></param>
+        /// <returns></returns>
+        Task<List<int>> GetUpcomingTournamentsAsync(string sportEvent, DateTime upcomingStartDate, DateTime upcomingEndDate);
+        /// <summary>
         /// Fetch league data information from SofaScore
         /// </summary>
         /// <param name="leagueId">League Identifier</param>
