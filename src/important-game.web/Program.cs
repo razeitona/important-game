@@ -1,4 +1,4 @@
-using important_game.ui;
+using important_game.infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +9,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSassCompiler();
 #endif
 
-builder.Services.MatchImportanceDependency();
+builder.Services.MatchImportanceInfrastructure();
 
 var app = builder.Build();
 

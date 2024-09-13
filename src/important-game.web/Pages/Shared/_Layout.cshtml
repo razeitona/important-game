@@ -7,29 +7,25 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/esfont.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/important_game.web.styles.css" asp-append-version="true" />
 </head>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0WMDDFZYCB"></script>
+@* <script async src="https://www.googletagmanager.com/gtag/js?id=G-0WMDDFZYCB"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-0WMDDFZYCB');
-</script>
+</script> *@
+
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand page-title" asp-area="" asp-page="/Index">
-                    <span>Most exciting matches to watch</span>
-                    @* <span class="subtitle">Powered by AI</span> *@
+                    <span>Match to watch</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
             </div>
         </nav>
     </header>
@@ -38,6 +34,7 @@
             @RenderBody()
         </main>
     </div>
+    <input type="hidden" id="clientTime" name="clientTime" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

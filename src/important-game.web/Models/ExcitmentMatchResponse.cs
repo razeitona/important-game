@@ -1,4 +1,4 @@
-﻿using important_game.ui.Core.Models;
+﻿using important_game.infrastructure.ImportantMatch.Models;
 
 namespace important_game.web.Models
 {

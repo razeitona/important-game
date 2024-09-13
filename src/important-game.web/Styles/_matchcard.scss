@@ -1,0 +1,229 @@
+﻿
+
+.match-content {
+    display: flex;
+    flex-wrap: wrap;
+
+    > .match-card {
+        margin: 0.5rem;
+    }
+}
+
+.match-filter {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+
+    .match-filter-type-item {
+        cursor: pointer;
+        display: flex;
+        margin: 5px;
+        border: 2px solid $text-color;
+        border-radius: 5px;
+        padding: 0 8px;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+
+        &.filter-active {
+            background-color: #2a901d;
+            color: $background-color;
+        }
+    }
+
+    .match-filter-item {
+        cursor: pointer;
+        display: flex;
+        margin: 5px;
+        border: 2px solid $text-color;
+        border-radius: 5px;
+        padding: 0 8px;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+
+        div {
+            display: flex;
+            padding: 0 2px;
+        }
+
+        img {
+            width: 1rem;
+        }
+
+        &.filter-active {
+            background-color: #bcbcbc;
+        }
+    }
+}
+
+.match-card {
+    width: 19rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #2a2a33;
+    color: #FFFAFA;
+
+
+    .match-header {
+        padding: 0.1rem 0.8rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: $background-color;
+
+        div {
+        }
+
+        img {
+            width: 1.5rem;
+        }
+
+        .match-header-title {
+            padding: 0 0.2rem;
+            font-size: 14px;
+            color: $text-color;
+            font-weight: bold;
+        }
+    }
+
+
+    .match-card-body {
+
+        .match-card-teams {
+            display: flex;
+            flex-direction: row;
+            font-size: 12px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            height: 8rem;
+
+            time {
+                text-align: center;
+            }
+
+            .match-card-teams-item {
+                padding: 0px 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                p {
+                    margin: 0;
+
+                    &.match-card-today {
+                        font-size: 10px;
+                        text-align: center;
+                        margin: 5px !important;
+
+                        &.match-live {
+                            color: #ff0000;
+                        }
+                    }
+                }
+
+
+
+
+                &.match-card-team {
+                    width: 10rem;
+
+                    img {
+                        width: 60px;
+                        max-width: 60px;
+                    }
+
+                    p {
+                        margin-top: 10px;
+                        overflow: hidden;
+                        text-align: center;
+                    }
+
+
+                    .match-card-team-lastfixtures {
+                        font-size: 6px;
+
+
+
+
+                        .match-result-w {
+                            color: #146d13;
+                        }
+
+                        .match-result-d {
+                            color: $text-color;
+                        }
+
+                        .match-result-l {
+                            color: #ff0000;
+                        }
+                    }
+
+
+                    @media (min-width: 768px) {
+                        .match-card-team-lastfixtures {
+                            font-size: 10px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .match-card-content {
+            display: flex;
+            flex-grow: 1;
+
+            .match-card-data {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex-grow: 1;
+
+                .match-card-data-title {
+                    font-size: 16px;
+                    font-weight: lighter;
+
+
+                    span {
+                        font-size: 12px;
+                    }
+
+                    i {
+                        font-size: 18px;
+                    }
+                }
+
+                .match-card-data-value {
+                    font-weight: bold;
+                    font-size: 18px;
+                }
+
+                &.match-card-data-es {
+                    .match-card-data-title {
+                        i {
+                            font-size: 8px;
+                            background: $fire-color;
+                            -webkit-background-clip: text;
+                            -moz-background-clip: text;
+                            background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        }
+                    }
+                }
+            }
+        }
+
+        .match-card-watch {
+            display: none;
+
+            label {
+                font-size: 10px;
+                color: #FFFAFA;
+                font-weight: bold;
+            }
+        }
+    }
+}

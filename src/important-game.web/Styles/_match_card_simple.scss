@@ -1,0 +1,147 @@
+﻿
+.match-card-simple {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to right, #3a3d3f, #2a2a33);
+    /*background-color: #2a2a33;*/
+    color: #FFFAFA;
+    border-radius: 10px;
+    margin-top: 10px;
+    flex-grow: 1;
+    font-size: 12px;
+    font-weight: bold;
+
+    &.hide{
+        display:none;
+    }
+
+    .match-header {
+        display: flex;
+        padding: 0.4rem 0.8rem;
+        flex-direction: row;
+        align-items: center;
+        background-color: #ffffff;
+        border-radius: 8px 8px 0px 0px;
+
+        img {
+            width: 1.2rem;
+        }
+
+        .match-header-title {
+            padding: 0 0.2rem;
+            flex-grow: 1;
+        }
+    }
+
+
+    .match-card-body {
+        display: flex;
+        flex-direction: row;
+        font-size: 10px;
+
+
+        .match-card-teams {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 8px;
+
+            .match-card-team {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+
+                img {
+                    width: 2rem;
+                    max-width: 2rem;
+                }
+
+                .match-card-team-name {
+                    font-size: 0.8rem;
+                    text-transform:uppercase;
+                }
+            }
+        }
+
+        .match-card-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+
+            .match-card-data-value {
+                text-align: center;
+                font-weight: bold;
+                font-size: 1.5rem;
+            }
+        }
+
+        &.teams-content-score {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            padding: 5px 0px 0px 0px;
+
+            .match-card-data-title {
+                font-size: 10px;
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: center;
+
+                i {
+                    padding-left: 1px;
+                    background: $fire-color;
+                    -webkit-background-clip: text;
+                    -moz-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+            }
+        }
+
+        .match-card-content {
+            display: flex;
+            flex-grow: 1;
+
+            .match-card-data {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex-grow: 1;
+
+                .match-card-data-title {
+                    font-size: 1rem;
+                    font-weight: lighter;
+
+
+                    span {
+                        font-size: 0.8rem;
+                    }
+
+                    i {
+                        font-size: 1rem;
+                    }
+                }
+
+                .match-card-data-value {
+                    font-weight: bold;
+                    font-size: 1rem;
+                }
+
+                &.match-card-data-es {
+                    .match-card-data-title {
+                        i {
+                            font-size: 0.8rem;
+                            background: $fire-color;
+                            -webkit-background-clip: text;
+                            -moz-background-clip: text;
+                            background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

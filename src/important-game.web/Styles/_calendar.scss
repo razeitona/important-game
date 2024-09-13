@@ -1,0 +1,30 @@
+﻿.match-calendar {
+    display: flex;
+
+    .match-calendar-month {
+        display: flex;
+        flex-direction: column;
+        text-transform: uppercase;
+        
+        .match-calendar-day {
+            display: flex;
+            flex-direction: row;
+
+            &-item {
+                border: 2px solid $text-color;
+                padding: 10px;
+                margin: 5px;
+                border-radius: 8px;
+
+                &.day-active {
+                    border-color: #c01f1f;
+                    color: #c01f1f;
+                }
+
+                .calendar-day {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+}

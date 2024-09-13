@@ -5,7 +5,9 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "important-game.app", "src\important-game.app\important-game.app.csproj", "{7164CA71-3268-4F27-9DFA-14D6DDB8F621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "important-game.web", "src\important-game.web\important-game.web.csproj", "{F964B470-5B4A-404D-BAC3-16AD214DF386}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "important-game.web", "src\important-game.web\important-game.web.csproj", "{F964B470-5B4A-404D-BAC3-16AD214DF386}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "important-game.infrastructure", "src\important-game.infrastructure\important-game.infrastructure.csproj", "{BC795450-6C54-482B-88F9-4D58BC4BD90A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F964B470-5B4A-404D-BAC3-16AD214DF386}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F964B470-5B4A-404D-BAC3-16AD214DF386}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F964B470-5B4A-404D-BAC3-16AD214DF386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC795450-6C54-482B-88F9-4D58BC4BD90A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC795450-6C54-482B-88F9-4D58BC4BD90A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC795450-6C54-482B-88F9-4D58BC4BD90A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC795450-6C54-482B-88F9-4D58BC4BD90A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

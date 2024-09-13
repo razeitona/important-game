@@ -1,0 +1,221 @@
+﻿
+.match-card {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to right, #3a3d3f, #2a2a33);
+    /*background-color: #2a2a33;*/
+    color: #FFFAFA;
+    border-radius: 10px;
+    max-width: 300px;
+
+
+    .match-header {
+        padding: 0.2rem 0.8rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #ffffff;
+        border-radius: 8px 8px 0px 0px;
+
+        div {
+        }
+
+        img {
+            width: 1.5rem;
+        }
+
+        .match-header-title {
+            padding: 0 0.2rem;
+            font-size: 14px;
+            color: $text-color;
+            font-weight: bold;
+        }
+    }
+
+
+    .match-card-body {
+        .match-card-time {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .match-card-teams {
+            display: flex;
+            flex-direction: row;
+            font-size: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            height: 8rem;
+
+            time {
+                text-align: center;
+            }
+
+            .match-card-teams-item {
+                padding: 0px 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                p {
+                    margin: 0;
+                    text-transform:uppercase;
+
+                    &.match-card-today {
+                        font-size: 10px;
+                        text-align: center;
+                        margin: 5px !important;
+
+                        &.match-live {
+                            color: #ff0000;
+                        }
+                    }
+                }
+
+
+                &.match-card-team {
+                    width: 10rem;
+
+                    img {
+                        width: 4rem;
+                    }
+
+                    p {
+                        margin-top: 5px;
+                        overflow: hidden;
+                        text-align: center;
+                    }
+
+
+                    .match-card-team-lastfixtures {
+                        font-size: 0.6rem;
+                        margin: 0.4rem 0;
+
+                        .match-result-w {
+                            color: #146d13;
+                        }
+
+                        .match-result-d {
+                            color: $text-color;
+                        }
+
+                        .match-result-l {
+                            color: #ff0000;
+                        }
+                    }
+
+
+                    @media (min-width: 768px) {
+                        .match-card-team-lastfixtures {
+                            font-size: 10px;
+                        }
+                    }
+                }
+
+
+                .match-card-teams-content {
+                    .match-card-teams-content-item {
+                        display: flex;
+                        flex-direction: row;
+
+
+
+                        &.teams-content-score {
+                            display: flex;
+                            flex-direction: column;
+                            text-align: center;
+                            padding: 5px 0px 0px 0px;
+
+                            .match-card-data-title {
+                                font-size: 10px;
+                                display: flex;
+                                flex-wrap: nowrap;
+                                justify-content: center;
+
+                                i {
+                                    padding-left: 1px;
+                                    background: $fire-color;
+                                    -webkit-background-clip: text;
+                                    -moz-background-clip: text;
+                                    background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                }
+                            }
+                        }
+
+                        span {
+                            padding: 0 5px;
+                            padding: 0.4rem;
+                            border-width: 0;
+                            border-style: solid;
+                            border-width: 0px 0px 2px 0px;
+                            border-color: #ffffff;
+
+                            &.title {
+                                justify-content: center;
+                                display: flex;
+                                flex-grow: 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .match-card-content {
+            display: flex;
+            flex-grow: 1;
+
+            .match-card-data {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex-grow: 1;
+
+                .match-card-data-title {
+                    font-size: 1rem;
+                    font-weight: lighter;
+
+
+                    span {
+                        font-size: 0.8rem;
+                    }
+
+                    i {
+                        font-size: 1rem;
+                    }
+                }
+
+                .match-card-data-value {
+                    font-weight: bold;
+                    font-size: 1rem;
+                }
+
+                &.match-card-data-es {
+                    .match-card-data-title {
+                        i {
+                            font-size: 0.8rem;
+                            background: $fire-color;
+                            -webkit-background-clip: text;
+                            -moz-background-clip: text;
+                            background-clip: text;
+                            -webkit-text-fill-color: transparent;
+                        }
+                    }
+                }
+            }
+        }
+
+        .match-card-watch {
+            display: none;
+
+            label {
+                font-size: 10px;
+                color: #FFFAFA;
+                font-weight: bold;
+            }
+        }
+    }
+}

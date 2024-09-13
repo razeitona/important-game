@@ -1,0 +1,75 @@
+﻿@page
+@using System.Globalization
+@model CalendarModel
+@{
+    ViewData["Title"] = "Excitment Matches";
+}
+
+<div class="match-calendar">
+    @foreach (var month in Model.Matches.Dates)
+    {
+        <div class="match-calendar-month">
+            <h1>@month.Month.ToString("MMMM")</h1>
+            <div class="match-calendar-day">
+                @{
+                    var index = 0;
+                    foreach (var day in month.Days)
+                    {
+
+                        <div class="match-calendar-day-item @(index == 0 ? "day-active" : "")" data-day="@day.Key.ToString("MMMdd")">
+                            <span class="calendar-day">@day.Key.ToString("dd")</span>
+                        </div>
+                        index++;
+                    }
+
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@foreach (var month in Model.Matches.Dates)
+{
+    foreach (var day in month.Days)
+    {
+        foreach (var match in day.Value)
+        {
+            <partial name="_MatchSimpleCard" for="@match" />
+        }
+    }
+}
+
+@section Scripts {
+
+    <script>
+
+        $("time").each(function (elem) {
+            var utctimeval = $(this).html().trim();
+            var date = new Date(utctimeval);
+            var optionsDate = {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            };
+            var optionsTime = {
+                hour: "numeric",
+                minute: "numeric",
+            };
+            $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+        });
+
+        $(".match-calendar-day-item").on("click", function () {
+            var selectedDate = $(this).data("day");
+
+            $(".match-card-simple").each(function (idx, elem) {
+                var itemDay = $(elem).data("game-day");
+                if (selectedDate === itemDay) {
+                    console.log(itemDay);
+                    $(elem).removeClass("hide");
+                } else {
+                    $(elem).addClass("hide");
+                }
+            });
+        });
+    </script>
+}

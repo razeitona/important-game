@@ -1,11 +1,12 @@
 ﻿using BetterConsoleTables;
-using important_game.ui;
+using important_game.infrastructure;
+using important_game.infrastructure.ImportantMatch;
 using important_game.ui.Infrastructure.ImportantMatch;
 using Microsoft.Extensions.DependencyInjection;
 
 IServiceCollection services = new ServiceCollection();
 
-services.MatchImportanceDependency();
+services.MatchImportanceInfrastructure();
 
 var serviceProvider = services.BuildServiceProvider();
 var matchProcessor = serviceProvider.GetService<IExcitmentMatchProcessor>();
@@ -16,7 +17,7 @@ Console.WriteLine("==========================");
 Console.WriteLine("Analyzing the following leagues:");
 
 
-var excitementMatches = await matchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
+var excitementMatches = await matchProcessor.GetUpcomingExcitementMatchesAsync(new ExctimentMatchOptions());
 
 
 Console.Clear();

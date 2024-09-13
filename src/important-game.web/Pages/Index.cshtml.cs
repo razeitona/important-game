@@ -1,105 +1,65 @@
-using important_game.ui.Core.Models;
-using important_game.ui.Infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch.Models;
 using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text.Json;
+using System.Globalization;
 
 namespace important_game.web.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService) : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-        private readonly IExcitmentMatchProcessor _excitmentMatchProcessor;
-        public ExcitmentMatchResponse Matches { get; private set; } = new ExcitmentMatchResponse();
-
-        public IndexModel(ILogger<IndexModel> logger, IExcitmentMatchProcessor excitmentMatchProcessor)
-        {
-            _logger = logger;
-            _excitmentMatchProcessor = excitmentMatchProcessor;
-        }
+        public ExcitmentMatchMainResponse Matches { get; private set; } = new ExcitmentMatchMainResponse();
 
 
         public async Task OnGet()
         {
+            var allMatches = await _matchService.GetAllMatches();
 
-            List<ExcitementMatch> excitementMatches = null;
-            if (System.IO.File.Exists("data.json"))
-            {
-                var rawData = await System.IO.File.ReadAllTextAsync("data.json");
-                if (!string.IsNullOrWhiteSpace(rawData))
-                {
-                    excitementMatches = JsonSerializer.Deserialize<List<ExcitementMatch>>(rawData);
-                }
-            }
-
-            if (excitementMatches == null)
-            {
-                excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
-
-                if (excitementMatches == null)
-                    return;
-                else
-                    await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
-            }
-
-
-            var allMatches = excitementMatches!.OrderBy(c => c.MatchDate.Date >= DateTime.UtcNow.Date).OrderBy(c => c.MatchDate).ToList();
-
-            Matches.Leagues = PrepareLeagues(allMatches);
-
-            SetLiveGames(allMatches);
-            SetTodaysBestMatch(allMatches);
-
-            Matches.UpcomingMatch = allMatches.Where(c => c.MatchDate > DateTime.UtcNow).OrderByDescending(c => c.ExcitementScore).ToList();
-
-
+            Matches.LiveGames = GetLiveGames(allMatches);
+            Matches.WeekMatches = GetWeekMatches(allMatches);
+            Matches.UpcomingMatch = GetUpcomingMatches(allMatches);
         }
 
-        private void SetLiveGames(List<ExcitementMatch> allMatches)
+        private List<ExcitementMatch> GetLiveGames(List<ExcitementMatch> allMatches)
         {
-            Matches.LiveGames = allMatches?
-             .Where(c => c.MatchDate < DateTime.UtcNow && c.MatchDate > DateTime.UtcNow.AddMinutes(-110))
-             .OrderByDescending(c => c.ExcitementScore).ToList();
+            var liveGames = allMatches
+                                .Where(c => c.MatchDate < DateTime.UtcNow && c.MatchDate > DateTime.UtcNow.AddMinutes(-110))
+                                .OrderByDescending(c => c.ExcitementScore)
+                                .Take(5)
+                                .ToList();
 
-            allMatches.RemoveAll(c => Matches.LiveGames.Contains(c));
-        }
-
-        private void SetTodaysBestMatch(List<ExcitementMatch>? allMatches)
-        {
-            var upcomingMatches = allMatches.Where(c => c.MatchDate > DateTime.UtcNow).ToList();
-
-            Matches.TodaysBestMatch = upcomingMatches?
-             .Where(c => c.MatchDate <= DateTime.UtcNow.Date.AddHours(4))?
-             .OrderByDescending(c => c.ExcitementScore)?
-             .FirstOrDefault();
-
-            if (Matches.TodaysBestMatch == null)
+            foreach (var match in liveGames)
             {
-                Matches.TodaysBestMatch = upcomingMatches?
-               .Where(c => c.MatchDate.Date == DateTime.UtcNow.Date)?
-               .OrderByDescending(c => c.ExcitementScore)?
-               .FirstOrDefault();
+                allMatches.Remove(match);
             }
 
-            if (Matches.TodaysBestMatch == null)
-            {
-                Matches.TodaysBestMatch = upcomingMatches?
-                .Where(c => c.MatchDate.Date <= DateTime.UtcNow.AddHours(32))?
-                .OrderByDescending(c => c.ExcitementScore)?
-                .FirstOrDefault();
-            }
-
-            if (Matches.TodaysBestMatch != null)
-                allMatches.Remove(Matches.TodaysBestMatch);
+            return liveGames;
         }
 
-        private Dictionary<int, League> PrepareLeagues(List<ExcitementMatch> allMatches)
+        public List<ExcitementMatch> GetWeekMatches(List<ExcitementMatch> allMatches)
         {
-            return allMatches
-                .GroupBy(c => c.League.Id)
-                .Select(c => new KeyValuePair<int, League>(c.Key, c.First().League))
-                .OrderBy(c => c.Key)
-                .ToDictionary();
+            DateTime now = DateTime.Now;
+            CultureInfo cultureInfo = CultureInfo.CurrentCulture;
+            Calendar calendar = cultureInfo.Calendar;
+            CalendarWeekRule calendarWeekRule = cultureInfo.DateTimeFormat.CalendarWeekRule;
+
+            int weekNumber = calendar.GetWeekOfYear(now, calendarWeekRule, DayOfWeek.Monday);
+
+            var matchesOfWeek = allMatches.Where(c =>
+                calendar.GetWeekOfYear(c.MatchDate.Date, calendarWeekRule, DayOfWeek.Monday) == weekNumber
+            ).OrderByDescending(c => c.ExcitementScore).Take(5).ToList();
+
+            return matchesOfWeek;
+        }
+
+        public List<ExcitementMatch> GetUpcomingMatches(List<ExcitementMatch> allMatches)
+        {
+            var upcomingMatches = allMatches
+                .Where(c => c.MatchDate > DateTime.UtcNow)
+                .OrderBy(c => c.MatchDate)
+                .Take(5).ToList();
+
+            return upcomingMatches;
         }
     }
 }

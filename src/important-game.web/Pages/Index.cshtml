@@ -1,7 +1,5 @@
 ﻿@page
 @using System.Globalization
-@using important_game.ui.Core.Models
-
 @model IndexModel
 @{
     ViewData["Title"] = "Excitment Matches";
@@ -11,323 +9,84 @@
         <b><i>Exciment Score (ES)</i></b> is an indication of how enthusiastic and excited the match might be worth to watch. It takes into consideration different factors such as league table, <i>head to head</i> and many others.
     </p>
     <p> With values closer to <i>100</i> it's expected to be an interesting match to watch, while a value closer to <i>0</i> might not be so excited to watch.</p>
-
 </div>
 
-<div>
-    <h6>Filters</h6>
-</div>
-<div class="match-filter">
-    <div class="match-filter-type-item" data-filter-type="2">
-        <div>Todays's Game</div>
+
+<div class="match-section">
+    <div class="match-content-title">
+        <h5>Match of the Week</h5>
     </div>
-    <div class="match-filter-type-item" data-filter-type="1">
-        <div>Live Game</div>
+    <div class="match-section-content">
+        <div class="match-section-slider">
+            @if (Model.Matches.WeekMatches.Count == 0)
+            {
+                <label>No Exctiment Match to happen</label>
+            }
+            else
+            {
+                foreach (var match in Model.Matches.WeekMatches)
+                {
+                    <partial name="_MatchCard" for="@match" />
+                }
+            }
+        </div>
     </div>
 </div>
 
-<div class="match-filter">
-    @foreach (var item in Model.Matches.Leagues)
-    {
-        <div class="match-filter-item match-filter-item-league" data-league="@item.Value.Id">
-            <div>
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + item.Value.Id + "/image")" />
-            </div>
-            <div>
-                @item.Value.Name
-            </div>
-        </div>
-    }
+
+<div class="match-section">
+    <div class="match-content-title">
+        <h5>Live Games</h5>
+    </div>
+    <div class="match-section-content">
+        @if (Model.Matches.LiveGames.Count == 0)
+        {
+            <label>No Live Matches</label>
+        }
+        else
+        {
+            foreach (var match in Model.Matches.LiveGames)
+            {
+                <partial name="_MatchCard" for="@match" />
+            }
+        }
+    </div>
 </div>
 
-<div>
-    <h6>Matches</h6>
+
+<div class="match-section">
+    <div class="match-content-title">
+        <h1>Upcoming Games</h1>
+        <a href="calendar">See all</a>
+    </div>
+    <div class="match-section-content">
+        <div class="match-section-slider">
+            @if (Model.Matches.UpcomingMatch.Count == 0)
+            {
+                <label>No Upcoming Matches</label>
+            }
+            else
+            {
+                foreach (var match in Model.Matches.UpcomingMatch)
+                {
+                    <partial name="_MatchCard" for="@match" />
+                }
+            }
+        </div>
+    </div>
 </div>
-<div class="match-content">
 
-    @foreach (var match in Model.Matches.LiveGames)
-    {
-        <div class="card match-card" data-league="@match.League.Id" data-game-type="1">
-            <div class="card-header match-header" style="background-color:@(match.League.BackgroundColor)">
-                <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
-                </div>
-                <div class="match-header-title" style="color:@(match.League.PrimaryColor)">
-                    @match.League.Name
-                </div>
-            </div>
-            <div class="card-body match-card-body">
-                <div class="match-card-teams">
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.HomeTeam.Id + "/image")" alt="@(match.HomeTeam.Name)" />
-                        <p>@match.HomeTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.HomeTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                    <div class="match-card-teams-item">
-                        <p class="match-card-today match-live">
-                            <i class="es-circle-fill"></i>
-                            Live
-                        </p>
-                        <time>
-                            @match.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
-                        </time>
-                    </div>
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
-                        <p>@match.AwayTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.AwayTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="match-card-content">
-
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-table"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @(match.HomeTeam.Position)º-@(match.AwayTeam.Position)º
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">H<span>2</span>H</div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.H2hWins-@match.AwayTeam.H2hWins
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-football"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.Goals-@match.AwayTeam.Goals
-                        </div>
-                    </div>
-                    <div class="match-card-data match-card-data-es">
-                        <div class="match-card-data-title">
-                            ES
-                            @if (match.ExcitementScore > 0.7d)
-                            {
-                                <i class="es-fire"></i>
-                            }
-                        </div>
-                        <div class="match-card-data-value" title="Excitement Score">
-                            @(Math.Round(match.ExcitementScore * 100, 0))
-                        </div>
-                    </div>
-                </div>
-
-                <div class="match-card-watch">
-                    <label>Worth To Watch</label>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Math.Round(match.ExcitementScore*100, 0))%" aria-valuenow="@(Math.Round(match.ExcitementScore*100, 0))" aria-valuemin="0" aria-valuemax="100">
-                            @(Math.Round(match.ExcitementScore * 100, 0))%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    @if (Model.Matches.TodaysBestMatch != null)
-    {
-        var match = Model.Matches.TodaysBestMatch;
-
-        var gameType = match.MatchDate.Date == DateTime.UtcNow.Date ? 2 : 0;
-
-        <div class="card match-card" data-league="@match.League.Id" data-game-type="@gameType">
-            <div class="card-header match-header" style="background-color:@(match.League.BackgroundColor)">
-                <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
-                </div>
-                <div class="match-header-title" style="color:@(match.League.PrimaryColor)">
-                    @match.League.Name
-                </div>
-            </div>
-            <div class="card-body match-card-body">
-                <div class="match-card-teams">
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.HomeTeam.Id + "/image")" alt="@(match.HomeTeam.Name)" />
-                        <p>@match.HomeTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.HomeTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                    <div class="match-card-teams-item">
-                        <p class="match-card-today">Today's Match</p>
-                        <time>
-                            @match.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
-                        </time>
-                    </div>
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
-                        <p>@match.AwayTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.AwayTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="match-card-content">
-
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-table"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @(match.HomeTeam.Position)º-@(match.AwayTeam.Position)º
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">H<span>2</span>H</div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.H2hWins-@match.AwayTeam.H2hWins
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-football"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.Goals-@match.AwayTeam.Goals
-                        </div>
-                    </div>
-                    <div class="match-card-data match-card-data-es">
-                        <div class="match-card-data-title">
-                            ES
-                            @if (match.ExcitementScore > 0.7d)
-                            {
-                                <i class="es-fire"></i>
-                            }
-                        </div>
-                        <div class="match-card-data-value" title="Excitement Score">
-                            @(Math.Round(match.ExcitementScore * 100, 0))
-                        </div>
-                    </div>
-                </div>
-
-                <div class="match-card-watch">
-                    <label>Worth To Watch</label>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Math.Round(match.ExcitementScore*100, 0))%" aria-valuenow="@(Math.Round(match.ExcitementScore*100, 0))" aria-valuemin="0" aria-valuemax="100">
-                            @(Math.Round(match.ExcitementScore * 100, 0))%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-
-    @foreach (var match in Model.Matches.UpcomingMatch)
-    {
-        var gameType = match.MatchDate.Date == DateTime.UtcNow.Date ? 2 : 0;
-        <div class="card match-card" data-league="@match.League.Id" data-game-type="@gameType">
-            <div class="card-header match-header" style="background-color:@(match.League.BackgroundColor)">
-                <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + match.League.Id + "/image")" />
-                </div>
-                <div class="match-header-title" style="color:@(match.League.PrimaryColor)">
-                    @match.League.Name
-                </div>
-            </div>
-            <div class="card-body match-card-body">
-                <div class="match-card-teams">
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.HomeTeam.Id + "/image")" alt="@(match.HomeTeam.Name)" />
-                        <p>@match.HomeTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.HomeTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                    <div class="match-card-teams-item">
-                        <time>
-                            @match.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
-                        </time>
-                    </div>
-                    <div class="match-card-teams-item match-card-team">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + match.AwayTeam.Id + "/image")" alt="@(match.AwayTeam.Name)" />
-                        <p>@match.AwayTeam.Name</p>
-                        <div class="match-card-team-lastfixtures">
-                            @for (int i = match.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
-                            {
-                                var fixtureResult = match.AwayTeam.LastFixtures.FixtureResult[i];
-                                <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <div class="match-card-content">
-
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-table"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @(match.HomeTeam.Position)º-@(match.AwayTeam.Position)º
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">H<span>2</span>H</div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.H2hWins-@match.AwayTeam.H2hWins
-                        </div>
-                    </div>
-                    <div class="match-card-data">
-                        <div class="match-card-data-title">
-                            <i class="es-football"></i>
-                        </div>
-                        <div class="match-card-data-value">
-                            @match.HomeTeam.Goals-@match.AwayTeam.Goals
-                        </div>
-                    </div>
-                    <div class="match-card-data match-card-data-es">
-                        <div class="match-card-data-title">
-                            ES
-                            @if (match.ExcitementScore > 0.7d)
-                            {
-                                <i class="es-fire"></i>
-                            }
-                        </div>
-                        <div class="match-card-data-value" title="Excitement Score">
-                            @(Math.Round(match.ExcitementScore * 100, 0))
-                        </div>
-                    </div>
-                </div>
-
-                <div class="match-card-watch">
-                    <label>Worth To Watch</label>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: @(Math.Round(match.ExcitementScore*100, 0))%" aria-valuenow="@(Math.Round(match.ExcitementScore*100, 0))" aria-valuemin="0" aria-valuemax="100">
-                            @(Math.Round(match.ExcitementScore * 100, 0))%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
+<div class="watch-menu">
+    <div class="watch-menu-option">
+        <span class="watch-menu-option-item">
+            <i class="es-table"></i> Calendar
+        </span>
+        <span class="watch-menu-option-item">
+            <i class="es-table"></i> Leagues
+        </span>
+    </div>
 </div>
+
 
 @section Scripts {
 
@@ -345,120 +104,62 @@
                 hour: "numeric",
                 minute: "numeric",
             };
-            $(this).html(date.toLocaleString("pt", optionsDate) + "<br/>" + date.toLocaleString("pt", optionsTime));
-        })
-
-        var selectedLeagues = [];
-        var selectedFilter = [];
-
-        //
-        $(".match-filter-type-item").on("click", function (elem) {
-            var leagueId = $(this).data("filter-type");
-            var checked = $(this).data("checked");
-
-            if (checked === undefined) {
-                checked = true;
-            } else {
-                checked = !checked;
-            }
-
-            if (checked) {
-                $(this).addClass("filter-active");
-            } else {
-                $(this).removeClass("filter-active");
-            }
-            $(this).data("checked", checked);
-            selectedFilter = [];
-
-            $(".match-filter-type-item").each(function () {
-                var checked = $(this).data("checked");
-                var leagueId = $(this).data("filter-type");
-                if (checked === true) {
-                    selectedFilter.push(leagueId);
-                }
-            });
-
-            filterItems();
-
+            $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
         });
 
-        $(".match-filter-item").on("click", function (elem) {
-            var leagueId = $(this).data("league");
-            var checked = $(this).data("checked");
-
-            if (checked === undefined) {
-                checked = true;
-            } else {
-                checked = !checked;
-            }
-
-            if (checked) {
-                $(this).addClass("filter-active");
-            } else {
-                $(this).removeClass("filter-active");
-            }
-            $(this).data("checked", checked);
-
-            selectedLeagues = [];
-
-            $(".match-filter-item").each(function () {
-                var checked = $(this).data("checked");
-                var leagueId = $(this).data("league");
-                if (checked === true) {
-                    selectedLeagues.push(leagueId);
-                }
-            });
-
-            filterItems();
-
-        });
-
-        function filterItems() {
-            $('.match-card').each(function () {
-                if (isValidItem(this)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-                // if (selectedLeagues.length > 0) {
-                //     if ($.inArray($(this).data("league"), selectedLeagues) >= 0) {
-                //         $(this).hide();
-                //     } else {
-                //         $(this).show();
-                //     }
-                // } else {
-                //     $(this).show();
-                // }
-            });
-        }
-
-        function isValidItem(item) {
-
-            var isValid = true;
 
 
-            if (selectedLeagues.length > 0) {
-                if ($.inArray($(item).data("league"), selectedLeagues) >= 0) {
-                    return false;
-                } else {
-                    isValid = true;
-                }
-            } else {
-                isValid = true;
-            }
+        // let slider = document.querySelector(".match-upcoming-content");
+        // let innerSlider = document.querySelector(".match-upcoming-slider");
 
-            if (selectedFilter.length > 0) {
-                if ($.inArray($(item).data("game-type"), selectedFilter) >= 0) {
-                    isValid = true;
-                } else {
-                    return false;
-                }
-            } else {
-                isValid = true;
-            }
+        // let pressed = false;
+        // let startx;
+        // let x;
 
-            return isValid;
-        }
+
+        // innerSlider.addEventListener("mousedown", (e) => {
+        //     pressed = true;
+        //     startx = e.offsetX - innerSlider.offsetLeft;
+        //     console.log(`OffsetX: ${e.offsetX}, InnerSlider OffsetLeft: ${innerSlider.offsetLeft}`);
+        //     slider.style.cursor = "grabbing";
+        // });
+
+        // slider.addEventListener("mouseenter", () => {
+        //     slider.style.cursor = "grab";
+        // });
+
+        // slider.addEventListener("mouseup", () => {
+        //     slider.style.cursor = "grab";
+        // });
+
+        // window.addEventListener("mouseup", () => {
+        //     pressed = false;
+        // });
+
+        // slider.addEventListener("mousemove", (e) => {
+        //     if (!pressed) return;
+        //     e.preventDefault();
+
+        //     x = e.offsetX;
+        //     console.log(`x: ${x}, startx: ${startx}`);
+        //     console.log(`Diff: ${x - startx}`);
+
+        //     innerSlider.style.left = `${x - startx}px`;
+        //     checkBoundary();
+        // });
+
+        // function checkBoundary(x, startx) {
+        //     let outer = slider.getBoundingClientRect();
+        //     let inner = innerSlider.getBoundingClientRect();
+
+        //     if (parseInt(innerSlider.style.left) > 0) {
+        //         innerSlider.style.left = "0px";
+        //     }
+        //     if (inner.right < outer.right) {
+        //         innerSlider.style.left = `-${inner.width - outer.width}px`;
+        //     }
+        // }
+
 
     </script>
 }

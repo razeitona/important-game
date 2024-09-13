@@ -1,0 +1,72 @@
+﻿@using System.Globalization
+@using important_game.infrastructure.ImportantMatch.Models
+@model ExcitementMatch
+
+<div class="card match-card">
+    <div class="card-header match-header" style="background-color:@(Model.League.BackgroundColor)">
+        <div>
+            <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.League.Id  + "/image")" />
+        </div>
+        <div class="match-header-title" style="color:@(Model.League.PrimaryColor)">
+            @Model.League.Name
+        </div>
+    </div>
+    <div class="card-body match-card-body">
+        <div class="match-card-time">
+            <time>
+                @Model.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+            </time>
+        </div>
+        <div class="match-card-teams">
+            <div class="match-card-teams-item match-card-team">
+                <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeam.Id + "/image")" alt="@(Model.HomeTeam.Name)" />
+                <p>@Model.HomeTeam.Name</p>
+                <div class="match-card-team-lastfixtures">
+                    @for (int i = Model.HomeTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                    {
+                        var fixtureResult = Model.HomeTeam.LastFixtures.FixtureResult[i];
+                        <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                    }
+                </div>
+            </div>
+            <div class="match-card-teams-item">
+                <div class="match-card-teams-content">
+                    <div class="match-card-teams-content-item">
+                        <span>@Model.HomeTeam.Position</span>
+                        <span class="title">Position</span>
+                        <span>@Model.AwayTeam.Position</span>
+                    </div>
+                    <div class="match-card-teams-content-item">
+                        <span>@Model.HomeTeam.H2hWins</span>
+                        <span class="title">Victories</span>
+                        <span>@Model.AwayTeam.H2hWins</span>
+                    </div>
+                    <div class="match-card-teams-content-item">
+                        <span>@Model.HomeTeam.Goals</span>
+                        <span class="title">Goals</span>
+                        <span>@Model.AwayTeam.Goals</span>
+                    </div>
+                    <div class="match-card-teams-content-item teams-content-score">
+                        <div class="match-card-data-title">
+                            Excitment score
+                        </div>
+                        <div class="match-card-data-value" title="Excitement Score">
+                            @(Math.Round(Model.ExcitementScore * 100, 0))
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="match-card-teams-item match-card-team">
+                <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeam.Id + "/image")" alt="@(Model.AwayTeam.Name)" />
+                <p>@Model.AwayTeam.Name</p>
+                <div class="match-card-team-lastfixtures">
+                    @for (int i = Model.AwayTeam.LastFixtures.FixtureResult.Count - 1; i >= 0; i--)
+                    {
+                        var fixtureResult = Model.AwayTeam.LastFixtures.FixtureResult[i];
+                        <i class="es-circle-fill @("match-result-" + fixtureResult.ToLowerInvariant())"></i>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

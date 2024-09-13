@@ -1,0 +1,31 @@
+﻿.watch-explanation {
+    font-size: 10px;
+    margin: 0 0 10px;
+
+    p {
+        margin: 2px 0;
+    }
+}
+
+
+.watch-menu {
+    display: flex;
+
+    .watch-menu-option {
+        display:flex;
+        .watch-menu-option-item {
+            display:flex;
+            align-items:center;
+            border-color: $text-color;
+            border-style: solid;
+            border-width: 2px;
+            padding: 0.5rem 1rem;
+            border-radius: 8rem;
+            margin: 1rem;
+
+            i{
+                padding:0px 5px;
+            }
+        }
+    }
+}

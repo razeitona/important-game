@@ -1,4 +1,4 @@
-using important_game.ui.Infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
 
@@ -18,7 +18,7 @@ namespace important_game.web.Pages
         public async Task OnGet()
         {
 
-            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new MatchImportanceOptions());
+            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new ExctimentMatchOptions());
 
             if (excitementMatches == null)
                 return;
