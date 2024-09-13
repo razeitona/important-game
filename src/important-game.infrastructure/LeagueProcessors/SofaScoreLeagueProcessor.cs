@@ -167,7 +167,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 var matchStartTime = DateTimeOffset.FromUnixTimeSeconds(matchEvent.StartTimestamp);
 
                 //Skip past events that are older than 2 years
-                if (eventStartTime.AddYears(-2) > matchStartTime)
+                if (eventStartTime.AddYears(-2) >= matchStartTime)
                     continue;
 
                 fixtureResult.Add(new Fixture

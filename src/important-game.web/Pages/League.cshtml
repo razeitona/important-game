@@ -1,54 +1,36 @@
 ﻿@page
 @using System.Globalization
-@model CalendarModel
+@model LeagueModel
 @{
     ViewData["Title"] = "Excitment Matches";
 }
 
-<div class="match-calendar">
-    @foreach (var month in Model.Matches.Dates)
-    {
-        <div class="match-calendar-month">
-            <h1>@month.Month.ToString("MMMM")</h1>
-            <div class="match-calendar-day">
-                @{
-                    var index = 0;
-                    foreach (var day in month.Days)
-                    {
+<div class="match-league">
+    @{
+        var index = 0;
+        foreach (var league in Model.Matches.Leagues)
+        {
 
-                        <div class="match-calendar-day-item @(index == 0 ? "day-active" : "")" data-day="@day.Key.ToString("MMMdd")">
-                            <span class="calendar-day">@day.Key.ToString("dd")</span>
-                        </div>
-                        index++;
-                    }
-
-                }
+            <div class="match-league-item @(index == 0 ? "league-active" : "")" data-league="@league.Key.Id">
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Key.Id  + "/image")" />
             </div>
-        </div>
+            index++;
+        }
     }
 </div>
 
-<div class="match-calendar-options">
-    <div class="match-calendar-filter">
-        <label>Filter By:</label>
-        <a href="/League"> <i class="es-table"></i> Leagues</a>
-    </div>
-    <div class="match-calendar-filter filter-sort">
-        <label>Sort By:</label>
-        <button id="filter-date" data-filter-sort="desc" data-filter-field="data-game-date">Date</button>
-        <button id="filter-score" data-filter-sort="desc" data-filter-field="data-game-score">Score</button>
-    </div>
-
+<div class="match-league-filter">
+    <label>Sort By:</label>
+    <button id="filter-date" data-filter-sort="desc" data-filter-field="data-game-date">Date</button>
+    <button id="filter-score" data-filter-sort="desc" data-filter-field="data-game-score">Score</button>
 </div>
-<div class="match-calendar-content">
-    @foreach (var month in Model.Matches.Dates)
+<div class="match-league-content">
+    @foreach (var league in Model.Matches.Leagues)
     {
-        foreach (var day in month.Days)
+        foreach (var match in league.Value)
         {
-            foreach (var match in day.Value)
-            {
-                <partial name="_MatchSimpleCard" for="@match" />
-            }
+            <partial name="_MatchSimpleCard" for="@match" />
+
         }
     }
 </div>
@@ -73,24 +55,24 @@
                 $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
             });
 
-            $(".match-calendar-day-item").each(function (elem) {
-                if ($(this).hasClass("day-active")) {
-                    var selectedDate = $(this).data("day");
+            $(".match-league-item").each(function (elem) {
+                if ($(this).hasClass("league-active")) {
+                    var selectedDate = $(this).data("league");
                     updateGameHideStatus(selectedDate);
                     return;
                 }
             });
 
-            $(".match-calendar-day-item").on("click", function () {
-                var mainItemselectedDate = $(this).data("day");
+            $(".match-league-item").on("click", function () {
+                var mainItemselectedDate = $(this).data("league");
 
-                $(".match-calendar-day-item").each(function (elem) {
-                    var selectedDate = $(this).data("day");
+                $(".match-league-item").each(function (elem) {
+                    var selectedDate = $(this).data("league");
 
                     if (mainItemselectedDate == selectedDate) {
-                        $(this).addClass("day-active");
+                        $(this).addClass("league-active");
                     } else {
-                        $(this).removeClass("day-active");
+                        $(this).removeClass("league-active");
                     }
                 });
 
@@ -99,7 +81,7 @@
 
             function updateGameHideStatus(selectedDate) {
                 $(".match-card-simple").each(function (idx, elem) {
-                    var itemDay = $(elem).data("game-day");
+                    var itemDay = $(elem).data("game-league");
                     if (selectedDate === itemDay) {
                         console.log(itemDay);
                         $(elem).removeClass("hide");
@@ -128,7 +110,7 @@
 
         function sortCards(order = 'asc', sortField = 'data-game-date') {
 
-            const slider = document.querySelector('.match-calendar-content');
+            const slider = document.querySelector('.match-league-content');
             const cards = Array.from(slider.children); // Convert NodeList to Array
 
             // Sort based on the data-game-id attribute

@@ -1,0 +1,43 @@
+﻿.match-league {
+    display: flex;
+
+    .match-league-item {
+        display: flex;
+        flex-direction: row;
+        border: 2px solid $text-color;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 8px;
+        cursor: pointer;
+
+        img{
+            width:20px;
+        }
+        &.league-active {
+            border-color: #d11111;
+            color: #d11111;
+        }
+    }
+}
+
+
+.match-league-filter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    label {
+        margin: 0px 10px;
+    }
+
+    button {
+        background-color: none;
+        border: 0;
+        margin: 0 10px;
+        background-color: transparent;
+
+        &.filter-change {
+            border-bottom: 1px solid #000000;
+        }
+    }
+}

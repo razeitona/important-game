@@ -87,6 +87,7 @@ namespace important_game.infrastructure.ImportantMatch
                     Name = league.Name,
                     PrimaryColor = league.PrimaryColor,
                     BackgroundColor = league.BackgroundColor,
+                    LeagueRanking = league.LeagueRanking
                 };
 
                 matchImportanceResult.Add(matchImportance);
