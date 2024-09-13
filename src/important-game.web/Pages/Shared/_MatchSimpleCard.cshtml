@@ -2,7 +2,7 @@
 @using important_game.infrastructure.ImportantMatch.Models
 @model ExcitementMatch
 
-<div class="card match-card-simple" data-game-day="@Model.MatchDate.ToString("MMMdd")" data-game-league="@Model.League.LeagueRanking">
+<div class="card match-card-simple" data-game-day="@Model.MatchDate.ToString("MMMdd")" data-game-date="@Model.MatchDate.Ticks" data-game-score="@(Math.Round(Model.ExcitementScore * 100, 0))" data-game-league="@Model.League.LeagueRanking">
     <div class="card-header match-header" style="background-color:@(Model.League.BackgroundColor);color:@(Model.League.PrimaryColor)">
         <div>
             <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.League.Id  + "/image")" />

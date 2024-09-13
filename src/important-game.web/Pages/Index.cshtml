@@ -76,7 +76,7 @@
     </div>
 </div>
 
-<div class="watch-menu">
+@* <div class="watch-menu">
     <div class="watch-menu-option">
         <span class="watch-menu-option-item">
             <i class="es-table"></i> Calendar
@@ -85,29 +85,76 @@
             <i class="es-table"></i> Leagues
         </span>
     </div>
-</div>
+</div> *@
 
 
 @section Scripts {
 
     <script>
 
-        $("time").each(function (elem) {
-            var utctimeval = $(this).html().trim();
-            var date = new Date(utctimeval);
-            var optionsDate = {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-            };
-            var optionsTime = {
-                hour: "numeric",
-                minute: "numeric",
-            };
-            $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+
+        $(document).ready(function () {
+            $("time").each(function (elem) {
+                var utctimeval = $(this).html().trim();
+                var date = new Date(utctimeval);
+                var optionsDate = {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                };
+                var optionsTime = {
+                    hour: "numeric",
+                    minute: "numeric",
+                };
+                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            });
+
+
+            // let isDown = false;
+            // let startX, scrollLeft;
+            $('.match-section-slider').each(function () {
+
+                var slider = $(this);
+                console.log(slider);
+
+                slider.mousedown(function (e) {
+                    var startX = e.pageX - slider.offset().left;
+                    var scrollLeft = slider.scrollLeft();
+                    $(this).addClass('active');
+                    $(this).attr("startX", startX);
+                    $(this).attr("scrollLeft", scrollLeft);
+                    $(this).attr("isDown", true);
+                });
+
+                slider.mouseleave(function () {
+                    $(this).removeClass('active');
+                    $(this).attr("isDown", false);
+                });
+
+                slider.mouseup(function () {
+                    isDown = false;
+                    $(this).removeClass('active');
+                    $(this).attr("isDown", false);
+                });
+
+                slider.mousemove(function (e) {
+                    var isDown = $(this).attr("isDown");
+
+                    if (!isDown) return;
+                    e.preventDefault();
+
+                    var startX = $(this).attr("startX");
+                    var scrollLeft = $(this).attr("scrollLeft");
+
+                    const x = e.pageX - $(this).offset().left;
+                    const walk = (x - startX) * 2; // Adjust scrolling speed
+                    $(this).scrollLeft(scrollLeft - walk);
+                });
+
+            });
+
+
         });
-
-
 
         // let slider = document.querySelector(".match-upcoming-content");
         // let innerSlider = document.querySelector(".match-upcoming-slider");

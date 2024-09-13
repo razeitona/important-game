@@ -28,48 +28,117 @@
     }
 </div>
 
-@foreach (var month in Model.Matches.Dates)
-{
-    foreach (var day in month.Days)
+<div class="match-calendar-filter">
+    <label>Sort By:</label>
+    <button id="filter-date" data-filter-sort="desc" data-filter-field="data-game-date">Date</button>
+    <button id="filter-score" data-filter-sort="desc" data-filter-field="data-game-score">Score</button>
+</div>
+<div class="match-calendar-content">
+    @foreach (var month in Model.Matches.Dates)
     {
-        foreach (var match in day.Value)
+        foreach (var day in month.Days)
         {
-            <partial name="_MatchSimpleCard" for="@match" />
+            foreach (var match in day.Value)
+            {
+                <partial name="_MatchSimpleCard" for="@match" />
+            }
         }
     }
-}
+</div>
+
 
 @section Scripts {
 
     <script>
+        $(document).ready(function () {
+            $("time").each(function (elem) {
+                var utctimeval = $(this).html().trim();
+                var date = new Date(utctimeval);
+                var optionsDate = {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                };
+                var optionsTime = {
+                    hour: "numeric",
+                    minute: "numeric",
+                };
+                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            });
 
-        $("time").each(function (elem) {
-            var utctimeval = $(this).html().trim();
-            var date = new Date(utctimeval);
-            var optionsDate = {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-            };
-            var optionsTime = {
-                hour: "numeric",
-                minute: "numeric",
-            };
-            $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-        });
-
-        $(".match-calendar-day-item").on("click", function () {
-            var selectedDate = $(this).data("day");
-
-            $(".match-card-simple").each(function (idx, elem) {
-                var itemDay = $(elem).data("game-day");
-                if (selectedDate === itemDay) {
-                    console.log(itemDay);
-                    $(elem).removeClass("hide");
-                } else {
-                    $(elem).addClass("hide");
+            $(".match-calendar-day-item").each(function (elem) {
+                if ($(this).hasClass("day-active")) {
+                    var selectedDate = $(this).data("day");
+                    updateGameHideStatus(selectedDate);
+                    return;
                 }
             });
+
+            $(".match-calendar-day-item").on("click", function () {
+                var mainItemselectedDate = $(this).data("day");
+
+                $(".match-calendar-day-item").each(function (elem) {
+                    var selectedDate = $(this).data("day");
+
+                    if (mainItemselectedDate == selectedDate) {
+                        $(this).addClass("day-active");
+                    } else {
+                        $(this).removeClass("day-active");
+                    }
+                });
+
+                updateGameHideStatus(mainItemselectedDate);
+            });
+
+            function updateGameHideStatus(selectedDate) {
+                $(".match-card-simple").each(function (idx, elem) {
+                    var itemDay = $(elem).data("game-day");
+                    if (selectedDate === itemDay) {
+                        console.log(itemDay);
+                        $(elem).removeClass("hide");
+                    } else {
+                        $(elem).addClass("hide");
+                    }
+                });
+            }
+
+            $("#filter-date,#filter-score").on("click", function () {
+                var sort = $(this).data("filter-sort");
+                var field = $(this).data("filter-field");
+                //data-filter-sort="desc" data-filter-field="data-game-score"
+                sortCards(sort, field);
+
+                if (sort == "asc") {
+                    $(this).data("filter-sort", "desc");
+                    $(this).removeClass("filter-change");
+                } else {
+                    $(this).data("filter-sort", "asc");
+                    $(this).addClass("filter-change");
+                }
+            });
+
         });
+
+        function sortCards(order = 'asc', sortField = 'data-game-date') {
+
+            const slider = document.querySelector('.match-calendar-content');
+            const cards = Array.from(slider.children); // Convert NodeList to Array
+
+            // Sort based on the data-game-id attribute
+            cards.sort((a, b) => {
+                const idA = parseInt(a.getAttribute(sortField));
+                const idB = parseInt(b.getAttribute(sortField));
+
+                if (order === 'asc') {
+                    return idA - idB; // Sort in ascending order
+                } else {
+                    return idB - idA; // Sort in descending order
+                }
+            });
+
+            // Append sorted cards back to the parent container
+            cards.forEach(card => slider.appendChild(card));
+        }
+
     </script>
 }

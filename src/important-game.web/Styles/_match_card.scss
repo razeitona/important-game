@@ -61,7 +61,8 @@
 
                 p {
                     margin: 0;
-                    text-transform:uppercase;
+                    text-transform: uppercase;
+                    text-wrap: wrap;
 
                     &.match-card-today {
                         font-size: 10px;

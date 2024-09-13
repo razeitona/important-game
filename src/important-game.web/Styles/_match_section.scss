@@ -23,19 +23,20 @@
 
         h1 {
             flex-grow: 1;
-            font-size:1.3rem;
+            font-size: 1.3rem;
         }
 
         a {
             justify-content: flex-end;
-            text-decoration:none;
-            color:$text-color;
-            font-size:0.8rem;
-            align-self:center;
-            font-weight:bold;
-            &::after{
-                content:'>';
-                padding-left:2px;
+            text-decoration: none;
+            color: $text-color;
+            font-size: 0.8rem;
+            align-self: center;
+            font-weight: bold;
+
+            &::after {
+                content: '>';
+                padding-left: 2px;
             }
         }
     }
@@ -47,11 +48,26 @@
         .match-section-slider {
             width: calc(20rem * 14);
             display: flex;
-            pointer-events: none;
+            /*pointer-events: none;*/
             /*         animation: scroll $animationSpeed linear infinite;*/
+
+            overflow-x: auto; /* Enable horizontal scroll */
+            white-space: nowrap; /* Prevent wrapping of items */
+            scroll-behavior: smooth; /* Optional: Smooth scroll */
+            cursor: grab; /* Show a grabbing cursor */
+            user-select: none; /* Disable text selection */
+            box-sizing: border-box;
+            scrollbar-width: none; /* For Firefox: hide scrollbar */
             .match-card {
+                flex: 0 0 auto; /* Prevent cards from shrinking or growing */
                 margin: 0px 10px;
+                display: flex;
             }
+        }
+
+
+        .match-section-slider::-webkit-scrollbar {
+            display: none; /* For Chrome: hide scrollbar */
         }
     }
 }
