@@ -22,9 +22,6 @@ namespace important_game.infrastructure.ImportantMatch
             new MatchImportanceLeague(52, "Turkey", 0.85d, "#f00515", "#fffafa"),
             new MatchImportanceLeague(36, "Scotland", 0.80d, "#311b77", "#fffafa"),
             new MatchImportanceLeague(155, "Argentina", 0.75d, "#004a79", "#fffafa"),
-
-
-
         };
 
         //https://www.soccer-rating.com/Portugal/
@@ -34,5 +31,18 @@ namespace important_game.infrastructure.ImportantMatch
             return Leagues != null && Leagues.Count > 0;
         }
 
+        public static List<RivarlyMatchup> Rivalry = new List<RivarlyMatchup>()
+        {
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 33, Exctiment = 1d},
+            new RivarlyMatchup{TeamOneId = 2999, TeamTwoId = 3009, Exctiment = 0.65d}
+        };
+
+    }
+
+    public class RivarlyMatchup
+    {
+        public int TeamOneId { get; set; }
+        public int TeamTwoId { get; set; }
+        public double Exctiment { get; set; }
     }
 }

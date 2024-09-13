@@ -106,9 +106,10 @@ namespace important_game.infrastructure.ImportantMatch
             var fixtureCoef = 0.15d;
             var teamFormCoef = 0.2d;
             var teamGoalsCoef = 0.05d;
-            var tableRankCoef = 0.4d;
+            var tableRankCoef = 0.27d;
             var h2hCoef = 0.02d;
             var titleHolderCoef = 0.01d;
+            var rivalryCoef = 0.2d;
 
 
             // 0.2×CR
@@ -153,12 +154,15 @@ namespace important_game.infrastructure.ImportantMatch
             // 0.15×T
             double titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder) * titleHolderCoef;
 
+            double rivalryValue = CalculateRivalry(fixture.HomeTeam, fixture.AwayTeam, league.LeagueRanking) * rivalryCoef;
+
+
             double excitementScore =
                 competitionRankValue + fixtureValue +
                 teamsLastFixtureFormValue + teamsGoalsFormValue +
                 //teamsFormValue +
                 leagueTableValue + h2hValue
-                + titleHolderValue;
+                + titleHolderValue + rivalryValue;
 
             return new ExcitementMatch
             {
@@ -167,6 +171,19 @@ namespace important_game.infrastructure.ImportantMatch
                 AwayTeam = fixture.AwayTeam,
                 ExcitementScore = excitementScore,
             };
+        }
+
+        private double CalculateRivalry(Team homeTeam, Team awayTeam, double leagueRanking)
+        {
+            var rivalryInfo = ExctimentMatchOptions.Rivalry.Where(c =>
+            (c.TeamOneId == homeTeam.Id && c.TeamTwoId == awayTeam.Id)
+            ||
+            (c.TeamOneId == awayTeam.Id && c.TeamTwoId == homeTeam.Id)).FirstOrDefault();
+
+            if (rivalryInfo == null)
+                return 0d;
+
+            return rivalryInfo.Exctiment;
         }
 
         private double CalculateTitleHolder(Team homeTeam, Team awayTeam, Team titleHolder)
