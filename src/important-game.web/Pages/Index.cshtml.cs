@@ -46,6 +46,7 @@ namespace important_game.web.Pages
             int weekNumber = calendar.GetWeekOfYear(now, calendarWeekRule, DayOfWeek.Monday);
 
             var matchesOfWeek = allMatches.Where(c =>
+                c.MatchDate > now &&
                 calendar.GetWeekOfYear(c.MatchDate.Date, calendarWeekRule, DayOfWeek.Monday) == weekNumber
             ).OrderByDescending(c => c.ExcitementScore).Take(5).ToList();
 

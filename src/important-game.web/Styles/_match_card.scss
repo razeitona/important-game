@@ -6,7 +6,8 @@
     /*background-color: #2a2a33;*/
     color: #FFFAFA;
     border-radius: 10px;
-    max-width: 300px;
+    min-width: 350px;
+    max-width: 350px;
 
 
     .match-header {
@@ -54,10 +55,10 @@
             }
 
             .match-card-teams-item {
-                padding: 0px 10px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                flex-grow: 1;
 
                 p {
                     margin: 0;
@@ -77,22 +78,32 @@
 
 
                 &.match-card-team {
-                    width: 10rem;
+                    width: (60% /2);
+                    display: flex;
 
-                    img {
-                        width: 4rem;
-                    }
+                    .match-card-team-info {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
 
-                    p {
-                        margin-top: 5px;
-                        overflow: hidden;
-                        text-align: center;
+                        img {
+                            width: 3.5rem;
+                        }
+
+                        p {
+                            margin-top: 5px;
+                            overflow: hidden;
+                            text-align: center;
+                        }
                     }
 
 
                     .match-card-team-lastfixtures {
+                        display: flex;
+                        align-items: flex-end;
+                        gap:0.4rem;
                         font-size: 0.6rem;
-                        margin: 0.4rem 0;
+                        flex-grow:1;
 
                         .match-result-w {
                             color: #146d13;
@@ -115,6 +126,9 @@
                     }
                 }
 
+                &.match-card-time {
+                    padding: 0px 5px;
+                }
 
                 .match-card-teams-content {
                     .match-card-teams-content-item {

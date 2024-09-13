@@ -39,17 +39,19 @@
         <h5>Live Games</h5>
     </div>
     <div class="match-section-content">
-        @if (Model.Matches.LiveGames.Count == 0)
-        {
-            <label>No Live Matches</label>
-        }
-        else
-        {
-            foreach (var match in Model.Matches.LiveGames)
+        <div class="match-section-slider">
+            @if (Model.Matches.LiveGames.Count == 0)
             {
-                <partial name="_MatchCard" for="@match" />
+                <label>No Live Matches</label>
             }
-        }
+            else
+            {
+                foreach (var match in Model.Matches.LiveGames)
+                {
+                    <partial name="_MatchCard" for="@match" />
+                }
+            }
+        </div>
     </div>
 </div>
 
