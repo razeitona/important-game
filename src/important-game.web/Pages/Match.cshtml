@@ -56,15 +56,21 @@
             <div class="match-detail-extra">
                 @if (matchInfo.Score.ContainsKey(MatchDataPoint.RivalryValue.GetDescription()))
                 {
-                    <div class="match-detail-info">
-                        <span>Rivalry match</span>
-                    </div>
+                    @if (matchInfo.Score[MatchDataPoint.RivalryValue.GetDescription()] > 0)
+                    {
+                        <div class="match-detail-info">
+                            <span>Rivalry match</span>
+                        </div>
+                    }
                 }
-                @if (matchInfo.HomeTeam.IsTitleHolder || matchInfo.AwayTeam.IsTitleHolder)
+                @if (matchInfo.Score.ContainsKey(MatchDataPoint.TitleHolderValue.GetDescription()))
                 {
-                    <div class="match-detail-info">
-                        <span>Has title holder</span>
-                    </div>
+                    @if (matchInfo.Score[MatchDataPoint.TitleHolderValue.GetDescription()] > 0)
+                    {
+                        <div class="match-detail-info">
+                            <span>Has title holder</span>
+                        </div>
+                    }
                 }
             </div>
         </div>
