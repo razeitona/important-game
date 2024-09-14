@@ -66,6 +66,7 @@ namespace important_game.infrastructure.LeagueProcessors
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
                     {
+                        Id = leagueEvent.Id,
                         MatchDate = gameStartTime,
                         HomeTeam = new Team
                         {
@@ -172,6 +173,7 @@ namespace important_game.infrastructure.LeagueProcessors
 
                 fixtureResult.Add(new Fixture
                 {
+                    Id = matchEvent.Id,
                     MatchDate = matchStartTime,
                     HomeTeam = new Team
                     {

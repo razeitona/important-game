@@ -1,0 +1,184 @@
+﻿.match-detail {
+    .match-detail-content {
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(to right, #3a3d3f, #2a2a33);
+        /*background-color: #2a2a33;*/
+        color: #FFFAFA;
+        font-weight: bold;
+
+        .match-detail-content-header {
+
+            .match-detail-league {
+                border-top: 1px solid #2a2a33;
+                border-left: 1px solid #2a2a33;
+                border-right: 1px solid #2a2a33;
+                padding: 0.2rem 0.8rem;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                background-color: #ffffff;
+
+                img {
+                    width: 1.5rem;
+                }
+
+                .match-detail-league-title {
+                    padding: 0 0.2rem;
+                    display: flex;
+                    font-size: 14px;
+                    color: $text-color;
+                    font-weight: bold;
+                    flex-grow: 1;
+                }
+
+                .match-detail-time {
+                    display: flex;
+                    align-self:center;
+                    font-size: 12px;
+                }
+            }
+
+            .match-detail-teams {
+                display: flex;
+                margin: 20px 0;
+
+                .match-detail-team-info {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    flex-grow: 1;
+                    width: (60% /2);
+
+                    img {
+                        width: 5rem;
+                    }
+
+                    p {
+                        margin-top: 5px;
+                        overflow: hidden;
+                        text-align: center;
+                    }
+                }
+
+                .match-detail-team-label {
+                    font-size: 10px;
+                    display: flex;
+                    align-self: center;
+                }
+            }
+
+            .match-detail-extra {
+                margin: 10px;
+                .match-detail-info{
+                    font-size:0.8rem;
+                    font-weight:normal;
+                    margin:5px;
+                }
+            }
+        }
+
+
+
+        .match-detail-content-body {
+            background-color: #ffffff;
+            border-radius: 20px 20px 0px 0px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            color: $text-color;
+            margin: 0px -1px -1px;
+
+            .match-detail-content-item {
+                margin-bottom: 25px;
+
+                &.short-description{
+                    display:flex;
+                    align-items:center;
+                    gap:20px;
+                    span{
+                        font-size:2rem;
+
+                        &.title{
+                            font-size:1rem;
+                        }
+                    }
+                }
+
+                h1 {
+                    font-size: 1rem;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+
+                .match-detail-content-data {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 10%;
+                    justify-content: center;
+
+                    .match-detail-content-data-team {
+                        border: 2px solid #d0c4c4;
+                        display: flex;
+                        flex-direction: column;
+                        border-radius: 8px;
+                        width: 33.3%;
+                        max-width:200px;
+
+                        div {
+                            border-bottom: 1px solid #d0c4c4;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            padding-top: 10px;
+
+                            h1 {
+                                font-size: 0.8rem;
+                                font-weight: bold;
+                            }
+                        }
+
+                        span {
+                            align-self: center;
+                            font-size: 2rem;
+
+                            span {
+                                font-size: 0.6rem;
+                                padding-left: 2px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .match-detail-graph {
+                font-size: 10px;
+                margin: 10px 0;
+
+                h1 {
+                    font-size: 1rem;
+                    font-weight: bold;
+                }
+
+                .bar {
+                    display: flex;
+                    align-items: center;
+                    padding: 5px 0px;
+
+                    .bar-value {
+                        $border-rad: 4px;
+                        background: linear-gradient(to right, #d16ba5, #c777b9, #ba83ca);
+                        padding: 5px 5px;
+                        border-top-right-radius: $border-rad;
+                        border-bottom-right-radius: $border-rad;
+
+                        span {
+                            text-wrap: nowrap;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

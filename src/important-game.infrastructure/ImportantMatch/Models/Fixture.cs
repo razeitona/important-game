@@ -7,6 +7,7 @@
 
     public class Fixture
     {
+        public int Id { get; set; }
         public DateTimeOffset MatchDate { get; set; }
         public Team HomeTeam { get; set; }
         public int HomeTeamScore { get; set; }

@@ -1,0 +1,198 @@
+﻿@page "/match/{id:int}"
+@using System.Globalization
+@using important_game.infrastructure.Extensions
+@using important_game.infrastructure.ImportantMatch
+@model MatchModel
+@{
+    var matchInfo = Model.MatchInfo;
+
+    if (matchInfo != null)
+    {
+        ViewData["Title"] = $"Excitment Matches - {matchInfo.HomeTeam.Name} v {matchInfo.AwayTeam.Name}";
+    }
+    else
+    {
+        ViewData["Title"] = $"Excitment Matches - match not found";
+    }
+}
+
+@if (matchInfo == null)
+{
+    <div>Sorry, we couldn't find any excitment report for this match</div>
+    return;
+}
+
+<div class="match-detail">
+
+    <div class="match-detail-content">
+
+        <div class="match-detail-content-header">
+            <div class="match-detail-league">
+                <div>
+                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id  + "/image")" />
+                </div>
+                <div class="match-detail-league-title">
+                    @matchInfo.League.Name
+                </div>
+                <div class="match-detail-time" style="color:@(matchInfo.League.PrimaryColor)">
+                    <time>
+                        @matchInfo.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                    </time>
+                </div>
+            </div>
+            <div class="match-detail-teams">
+                <div class="match-detail-team-info">
+                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
+                    <p>@matchInfo.HomeTeam.Name</p>
+                </div>
+                <div class="match-detail-team-label">
+                    <span>vs</span>
+                </div>
+                <div class="match-detail-team-info">
+                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
+                    <p>@matchInfo.AwayTeam.Name</p>
+                </div>
+            </div>
+            <div class="match-detail-extra">
+                @if (matchInfo.Score.ContainsKey(MatchDataPoint.RivalryValue.GetDescription()))
+                {
+                    <div class="match-detail-info">
+                        <span>Rivalry match</span>
+                    </div>
+                }
+                @if (matchInfo.HomeTeam.IsTitleHolder || matchInfo.AwayTeam.IsTitleHolder)
+                {
+                    <div class="match-detail-info">
+                        <span>Has title holder</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+
+        <div class="match-detail-content-body">
+
+            <div class="match-detail-content-item short-description">
+                <span class="title">Excitment Score</span>
+                <span>@Math.Round(matchInfo.ExcitementScore * 100, 0)</span>
+            </div>
+
+            <div class="match-detail-content-item">
+                <h1>Table Position</h1>
+                <div>
+                    <div class="match-detail-content-data">
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.HomeTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.HomeTeam.Position</span>
+                        </div>
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.AwayTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.AwayTeam.Position</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="match-detail-content-item">
+                <h1>Current Form <span>(Last 5 games)</span></h1>
+                <div>
+                    <div class="match-detail-content-data">
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.HomeTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.HomeTeam.LastFixtures.Wins<span>wins</span></span>
+                        </div>
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.AwayTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.AwayTeam.LastFixtures.Wins<span>wins</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="match-detail-content-item">
+                <h1>Head to Head games <span>(Last @(matchInfo.HeadToHead.Count) games)</span></h1>
+                <div>
+                    <div class="match-detail-content-data">
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.HomeTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.HomeTeam.H2hWins</span>
+                        </div>
+                        <div class="match-detail-content-data-team">
+                            <div>
+                                <h1>@matchInfo.AwayTeam.Name</h1>
+                            </div>
+                            <span>@matchInfo.AwayTeam.H2hWins</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="match-detail-graph">
+                <h1>How much the score is affected</h1>
+                @{
+                    var totalScore = matchInfo.Score.Sum(c => c.Value);
+
+                    foreach (var score in matchInfo.Score)
+                    {
+                        if (score.Value == 0)
+                            continue;
+                        <div class="bar">
+                            <div class="bar-value" style="width:@(Math.Round((score.Value/totalScore) * 100, 2).ToString().Replace(',', '.'))%">
+                                <span>@score.Key</span>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="match-detail-description">
+                @{
+                    var firstReason = matchInfo.Score.OrderByDescending(c => c.Value).First().Key;
+                    var secondReason = matchInfo.Score.OrderByDescending(c => c.Value).Skip(1).First().Key;
+                }
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+            $("time").each(function (elem) {
+                var utctimeval = $(this).html().trim();
+                var date = new Date(utctimeval);
+                var optionsDate = {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                };
+                var optionsTime = {
+                    hour: "numeric",
+                    minute: "numeric",
+                };
+                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            });
+
+        });
+
+
+
+    </script>
+}

@@ -4,6 +4,7 @@ namespace important_game.infrastructure.ImportantMatch
 {
     public interface IExctimentMatchRepository
     {
-        Task<List<ExcitementMatch>> GetAllMatches();
+        Task<List<ExcitementMatch>> GetAllMatchesAsync();
+        Task<ExcitementMatch> GetMatchByIdAsync(int id);
     }
 }

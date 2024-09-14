@@ -13,7 +13,7 @@ namespace important_game.web.Pages
 
         public async Task OnGet()
         {
-            var allMatches = await _matchService.GetAllMatches();
+            var allMatches = await _matchService.GetAllMatchesAsync();
 
             Matches.LiveGames = GetLiveGames(allMatches);
             Matches.WeekMatches = GetWeekMatches(allMatches);

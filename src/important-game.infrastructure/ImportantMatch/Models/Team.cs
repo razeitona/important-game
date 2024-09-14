@@ -8,5 +8,6 @@
         public int H2hWins { get; set; }
         public int Goals { get; set; }
         public TeamFixtureData LastFixtures { get; set; }
+        public bool IsTitleHolder { get; internal set; }
     }
 }

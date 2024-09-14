@@ -1,4 +1,6 @@
 ﻿using important_game.infrastructure.ImportantMatch.Models;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace important_game.infrastructure.ImportantMatch
 {
@@ -38,6 +40,20 @@ namespace important_game.infrastructure.ImportantMatch
         };
 
     }
+
+    public enum MatchDataPoint
+    {
+        [Description("Competition Rank")] CompetitionRank,
+        [Description("Fixture")] FixtureValue,
+        [Description("Current Form")] TeamsLastFixtureFormValue,
+        [Description("Goals by both teams")] TeamsGoalsFormValue,
+        [Description("League Standing")] LeagueTableValue,
+        [Description("Head to Head")] H2HValue,
+        [Description("Title Holder")] TitleHolderValue,
+        [Description("Rivalry")] RivalryValue
+    }
+
+
 
     public class RivarlyMatchup
     {

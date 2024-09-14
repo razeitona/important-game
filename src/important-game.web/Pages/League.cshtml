@@ -2,21 +2,25 @@
 @using System.Globalization
 @model LeagueModel
 @{
-    ViewData["Title"] = "Excitment Matches";
+    ViewData["Title"] = "Excitment Matches - Leagues";
 }
 
 <div class="match-league">
-    @{
-        var index = 0;
-        foreach (var league in Model.Matches.Leagues)
-        {
+    <div class="match-league-content-slider">
+        <div class="match-league-slider">
+            @{
+                var index = 0;
+                foreach (var league in Model.Matches.Leagues)
+                {
 
-            <div class="match-league-item @(index == 0 ? "league-active" : "")" data-league="@league.Key.Id">
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Key.Id  + "/image")" />
-            </div>
-            index++;
-        }
-    }
+                    <div class="match-league-item @(index == 0 ? "league-active" : "")" data-league="@league.Key.Id">
+                        <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Key.Id  + "/image")" />
+                    </div>
+                    index++;
+                }
+            }
+        </div>
+    </div>
 </div>
 
 <div class="match-league-filter">
@@ -104,6 +108,49 @@
                     $(this).data("filter-sort", "asc");
                     $(this).addClass("filter-change");
                 }
+            });
+
+            // let isDown = false;
+            // let startX, scrollLeft;
+            $('.match-league-slider').each(function () {
+
+                var slider = $(this);
+                console.log(slider);
+
+                slider.mousedown(function (e) {
+                    var startX = e.pageX - slider.offset().left;
+                    var scrollLeft = slider.scrollLeft();
+                    $(this).addClass('active');
+                    $(this).attr("startX", startX);
+                    $(this).attr("scrollLeft", scrollLeft);
+                    $(this).attr("isDown", true);
+                });
+
+                slider.mouseleave(function () {
+                    $(this).removeClass('active');
+                    $(this).attr("isDown", false);
+                });
+
+                slider.mouseup(function () {
+                    isDown = false;
+                    $(this).removeClass('active');
+                    $(this).attr("isDown", false);
+                });
+
+                slider.mousemove(function (e) {
+                    var isDown = $(this).attr("isDown");
+
+                    if (!isDown) return;
+                    e.preventDefault();
+
+                    var startX = $(this).attr("startX");
+                    var scrollLeft = $(this).attr("scrollLeft");
+
+                    const x = e.pageX - $(this).offset().left;
+                    const walk = (x - startX) * 2; // Adjust scrolling speed
+                    $(this).scrollLeft(scrollLeft - walk);
+                });
+
             });
 
         });

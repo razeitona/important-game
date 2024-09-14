@@ -6,16 +6,50 @@
         flex-direction: row;
         border: 2px solid $text-color;
         padding: 10px;
-        margin: 5px;
         border-radius: 8px;
         cursor: pointer;
 
-        img{
-            width:20px;
+        img {
+            width: 20px;
         }
+
         &.league-active {
             border-color: #d11111;
             color: #d11111;
+        }
+    }
+
+    .match-league-content-slider {
+        overflow: hidden;
+        display: flex;
+
+
+
+        .match-league-slider {
+            width: calc(20rem * 14);
+            display: flex;
+            /*pointer-events: none;*/
+            /*         animation: scroll $animationSpeed linear infinite;*/
+
+            overflow-x: auto; /* Enable horizontal scroll */
+            white-space: nowrap; /* Prevent wrapping of items */
+            scroll-behavior: smooth; /* Optional: Smooth scroll */
+            cursor: grab; /* Show a grabbing cursor */
+            user-select: none; /* Disable text selection */
+            box-sizing: border-box;
+            scrollbar-width: none; /* For Firefox: hide scrollbar */
+            gap: 6px;
+
+            .match-card {
+                flex: 0 0 auto; /* Prevent cards from shrinking or growing */
+                margin: 0px 10px;
+                display: flex;
+            }
+        }
+
+
+        .match-section-slider::-webkit-scrollbar {
+            display: none; /* For Chrome: hide scrollbar */
         }
     }
 }
@@ -39,5 +73,15 @@
         &.filter-change {
             border-bottom: 1px solid #000000;
         }
+    }
+}
+
+.match-league-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    .match-card-simple {
+        width:450px;
     }
 }

@@ -5,7 +5,7 @@ namespace important_game.infrastructure.ImportantMatch
 {
     public class ExctimentMatchRepository : IExctimentMatchRepository
     {
-        public async Task<List<ExcitementMatch>> GetAllMatches()
+        public async Task<List<ExcitementMatch>> GetAllMatchesAsync()
         {
             var matches = new List<ExcitementMatch>();
 
@@ -19,6 +19,21 @@ namespace important_game.infrastructure.ImportantMatch
             }
 
             return matches;
+        }
+
+        public async Task<ExcitementMatch> GetMatchByIdAsync(int id)
+        {
+            if (System.IO.File.Exists("data.json"))
+            {
+                var rawData = await System.IO.File.ReadAllTextAsync("data.json");
+                if (!string.IsNullOrWhiteSpace(rawData))
+                {
+                    var allMatches = JsonSerializer.Deserialize<List<ExcitementMatch>>(rawData);
+                    return allMatches.FirstOrDefault(c => c.Id == id);
+                }
+            }
+
+            return null;
         }
     }
 }

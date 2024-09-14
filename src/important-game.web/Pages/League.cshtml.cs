@@ -11,7 +11,7 @@ namespace important_game.web.Pages
 
         public async Task OnGet()
         {
-            var allMatches = await _matchService.GetAllMatches();
+            var allMatches = await _matchService.GetAllMatchesAsync();
 
             Matches.Leagues = allMatches.OrderByDescending(c => c.League.LeagueRanking)
                 .GroupBy(c => c.League.Id)

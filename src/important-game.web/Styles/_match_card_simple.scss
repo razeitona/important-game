@@ -11,8 +11,8 @@
     font-size: 12px;
     font-weight: bold;
 
-    &.hide{
-        display:none;
+    &.hide {
+        display: none;
     }
 
     .match-header {
@@ -59,7 +59,7 @@
 
                 .match-card-team-name {
                     font-size: 0.8rem;
-                    text-transform:uppercase;
+                    text-transform: uppercase;
                 }
             }
         }
@@ -68,12 +68,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction:column;
 
 
             .match-card-data-value {
                 text-align: center;
                 font-weight: bold;
                 font-size: 1.5rem;
+            }
+
+
+            .match-card-see-more {
+                display: flex;
+
+                font-size: 0.8rem;
+                flex-grow: 1;
+                justify-content: flex-end;
+
+                a {
+                    color: $background-color;
+                    text-decoration: none;
+                    border-bottom: 1px solid $background-color;
+
+                    &:hover {
+                        color: #146d13;
+                        border-bottom: 1px solid #146d13;
+                    }
+                }
             }
         }
 

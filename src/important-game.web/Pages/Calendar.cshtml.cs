@@ -11,7 +11,7 @@ namespace important_game.web.Pages
 
         public async Task OnGet()
         {
-            var allMatches = await _matchService.GetAllMatches();
+            var allMatches = await _matchService.GetAllMatchesAsync();
 
             var matchesGroupedMonth = allMatches.GroupBy(c => c.MatchDate.Date.Month).OrderBy(c => c.Key);
 

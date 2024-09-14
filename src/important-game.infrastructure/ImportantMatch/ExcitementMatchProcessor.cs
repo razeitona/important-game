@@ -1,4 +1,5 @@
-﻿using important_game.infrastructure.ImportantMatch.Models;
+﻿using important_game.infrastructure.Extensions;
+using important_game.infrastructure.ImportantMatch.Models;
 using important_game.infrastructure.LeagueProcessors;
 using System.Collections.Concurrent;
 
@@ -119,7 +120,7 @@ namespace important_game.infrastructure.ImportantMatch
             double fixtureValue = 1d;
             if (leagueTable != null)
             {
-                fixtureValue = (double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds * fixtureCoef;
+                fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * fixtureCoef;
             }
 
             //double fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.2d;
@@ -131,14 +132,14 @@ namespace important_game.infrastructure.ImportantMatch
             var homeLastFixturesScoreValue = CalculateTeamLastFixturesForm(homeLastFixturesData);
             var awaitLastFixturesScoreValue = CalculateTeamLastFixturesForm(awayLastFixturesData);
 
-            double teamsLastFixtureFormValue = (homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d * teamFormCoef;
+            double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamFormCoef;
             //double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.7d;
 
             //0.18×(Goals of Team A+Goals of Team B / 2 )
             var homeGoalsFormScoreValue = CalculateTeamGoalsForm(homeLastFixturesData);
             var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
 
-            double teamsGoalsFormValue = (homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d * teamGoalsCoef;
+            double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamGoalsCoef;
             //double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.3d;
 
             //double teamsFormValue = (teamsLastFixtureFormValue + teamsGoalsFormValue) * 0.3d;
@@ -163,13 +164,24 @@ namespace important_game.infrastructure.ImportantMatch
                 //teamsFormValue +
                 leagueTableValue + h2hValue
                 + titleHolderValue + rivalryValue;
-
             return new ExcitementMatch
             {
+                Id = fixture.Id,
                 MatchDate = fixture.MatchDate,
                 HomeTeam = fixture.HomeTeam,
                 AwayTeam = fixture.AwayTeam,
+                HeadToHead = fixture.HeadToHead,
                 ExcitementScore = excitementScore,
+                Score = new Dictionary<string, double>(){
+                    { MatchDataPoint.CompetitionRank.GetDescription(), competitionRankValue/competitionCoef  },
+                    { MatchDataPoint.FixtureValue.GetDescription(), fixtureValue /fixtureCoef  },
+                    { MatchDataPoint.TeamsLastFixtureFormValue.GetDescription(), teamsLastFixtureFormValue /teamFormCoef  },
+                    { MatchDataPoint.TeamsGoalsFormValue.GetDescription(), teamsGoalsFormValue /teamGoalsCoef  },
+                    { MatchDataPoint.LeagueTableValue.GetDescription(), leagueTableValue/tableRankCoef  },
+                    { MatchDataPoint.H2HValue.GetDescription(), h2hValue/h2hCoef  },
+                    { MatchDataPoint.TitleHolderValue.GetDescription(), titleHolderValue/titleHolderCoef  },
+                    { MatchDataPoint.RivalryValue.GetDescription(), rivalryValue/rivalryCoef  }
+                }
             };
         }
 
@@ -191,7 +203,10 @@ namespace important_game.infrastructure.ImportantMatch
             if (titleHolder == null)
                 return 0d;
 
-            return titleHolder.Id == homeTeam.Id || titleHolder.Id == awayTeam.Id ? 1 : 0;
+            homeTeam.IsTitleHolder = titleHolder.Id == homeTeam.Id;
+            awayTeam.IsTitleHolder = titleHolder.Id == awayTeam.Id;
+
+            return homeTeam.IsTitleHolder || awayTeam.IsTitleHolder ? 1 : 0;
         }
 
         private double CalculateLeagueTableValue(Team homeTeam, Team awayTeam, LeagueStanding leagueTable)
