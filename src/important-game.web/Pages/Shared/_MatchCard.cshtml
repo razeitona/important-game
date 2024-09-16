@@ -34,9 +34,9 @@
             <div class="match-card-teams-item match-card-time">
                 <div class="match-card-teams-content">
                     <div class="match-card-teams-content-item">
-                        <span>@Model.HomeTeam.Position</span>
+                        <span>@(Model.League.CurrentSeason.Round <= 1 ? "-" : Model.HomeTeam.Position)</span>
                         <span class="title">Position</span>
-                        <span>@Model.AwayTeam.Position</span>
+                        <span>@(Model.League.CurrentSeason.Round <= 1 ? "-" : Model.AwayTeam.Position)</span>
                     </div>
                     <div class="match-card-teams-content-item">
                         <span>@Model.HomeTeam.H2hWins</span>

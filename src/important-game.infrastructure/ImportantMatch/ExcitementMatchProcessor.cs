@@ -88,7 +88,11 @@ namespace important_game.infrastructure.ImportantMatch
                     Name = league.Name,
                     PrimaryColor = league.PrimaryColor,
                     BackgroundColor = league.BackgroundColor,
-                    LeagueRanking = league.LeagueRanking
+                    LeagueRanking = league.LeagueRanking,
+                    CurrentSeason = new LeagueSeason
+                    {
+                        Round = leagueTable.CurrentRound
+                    }
                 };
 
                 matchImportanceResult.Add(matchImportance);
@@ -226,6 +230,9 @@ namespace important_game.infrastructure.ImportantMatch
             if (awayTeamPosition == null)
                 return 0;
 
+            if (leagueTable.CurrentRound <= 1)
+                return 0.5d;
+
             awayTeam.Position = awayTeamPosition.Position;
 
             var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position);
@@ -253,6 +260,9 @@ namespace important_game.infrastructure.ImportantMatch
         {
             if (fixtures == null)
                 return 0;
+
+            if (fixtures.Count == 0)
+                return 0.5d;
 
             var homeTeamWins = fixtures.Where(c =>
                 c.HomeTeam.Id == homeTeam.Id && c.HomeTeamScore > c.AwayTeamScore

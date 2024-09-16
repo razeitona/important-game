@@ -18,7 +18,7 @@ namespace important_game.infrastructure.LeagueProcessors
             if (tournamentSeasons?.Seasons.Count == 0) { return null; }
 
             var currentSeason = tournamentSeasons.Seasons.First();
-
+            
             var uniqueTournament = tournament.UniqueTournament;
 
             var league = new League
@@ -29,7 +29,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 CurrentSeason = new LeagueSeason
                 {
                     Id = currentSeason.Id,
-                    Name = currentSeason.Name
+                    Name = currentSeason.Name,
                 },
                 PrimaryColor = configLeague.PrimaryColor,
                 BackgroundColor = configLeague.BackgroundColor,

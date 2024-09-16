@@ -91,13 +91,27 @@
                             <div>
                                 <h1>@matchInfo.HomeTeam.Name</h1>
                             </div>
-                            <span>@matchInfo.HomeTeam.Position</span>
+                            @if (matchInfo.League.CurrentSeason.Round <= 1)
+                            {
+                                <span>-</span>
+                            }
+                            else
+                            {
+                                <span>@matchInfo.HomeTeam.Position</span>
+                            }
                         </div>
                         <div class="match-detail-content-data-team">
                             <div>
                                 <h1>@matchInfo.AwayTeam.Name</h1>
                             </div>
-                            <span>@matchInfo.AwayTeam.Position</span>
+                            @if (matchInfo.League.CurrentSeason.Round <= 1)
+                            {
+                                <span>-</span>
+                            }
+                            else
+                            {
+                                <span>@matchInfo.AwayTeam.Position</span>
+                            }
                         </div>
                     </div>
                 </div>
