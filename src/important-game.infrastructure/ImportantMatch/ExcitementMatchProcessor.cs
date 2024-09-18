@@ -199,7 +199,7 @@ namespace important_game.infrastructure.ImportantMatch
             if (rivalryInfo == null)
                 return 0d;
 
-            return rivalryInfo.Exctiment;
+            return rivalryInfo.Excitment;
         }
 
         private double CalculateTitleHolder(Team homeTeam, Team awayTeam, Team titleHolder)

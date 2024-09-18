@@ -1,6 +1,5 @@
 ﻿using important_game.infrastructure.ImportantMatch.Models;
 using System.ComponentModel;
-using System.Reflection;
 
 namespace important_game.infrastructure.ImportantMatch
 {
@@ -35,9 +34,99 @@ namespace important_game.infrastructure.ImportantMatch
 
         public static List<RivarlyMatchup> Rivalry = new List<RivarlyMatchup>()
         {
-            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 33, Exctiment = 1d},
-            new RivarlyMatchup{TeamOneId = 2692, TeamTwoId = 44, Exctiment = 0.75d},
-            new RivarlyMatchup{TeamOneId = 2999, TeamTwoId = 3009, Exctiment = 0.65d}
+            new RivarlyMatchup {TeamOneId = 42, TeamTwoId = 2672, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 2817, TeamTwoId = 2672, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 2817, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 2829, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId =2218, TeamTwoId =2404, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 2032, TeamTwoId = 5149, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 2829, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 2672, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 1644, TeamTwoId = 2817, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2672, TeamTwoId = 2829, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 2673, TeamTwoId = 2829, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 2687, TeamTwoId = 2829, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 44, TeamTwoId = 2829, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 44, TeamTwoId = 2687, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2697, TeamTwoId = 2817, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 3006, TeamTwoId = 3002, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 3006, TeamTwoId = 3001, Excitment = 1.0},
+            new RivarlyMatchup{TeamOneId = 3002, TeamTwoId = 3001, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2995, TeamTwoId = 3002, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 3009, TeamTwoId = 2999, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 1648, TeamTwoId = 1643, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 1647, TeamTwoId = 1684, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 1649, TeamTwoId = 1678, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 1653, TeamTwoId = 1661, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 1641, TeamTwoId = 1644, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 1649, TeamTwoId = 1641, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 1641, TeamTwoId = 1678, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 1647, TeamTwoId = 1678, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 2672, TeamTwoId = 2677, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 2672, TeamTwoId = 2673, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 2672, TeamTwoId = 2534, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 2524, TeamTwoId = 2534, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 2538, TeamTwoId = 2677, Excitment = 0.55},
+            new RivarlyMatchup{TeamOneId = 2697, TeamTwoId = 2692, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 2699, TeamTwoId = 2702, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 2687, TeamTwoId = 2696, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2697, TeamTwoId = 2687, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId =2714, TeamTwoId = 2702, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2685, TeamTwoId = 2693, Excitment = 0.65},
+            new RivarlyMatchup{TeamOneId = 2685, TeamTwoId = 2690, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 2693, TeamTwoId = 2687, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2687, TeamTwoId = 2692, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 2687, TeamTwoId = 2714, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2687, TeamTwoId = 2702, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2693, TeamTwoId = 2705, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 2693, TeamTwoId = 2699, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 2693, TeamTwoId = 2702, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 2953, TeamTwoId =2959, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 2953, TeamTwoId = 2952, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2952, TeamTwoId = 2959, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 2953, TeamTwoId = 2950, Excitment = 0.65},
+            new RivarlyMatchup{TeamOneId = 2352, TeamTwoId = 2351, Excitment = 1.0},
+            new RivarlyMatchup{TeamOneId = 2829, TeamTwoId = 2817, Excitment = 1.0},
+            new RivarlyMatchup{TeamOneId = 2829, TeamTwoId = 2825, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 2817, TeamTwoId = 2836, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2829, TeamTwoId = 2836, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 2836, TeamTwoId = 2825, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 2836, TeamTwoId = 2833, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 2825, TeamTwoId = 2824, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2828, TeamTwoId =2819, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 2817, TeamTwoId = 2814, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 2816, TeamTwoId = 2833, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 2859, TeamTwoId = 2845, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 42, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 44, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 38, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 35, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 17, TeamTwoId = 33, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 44, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 40, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 38, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 35, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 33, Excitment = 1.0},
+            new RivarlyMatchup{TeamOneId = 42, TeamTwoId = 37, Excitment = 0.8},
+            new RivarlyMatchup{TeamOneId = 39, TeamTwoId = 35, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 44, TeamTwoId = 38, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 44, TeamTwoId = 35, Excitment = 1.0},
+            new RivarlyMatchup{TeamOneId = 44, TeamTwoId = 48, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 40, TeamTwoId = 38, Excitment = 0.75},
+            new RivarlyMatchup{TeamOneId = 40, TeamTwoId = 37, Excitment = 0.65},
+            new RivarlyMatchup{TeamOneId = 40, TeamTwoId = 3, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 30, TeamTwoId = 7, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 14, TeamTwoId = 38, Excitment = 0.65},
+            new RivarlyMatchup{TeamOneId = 14, TeamTwoId = 31, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 50, Excitment = 0.65},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 35, Excitment = 0.9},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 43, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 33, Excitment = 0.95},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 37, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 38, TeamTwoId = 7, Excitment = 0.7},
+            new RivarlyMatchup{TeamOneId = 60, TeamTwoId = 45, Excitment = 0.6},
+            new RivarlyMatchup{TeamOneId = 33, TeamTwoId = 37, Excitment = 0.85},
+            new RivarlyMatchup{TeamOneId = 33, TeamTwoId = 31, Excitment = 0.7}
         };
 
     }
@@ -60,6 +149,6 @@ namespace important_game.infrastructure.ImportantMatch
     {
         public int TeamOneId { get; set; }
         public int TeamTwoId { get; set; }
-        public double Exctiment { get; set; }
+        public double Excitment { get; set; }
     }
 }
