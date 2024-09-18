@@ -107,13 +107,22 @@ namespace important_game.infrastructure.ImportantMatch
             if (fixture == null || fixture.HomeTeam == null || fixture.AwayTeam == null)
                 return null;
 
-            var competitionCoef = 0.36d;
-            var rivalryCoef = 0.15d;
-            var tableRankCoef = 0.2d;
-            var fixtureCoef = 0.09d;
-            var teamFormCoef = 0.13d;
-            var teamGoalsCoef = 0.02d;
-            var h2hCoef = 0.02d;
+            //var competitionCoef = 0.36d;
+            //var rivalryCoef = 0.15d;
+            //var tableRankCoef = 0.2d;
+            //var fixtureCoef = 0.09d;
+            //var teamFormCoef = 0.13d;
+            //var teamGoalsCoef = 0.02d;
+            //var h2hCoef = 0.02d;
+            //var titleHolderCoef = 0.02d;
+
+            var competitionCoef = 0.15d;
+            var rivalryCoef = 0.1d;
+            var fixtureCoef = 0.1d;
+            var teamFormCoef = 0.25d;
+            var teamGoalsCoef = 0.18d;
+            var tableRankCoef = 0.1d;
+            var h2hCoef = 0.1d;
             var titleHolderCoef = 0.02d;
 
 
