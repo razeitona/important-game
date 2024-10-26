@@ -4,17 +4,11 @@
 @{
     ViewData["Title"] = "Excitment Matches";
 }
-<div class="watch-explanation">
-    <p>
-        <b><i>Exciment Score (ES)</i></b> is an indication of how enthusiastic and excited the match might be worth to watch. It takes into consideration different factors such as league table, <i>head to head</i> and many others.
-    </p>
-    <p> With values closer to <i>100</i> it's expected to be an interesting match to watch, while a value closer to <i>0</i> might not be so excited to watch.</p>
-</div>
-
 
 <div class="match-section">
     <div class="match-content-title">
-        <h5>Match of the Week</h5>
+        <h1>Match of the Week</h1>
+        <a href="calendar">See all</a>
     </div>
     <div class="match-section-content">
         <div class="match-section-slider">
@@ -36,7 +30,8 @@
 
 <div class="match-section">
     <div class="match-content-title">
-        <h5>Live Games</h5>
+        <h1>Live Games</h1>
+        <a href="live">See all</a>
     </div>
     <div class="match-section-content">
         <div class="match-section-slider">
@@ -48,7 +43,7 @@
             {
                 foreach (var match in Model.Matches.LiveGames)
                 {
-                    <partial name="_MatchCard" for="@match" />
+                    <partial name="_MatchLiveCard" for="@match" />
                 }
             }
         </div>
@@ -78,17 +73,6 @@
     </div>
 </div>
 
-@* <div class="watch-menu">
-    <div class="watch-menu-option">
-        <span class="watch-menu-option-item">
-            <i class="es-table"></i> Calendar
-        </span>
-        <span class="watch-menu-option-item">
-            <i class="es-table"></i> Leagues
-        </span>
-    </div>
-</div> *@
-
 
 @section Scripts {
 
@@ -111,9 +95,6 @@
                 $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
             });
 
-
-            // let isDown = false;
-            // let startX, scrollLeft;
             $('.match-section-slider').each(function () {
 
                 var slider = $(this);
@@ -155,59 +136,8 @@
 
             });
 
-
         });
 
-        // let slider = document.querySelector(".match-upcoming-content");
-        // let innerSlider = document.querySelector(".match-upcoming-slider");
-
-        // let pressed = false;
-        // let startx;
-        // let x;
-
-
-        // innerSlider.addEventListener("mousedown", (e) => {
-        //     pressed = true;
-        //     startx = e.offsetX - innerSlider.offsetLeft;
-        //     console.log(`OffsetX: ${e.offsetX}, InnerSlider OffsetLeft: ${innerSlider.offsetLeft}`);
-        //     slider.style.cursor = "grabbing";
-        // });
-
-        // slider.addEventListener("mouseenter", () => {
-        //     slider.style.cursor = "grab";
-        // });
-
-        // slider.addEventListener("mouseup", () => {
-        //     slider.style.cursor = "grab";
-        // });
-
-        // window.addEventListener("mouseup", () => {
-        //     pressed = false;
-        // });
-
-        // slider.addEventListener("mousemove", (e) => {
-        //     if (!pressed) return;
-        //     e.preventDefault();
-
-        //     x = e.offsetX;
-        //     console.log(`x: ${x}, startx: ${startx}`);
-        //     console.log(`Diff: ${x - startx}`);
-
-        //     innerSlider.style.left = `${x - startx}px`;
-        //     checkBoundary();
-        // });
-
-        // function checkBoundary(x, startx) {
-        //     let outer = slider.getBoundingClientRect();
-        //     let inner = innerSlider.getBoundingClientRect();
-
-        //     if (parseInt(innerSlider.style.left) > 0) {
-        //         innerSlider.style.left = "0px";
-        //     }
-        //     if (inner.right < outer.right) {
-        //         innerSlider.style.left = `-${inner.width - outer.width}px`;
-        //     }
-        // }
 
 
     </script>

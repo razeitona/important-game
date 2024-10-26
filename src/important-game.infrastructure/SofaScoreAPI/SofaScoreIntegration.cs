@@ -43,20 +43,29 @@ namespace important_game.infrastructure.SofaScoreAPI
             return await Invoke<SSTournamentEvents>(url);
         }
 
-        public async Task<SSHeadToHead> GetEventH2HAsync(string customEventId)
+        public async Task<SSHeadToHead> GetEventH2HAsync(string eventId)
         {
-            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{customEventId}/h2h/events";
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{eventId}/h2h/events";
             return await Invoke<SSHeadToHead>(url);
         }
 
+        public async Task<SSEventStatistics> GetEventStatisticsAsync(string eventId)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{eventId}/statistics";
+            return await Invoke<SSEventStatistics>(url);
+        }
 
-
+        public async Task<SSEventInfo> GetEventInformationAsync(string eventId)
+        {
+            var url = $"{SofaScoreConstants.BaseUrl}api/v1/event/{eventId}";
+            return await Invoke<SSEventInfo>(url);
+        }
 
         private async Task<T> Invoke<T>(string url) where T : class
         {
             try
             {
-                var response = await httpClient.GetAsync(url);
+                using var response = await httpClient.GetAsync(url);
 
                 var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 

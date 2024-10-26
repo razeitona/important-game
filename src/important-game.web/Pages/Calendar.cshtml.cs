@@ -8,7 +8,6 @@ namespace important_game.web.Pages
     {
         public ExcitmentMatchCalendarResponse Matches { get; private set; } = new ExcitmentMatchCalendarResponse();
 
-
         public async Task OnGet()
         {
             var allMatches = await _matchService.GetAllMatchesAsync();

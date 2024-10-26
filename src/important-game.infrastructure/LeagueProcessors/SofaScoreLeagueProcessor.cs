@@ -18,7 +18,7 @@ namespace important_game.infrastructure.LeagueProcessors
             if (tournamentSeasons?.Seasons.Count == 0) { return null; }
 
             var currentSeason = tournamentSeasons.Seasons.First();
-            
+
             var uniqueTournament = tournament.UniqueTournament;
 
             var league = new League
@@ -150,7 +150,6 @@ namespace important_game.infrastructure.LeagueProcessors
             return leagueStanding;
         }
 
-
         private async Task<List<Fixture>> GetHeadToHeadDataAsync(string ssCustomEventId, DateTimeOffset eventStartTime)
         {
             var fixtureResult = new List<Fixture>();
@@ -270,6 +269,123 @@ namespace important_game.infrastructure.LeagueProcessors
             return (eventScore, teamScore, oppositeTeamScore);
         }
 
+        public async Task<EventStatistics?> GetEventStatisticsAsync(string eventId)
+        {
+            var ssStatistics = await _sofaScoreIntegration.GetEventStatisticsAsync(eventId);
 
+            if (ssStatistics is null || ssStatistics.Statistics is null)
+                return default;
+
+            var eventStatistics = ProcessEventStatistics(ssStatistics);
+
+            return eventStatistics;
+        }
+
+        public async Task<EventInfo> GetEventInformationAsync(string eventId)
+        {
+            var ssEventInfo = await _sofaScoreIntegration.GetEventInformationAsync(eventId);
+
+            if (ssEventInfo is null || ssEventInfo.EventData is null)
+                return default;
+
+            var ssEventData = ssEventInfo.EventData;
+
+            return new EventInfo
+            {
+                Id = ssEventData.Id,
+                AwayTeam = new Team
+                {
+                    Id = ssEventData.AwayTeam.Id,
+                },
+                AwayTeamScore = ssEventData.AwayScore.Current,
+                HomeTeam = new Team
+                {
+                    Id = ssEventData.HomeTeam.Id,
+                },
+                HomeTeamScore = ssEventData.HomeScore.Current,
+                Status = new EventStatus
+                {
+                    Status = ssEventData.Status.Type,
+                    Period = ssEventData.LastPeriod,
+                    MatchStartTimestamp = ssEventData.StartTimestamp,
+                    MatchPeriodStartTimestamp = ssEventData.Time.CurrentPeriodStartTimestamp,
+                    InjuryTime1 = ssEventData.Time.InjuryTime1,
+                    InjuryTime2 = ssEventData.Time.InjuryTime2,
+
+                }
+            };
+
+        }
+
+        private EventStatistics ProcessEventStatistics(SSEventStatistics ssStatistics)
+        {
+            EventStatistics eventStatistics = new EventStatistics();
+
+            //Loop through all statistics, first through game periods (ALL, 1st, 2nd...)
+            for (int periodIdx = 0; periodIdx < ssStatistics.Statistics.Count; periodIdx++)
+            {
+                var ssPeriodStatistics = ssStatistics.Statistics[periodIdx];
+
+                Dictionary<string, Dictionary<string, StatisticsItem>> periodStats = null;
+
+                if (eventStatistics.Statistics.ContainsKey(ssPeriodStatistics.Period))
+                {
+                    periodStats = eventStatistics.Statistics[ssPeriodStatistics.Period];
+                }
+                else
+                {
+                    periodStats = new();
+                    eventStatistics.Statistics.Add(ssPeriodStatistics.Period, periodStats);
+                }
+
+                ProcessPeriodGroupStats(periodStats, ssPeriodStatistics);
+
+            }
+
+            return eventStatistics;
+        }
+
+        private void ProcessPeriodGroupStats(Dictionary<string, Dictionary<string, StatisticsItem>> periodStats, SSPeriodStatistic ssPeriodStatistics)
+        {
+            for (int groupIdx = 0; groupIdx < ssPeriodStatistics.Groups.Count; groupIdx++)
+            {
+                var ssGroupStatistics = ssPeriodStatistics.Groups[groupIdx];
+
+                Dictionary<string, StatisticsItem> periodGroupstat = null;
+
+                if (periodStats.ContainsKey(ssGroupStatistics.GroupName))
+                {
+                    periodGroupstat = periodStats[ssGroupStatistics.GroupName];
+                }
+                else
+                {
+                    periodGroupstat = new();
+                    periodStats.Add(ssGroupStatistics.GroupName, periodGroupstat);
+                }
+
+                ProcessGameStats(periodGroupstat, ssGroupStatistics);
+            }
+        }
+
+        private void ProcessGameStats(Dictionary<string, StatisticsItem> eventStats, SSGroupStatistic ssGroupStatistics)
+        {
+            for (int statIdx = 0; statIdx < ssGroupStatistics.StatisticsItems.Count; statIdx++)
+            {
+                var ssStat = ssGroupStatistics.StatisticsItems[statIdx];
+
+
+                if (!eventStats.ContainsKey(ssStat.Key))
+                {
+                    var statItem = new StatisticsItem(
+                        ssStat.Key, ssStat.Name,
+                        ssStat.Home, ssStat.HomeValue, ssStat.HomeTotal,
+                        ssStat.Away, ssStat.AwayValue, ssStat.AwayTotal,
+                        ssStat.CompareCode
+                        );
+
+                    eventStats.Add(ssStat.Key, statItem);
+                }
+            }
+        }
     }
 }

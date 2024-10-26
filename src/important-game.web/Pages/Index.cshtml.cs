@@ -1,4 +1,5 @@
 using important_game.infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.ImportantMatch.Models;
 using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,7 +7,8 @@ using System.Globalization;
 
 namespace important_game.web.Pages
 {
-    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService) : PageModel
+    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService
+        , IExcitmentMatchLiveProcessor _liveProcessor) : PageModel
     {
         public ExcitmentMatchMainResponse Matches { get; private set; } = new ExcitmentMatchMainResponse();
 
@@ -15,21 +17,34 @@ namespace important_game.web.Pages
         {
             var allMatches = await _matchService.GetAllMatchesAsync();
 
-            Matches.LiveGames = GetLiveGames(allMatches);
+            Matches.LiveGames = await GetLiveGames(allMatches);
             Matches.WeekMatches = GetWeekMatches(allMatches);
             Matches.UpcomingMatch = GetUpcomingMatches(allMatches);
         }
 
-        private List<ExcitementMatch> GetLiveGames(List<ExcitementMatch> allMatches)
+        private async Task<List<LiveExcitementMatch>> GetLiveGames(List<ExcitementMatch> allMatches)
         {
-            var liveGames = allMatches
+            var allGames = allMatches
                                 .Where(c => c.MatchDate < DateTime.UtcNow && c.MatchDate > DateTime.UtcNow.AddMinutes(-110))
                                 .OrderByDescending(c => c.ExcitementScore)
                                 .Take(5)
                                 .ToList();
 
-            foreach (var match in liveGames)
+            var liveGames = new List<LiveExcitementMatch>();
+            foreach (var match in allGames)
             {
+                var liveES = await _liveProcessor.ProcessLiveMatchData(match.Id);
+                liveGames.Add(new LiveExcitementMatch
+                {
+                    Id = match.Id,
+                    AwayTeam = match.AwayTeam,
+                    ExcitementScore = match.ExcitementScore,
+                    HeadToHead = match.HeadToHead,
+                    HomeTeam = match.HomeTeam,
+                    League = match.League,
+                    LiveExcitementScore = liveES,
+                    MatchDate = match.MatchDate
+                });
                 allMatches.Remove(match);
             }
 

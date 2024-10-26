@@ -6,5 +6,6 @@ namespace important_game.infrastructure.ImportantMatch
     {
         Task<List<ExcitementMatch>> GetAllMatchesAsync();
         Task<ExcitementMatch> GetMatchByIdAsync(int id);
+        Task SaveMatchesAsync(List<ExcitementMatch> excitementMatches);
     }
 }

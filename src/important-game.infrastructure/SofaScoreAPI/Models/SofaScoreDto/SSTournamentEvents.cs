@@ -6,28 +6,30 @@ namespace important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto
         [property: JsonPropertyName("events")] IReadOnlyList<SSEvent> Events,
         [property: JsonPropertyName("hasNextPage")] bool? HasNextPage
     );
-    public record SSEvent(
-        [property: JsonPropertyName("id")] int Id,
-        [property: JsonPropertyName("detailId")] int? DetailId,
-        [property: JsonPropertyName("customId")] string CustomId,
-        //[property: JsonPropertyName("tournament")] SSTournament Tournament,
-        [property: JsonPropertyName("season")] SSSeason Season,
-        [property: JsonPropertyName("winnerCode")] int? WinnerCode,
-        [property: JsonPropertyName("roundInfo")] SSEventRoundInfo RoundInfo,
-        [property: JsonPropertyName("status")] SSEventStatus Status,
-        [property: JsonPropertyName("homeTeam")] SSTeam HomeTeam,
-        [property: JsonPropertyName("homeScore")] SSEventScore HomeScore,
-        [property: JsonPropertyName("awayTeam")] SSTeam AwayTeam,
-        [property: JsonPropertyName("awayScore")] SSEventScore AwayScore,
-        [property: JsonPropertyName("startTimestamp")] long StartTimestamp,
-        [property: JsonPropertyName("slug")] string Slug,
-        [property: JsonPropertyName("time")] SSEventTime Time,
-        [property: JsonPropertyName("finalResultOnly")] bool? FinalResultOnly,
-        [property: JsonPropertyName("hasGlobalHighlights")] bool? HasGlobalHighlights,
-        [property: JsonPropertyName("hasXg")] bool? HasXg,
-        [property: JsonPropertyName("hasEventPlayerStatistics")] bool? HasEventPlayerStatistics,
-        [property: JsonPropertyName("hasEventPlayerHeatMap")] bool? HasEventPlayerHeatMap
-    );
+
+    //public record SSEvent(
+    //    [property: JsonPropertyName("id")] int Id,
+    //    [property: JsonPropertyName("detailId")] int? DetailId,
+    //    [property: JsonPropertyName("customId")] string CustomId,
+    //    //[property: JsonPropertyName("tournament")] SSTournament Tournament,
+    //    [property: JsonPropertyName("season")] SSSeason Season,
+    //    [property: JsonPropertyName("winnerCode")] int? WinnerCode,
+    //    [property: JsonPropertyName("roundInfo")] SSEventRoundInfo RoundInfo,
+    //    [property: JsonPropertyName("status")] SSEventStatus Status,
+    //    [property: JsonPropertyName("homeTeam")] SSTeam HomeTeam,
+    //    [property: JsonPropertyName("homeScore")] SSEventScore HomeScore,
+    //    [property: JsonPropertyName("awayTeam")] SSTeam AwayTeam,
+    //    [property: JsonPropertyName("awayScore")] SSEventScore AwayScore,
+    //    [property: JsonPropertyName("startTimestamp")] long StartTimestamp,
+    //    [property: JsonPropertyName("slug")] string Slug,
+    //    [property: JsonPropertyName("time")] SSEventTime Time,
+    //    [property: JsonPropertyName("finalResultOnly")] bool? FinalResultOnly,
+    //    [property: JsonPropertyName("hasGlobalHighlights")] bool? HasGlobalHighlights,
+    //    [property: JsonPropertyName("hasXg")] bool? HasXg,
+    //    [property: JsonPropertyName("hasEventPlayerStatistics")] bool? HasEventPlayerStatistics,
+    //    [property: JsonPropertyName("hasEventPlayerHeatMap")] bool? HasEventPlayerHeatMap
+    //);
+
     public record SSEventRoundInfo(
         [property: JsonPropertyName("round")] int? Round
     );
@@ -42,7 +44,14 @@ namespace important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto
     public record SSEventTime(
         [property: JsonPropertyName("injuryTime1")] int? InjuryTime1,
         [property: JsonPropertyName("injuryTime2")] int? InjuryTime2,
-        [property: JsonPropertyName("currentPeriodStartTimestamp")] int? CurrentPeriodStartTimestamp
+        [property: JsonPropertyName("currentPeriodStartTimestamp")] long  CurrentPeriodStartTimestamp,
+        [property: JsonPropertyName("initial")] int? Initial,
+        [property: JsonPropertyName("max")] int? Max,
+        [property: JsonPropertyName("extra")] int? Extra,
+        [property: JsonPropertyName("period1StartTimestamp")] int? Period1StartTimestamp,
+        [property: JsonPropertyName("period2StartTimestamp")] int? Period2StartTimestamp
+
+
     );
 
     public record SSEventScore(

@@ -26,5 +26,16 @@ namespace important_game.infrastructure.LeagueProcessors
         /// <param name="seasonId"></param>
         /// <returns></returns>
         Task<LeagueStanding> GetLeagueTableAsync(int leagueId, int seasonId);
+
+
+        /// <summary>
+        /// Get event match statistics
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        Task<EventStatistics?> GetEventStatisticsAsync(string eventId);
+
+
+        Task<EventInfo> GetEventInformationAsync(string eventId);
     }
 }

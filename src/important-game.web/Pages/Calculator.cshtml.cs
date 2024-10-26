@@ -1,30 +1,21 @@
 using important_game.infrastructure.ImportantMatch;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text.Json;
 
 namespace important_game.web.Pages
 {
     public class CalculatorModel : PageModel
     {
         private readonly ILogger<CalculatorModel> _logger;
-        private readonly IExcitmentMatchProcessor _excitmentMatchProcessor;
-        public CalculatorModel(ILogger<CalculatorModel> logger, IExcitmentMatchProcessor excitmentMatchProcessor)
+        private readonly IExcitmentMatchService _excitmentMatchService;
+        public CalculatorModel(ILogger<CalculatorModel> logger, IExcitmentMatchService excitmentMatchService)
         {
             _logger = logger;
-            _excitmentMatchProcessor = excitmentMatchProcessor;
+            _excitmentMatchService = excitmentMatchService;
         }
-
 
         public async Task OnGet()
         {
-
-            var excitementMatches = await _excitmentMatchProcessor.GetUpcomingExcitementMatchesAsync(new ExctimentMatchOptions());
-
-            if (excitementMatches == null)
-                return;
-
-            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
-
+            await _excitmentMatchService.CalculateUpcomingMatchsExcitment();
         }
     }
 }

@@ -35,5 +35,13 @@ namespace important_game.infrastructure.ImportantMatch
 
             return null;
         }
+
+        public async Task SaveMatchesAsync(List<ExcitementMatch> excitementMatches)
+        {
+            if (excitementMatches == null)
+                return;
+
+            await System.IO.File.WriteAllTextAsync("data.json", JsonSerializer.Serialize(excitementMatches));
+        }
     }
 }

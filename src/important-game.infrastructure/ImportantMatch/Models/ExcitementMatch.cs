@@ -12,4 +12,9 @@
         public Dictionary<string, double> Score { get; set; }
         public List<Fixture> HeadToHead { get; set; }
     }
+
+    public class LiveExcitementMatch : ExcitementMatch
+    {
+        public double LiveExcitementScore { get; set; }
+    }
 }

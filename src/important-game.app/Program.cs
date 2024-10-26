@@ -1,7 +1,7 @@
 ﻿using BetterConsoleTables;
 using important_game.infrastructure;
 using important_game.infrastructure.ImportantMatch;
-using important_game.ui.Infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch.Live;
 using Microsoft.Extensions.DependencyInjection;
 
 IServiceCollection services = new ServiceCollection();
@@ -10,12 +10,19 @@ services.MatchImportanceInfrastructure();
 
 var serviceProvider = services.BuildServiceProvider();
 var matchProcessor = serviceProvider.GetService<IExcitmentMatchProcessor>();
+var liveProcessor = serviceProvider.GetService<IExcitmentMatchLiveProcessor>();
 
 Console.WriteLine("Welcome to Match Processor");
 Console.WriteLine("==========================");
 
 Console.WriteLine("Analyzing the following leagues:");
 
+var brest = await liveProcessor.ProcessLiveMatchData(12764435);
+var psg = await liveProcessor.ProcessLiveMatchData(12764392);
+var sporting = await liveProcessor.ProcessLiveMatchData(12764511);
+var girona = await liveProcessor.ProcessLiveMatchData(12764255);
+var arsenal = await liveProcessor.ProcessLiveMatchData(12763955);
+//
 
 var excitementMatches = await matchProcessor.GetUpcomingExcitementMatchesAsync(new ExctimentMatchOptions());
 

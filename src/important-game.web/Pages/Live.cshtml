@@ -1,0 +1,35 @@
+﻿@page
+@using System.Globalization
+@model LiveModel
+@{
+    ViewData["Title"] = "Excitment Matches - Live";
+}
+
+<div class="match-calendar-content">
+    @foreach (var match in Model.Matches.Matches)
+    {
+        <partial name="_MatchSimpleLiveCard" for="@match" />
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("time").each(function (elem) {
+                var utctimeval = $(this).html().trim();
+                var date = new Date(utctimeval);
+                var optionsDate = {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                };
+                var optionsTime = {
+                    hour: "numeric",
+                    minute: "numeric",
+                };
+                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            });
+
+        });
+    </script>
+}
