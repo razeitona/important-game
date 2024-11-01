@@ -1393,7 +1393,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 			// The type and name attributes are restricted during .innerHTML assignment
 			var input = document.createElement( "input" );
 			input.setAttribute( "type", "hidden" );
-			el.appendChild( input ).setAttribute( "name", "D" );
+			el.appendChild( input ).setAttribute( "name", 0 );
 
 			// Support: IE8
 			// Enforce case-sensitivity of name attribute

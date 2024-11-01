@@ -1,4 +1,6 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Models
+﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+
+namespace important_game.infrastructure.ImportantMatch.Models.Processors
 {
     public class EventInfo : Fixture
     {
@@ -31,7 +33,7 @@
 
             if (Period == "period2")
             {
-                return (45 + (InjuryTime1 ?? 0)) + ((int)(DateTime.UtcNow - matchPeriodStartTime).TimeOfDay.TotalMinutes);
+                return 45 + (InjuryTime1 ?? 0) + (int)(DateTime.UtcNow - matchPeriodStartTime).TimeOfDay.TotalMinutes;
             }
 
 

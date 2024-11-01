@@ -1,4 +1,6 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Models
+﻿using important_game.infrastructure.ImportantMatch.Models;
+
+namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     public class TeamFixtureData
     {
@@ -8,6 +10,6 @@
         public int Lost { get; set; }
         public int GoalsFor { get; set; }
         public int GoalsAgainst { get; set; }
-        public List<string> FixtureResult { get; set; } = new List<string>();
+        public List<MatchResultType> FixtureResult { get; set; } = new List<MatchResultType>();
     }
 }

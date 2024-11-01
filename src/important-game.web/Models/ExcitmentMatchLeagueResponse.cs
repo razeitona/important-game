@@ -4,6 +4,6 @@ namespace important_game.web.Models
 {
     public class ExcitmentMatchLeagueResponse
     {
-        public Dictionary<League, List<ExcitementMatch>> Leagues { get; set; } = new();
+        public Dictionary<LeagueDto, List<ExcitementMatchDto>> Leagues { get; set; } = new();
     }
 }

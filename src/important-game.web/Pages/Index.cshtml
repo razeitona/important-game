@@ -2,82 +2,46 @@
 @using System.Globalization
 @model IndexModel
 @{
-    ViewData["Title"] = "Excitment Matches";
+    ViewData["Title"] = "Home";
 }
 
-<div class="match-section">
-    <div class="match-content-title">
-        <h1>Match of the Week</h1>
+@if (Model.TrendingMatches.Count > 0)
+{
+    <div class="matches-section">
+        <div class="matches-section-title">
+            <h1>Match of the week</h1>
+        </div>
+        <div class="matches-section-content">
+            @foreach (var match in Model.TrendingMatches)
+            {
+                <partial name="_MatchCardSimple" for="@match" />
+            }
+        </div>
+    </div>
+}
+<div class="matches-section">
+    <div class="matches-section-title">
+        <h1>Upcoming matches</h1>
         <a href="calendar">See all</a>
     </div>
-    <div class="match-section-content">
-        <div class="match-section-slider">
-            @if (Model.Matches.WeekMatches.Count == 0)
+    <div class="matches-section-content">
+        @if (Model.OtherMatches.Count == 0)
+        {
+            <label>No excitment match to watch this week. We are looking for one.</label>
+        }
+        else
+        {
+            foreach (var match in Model.OtherMatches)
             {
-                <label>No Exctiment Match to happen</label>
+                <partial name="_MatchCardSimple" for="@match" />
             }
-            else
-            {
-                foreach (var match in Model.Matches.WeekMatches)
-                {
-                    <partial name="_MatchCard" for="@match" />
-                }
-            }
-        </div>
+        }
     </div>
 </div>
-
-
-<div class="match-section">
-    <div class="match-content-title">
-        <h1>Live Games</h1>
-        <a href="live">See all</a>
-    </div>
-    <div class="match-section-content">
-        <div class="match-section-slider">
-            @if (Model.Matches.LiveGames.Count == 0)
-            {
-                <label>No Live Matches</label>
-            }
-            else
-            {
-                foreach (var match in Model.Matches.LiveGames)
-                {
-                    <partial name="_MatchLiveCard" for="@match" />
-                }
-            }
-        </div>
-    </div>
-</div>
-
-
-<div class="match-section">
-    <div class="match-content-title">
-        <h1>Upcoming Games</h1>
-        <a href="calendar">See all</a>
-    </div>
-    <div class="match-section-content">
-        <div class="match-section-slider">
-            @if (Model.Matches.UpcomingMatch.Count == 0)
-            {
-                <label>No Upcoming Matches</label>
-            }
-            else
-            {
-                foreach (var match in Model.Matches.UpcomingMatch)
-                {
-                    <partial name="_MatchCard" for="@match" />
-                }
-            }
-        </div>
-    </div>
-</div>
-
 
 @section Scripts {
 
     <script>
-
 
         $(document).ready(function () {
             $("time").each(function (elem) {
@@ -86,54 +50,13 @@
                 var optionsDate = {
                     day: "2-digit",
                     month: "2-digit",
-                    year: "numeric",
+                    year: "2-digit",
                 };
                 var optionsTime = {
                     hour: "numeric",
                     minute: "numeric",
                 };
                 $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            });
-
-            $('.match-section-slider').each(function () {
-
-                var slider = $(this);
-                console.log(slider);
-
-                slider.mousedown(function (e) {
-                    var startX = e.pageX - slider.offset().left;
-                    var scrollLeft = slider.scrollLeft();
-                    $(this).addClass('active');
-                    $(this).attr("startX", startX);
-                    $(this).attr("scrollLeft", scrollLeft);
-                    $(this).attr("isDown", true);
-                });
-
-                slider.mouseleave(function () {
-                    $(this).removeClass('active');
-                    $(this).attr("isDown", false);
-                });
-
-                slider.mouseup(function () {
-                    isDown = false;
-                    $(this).removeClass('active');
-                    $(this).attr("isDown", false);
-                });
-
-                slider.mousemove(function (e) {
-                    var isDown = $(this).attr("isDown");
-
-                    if (!isDown) return;
-                    e.preventDefault();
-
-                    var startX = $(this).attr("startX");
-                    var scrollLeft = $(this).attr("scrollLeft");
-
-                    const x = e.pageX - $(this).offset().left;
-                    const walk = (x - startX) * 2; // Adjust scrolling speed
-                    $(this).scrollLeft(scrollLeft - walk);
-                });
-
             });
 
         });

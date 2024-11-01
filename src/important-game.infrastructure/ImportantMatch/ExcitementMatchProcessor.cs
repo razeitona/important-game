@@ -1,5 +1,6 @@
 ﻿using important_game.infrastructure.Extensions;
-using important_game.infrastructure.ImportantMatch.Models;
+using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
 using System.Collections.Concurrent;
 
@@ -116,15 +117,26 @@ namespace important_game.infrastructure.ImportantMatch
             //var h2hCoef = 0.02d;
             //var titleHolderCoef = 0.02d;
 
-            var competitionCoef = 0.15d;
-            var rivalryCoef = 0.1d;
-            var fixtureCoef = 0.1d;
-            var teamFormCoef = 0.25d;
-            var teamGoalsCoef = 0.18d;
-            var tableRankCoef = 0.1d;
-            var h2hCoef = 0.1d;
-            var titleHolderCoef = 0.02d;
+            //var competitionCoef = 0.15d;
+            //var rivalryCoef = 0.1d;
+            //var fixtureCoef = 0.1d;
+            //var teamFormCoef = 0.25d;
+            //var teamGoalsCoef = 0.18d;
+            //var tableRankCoef = 0.1d;
+            //var h2hCoef = 0.1d;
+            //var titleHolderCoef = 0.02d;
 
+            var competitionCoef = 0.10d;
+            var rivalryCoef = 0.25d;
+            var fixtureCoef = 0.05d;
+            var teamFormCoef = 0.15d;
+            var teamGoalsCoef = 0.12d;
+            var tableRankCoef = 0.18d;
+            var h2hCoef = 0.1d;
+            var titleHolderCoef = 0.05d;
+
+            if (fixture.Id == 12437616)
+                titleHolderCoef = 0.05d;
 
             // 0.2×CR
             double competitionRankValue = league.LeagueRanking * competitionCoef;
@@ -168,8 +180,13 @@ namespace important_game.infrastructure.ImportantMatch
             // 0.15×T
             double titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder) * titleHolderCoef;
 
-            double rivalryValue = CalculateRivalry(fixture.HomeTeam, fixture.AwayTeam, league.LeagueRanking) * rivalryCoef;
+            double rivalry = CalculateRivalry(fixture.HomeTeam, fixture.AwayTeam, league.LeagueRanking);
+            double rivalryValue = rivalry * rivalryCoef;
 
+            if (rivalry > 0.9d)
+            {
+                fixtureValue = 1 * fixtureCoef;
+            }
 
             double excitementScore =
                 competitionRankValue + fixtureValue +
@@ -297,7 +314,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             var drawGames = (double)fixtures.Where(c => c.HomeTeamScore == c.AwayTeamScore).Count();
 
-            return 1d - ((homeTeamWins + awayTeamWins) * 3d + drawGames) / 15d;
+            return Math.Abs(1d - ((homeTeamWins + awayTeamWins) * 3d + drawGames) / 15d);
             //return ((3d / (double)difTeamWins) + (double)drawGames) / 5d;
         }
 

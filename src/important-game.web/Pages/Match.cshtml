@@ -2,6 +2,7 @@
 @using System.Globalization
 @using important_game.infrastructure.Extensions
 @using important_game.infrastructure.ImportantMatch
+@using important_game.infrastructure.ImportantMatch.Models
 @model MatchModel
 @{
     var matchInfo = Model.MatchInfo;
@@ -22,11 +23,11 @@
     return;
 }
 
-<div class="match-detail">
 
-    <div class="match-detail-content">
-
-        <div class="match-detail-content-header">
+<div class="match-detail" data-live="@matchInfo.IsLive">
+    <div class="match-detail-content-left">
+        <span class="match-detail-back"><i class="bi bi-arrow-left"></i>BACK</span>
+        <div class="match-detail-info match-detail-card">
             <div class="match-detail-league">
                 <div>
                     <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id  + "/image")" />
@@ -34,7 +35,7 @@
                 <div class="match-detail-league-title">
                     @matchInfo.League.Name
                 </div>
-                <div class="match-detail-time" style="color:@(matchInfo.League.PrimaryColor)">
+                <div class="match-detail-time">
                     <time>
                         @matchInfo.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
                     </time>
@@ -53,146 +54,140 @@
                     <p>@matchInfo.AwayTeam.Name</p>
                 </div>
             </div>
-            <div class="match-detail-extra">
-                @if (matchInfo.Score.ContainsKey(MatchDataPoint.RivalryValue.GetDescription()))
+        </div>
+
+        @* HEAD TO HEAD *@
+        <div class="match-detail-info match-detail-card match-detail-info-h2h">
+            <h1>Head to Head History</h1>
+            <div class="match-detail-info-h2h-content">
+                @if (matchInfo.Headtohead.Count == 0)
                 {
-                    @if (matchInfo.Score[MatchDataPoint.RivalryValue.GetDescription()] > 0)
-                    {
-                        <div class="match-detail-info">
-                            <span>Rivalry match</span>
-                        </div>
-                    }
+                    <span class="match-detail-info-h2h-empty">No matches between <i>@(matchInfo.HomeTeam.Name)</i> and <i>@(matchInfo.AwayTeam.Name)</i> the past two years </span>
                 }
-                @if (matchInfo.Score.ContainsKey(MatchDataPoint.TitleHolderValue.GetDescription()))
+                else
                 {
-                    @if (matchInfo.Score[MatchDataPoint.TitleHolderValue.GetDescription()] > 0)
+                    foreach (var match in matchInfo.Headtohead)
                     {
-                        <div class="match-detail-info">
-                            <span>Has title holder</span>
+                        <div class="match-detail-info-h2h-item">
+                            <span class="h2h-date">@match.MatchDate.ToString("dd/MM/yyyy")</span>
+                            <span class="h2h-match">@(match.HomeTeamName) @(match.HomeTeamScore)-@(match.AwayTeamScore) @(match.AwayTeamName) </span>
                         </div>
                     }
                 }
             </div>
         </div>
 
-
-        <div class="match-detail-content-body">
-
-            <div class="match-detail-content-item short-description">
-                <span class="title">Excitment Score</span>
-                <span>@Math.Round(matchInfo.ExcitementScore * 100, 0)</span>
-            </div>
-
-            <div class="match-detail-content-item">
-                <h1>Table Position</h1>
+        @* TEAMS FORM *@
+        <div class="match-detail-info match-detail-card match-detail-info-form">
+            <h1>Recent Form</h1>
+            <div class="match-detail-info-form-content">
                 <div>
-                    <div class="match-detail-content-data">
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.HomeTeam.Name</h1>
-                            </div>
-                            @if (matchInfo.League.CurrentSeason.Round <= 1)
+                    <span>@matchInfo.HomeTeam.Name</span>
+                    <div>
+
+                        @foreach (var form in matchInfo.HomeTeam.Form)
+                        {
+                            var formResult = form switch
                             {
-                                <span>-</span>
-                            }
-                            else
-                            {
-                                <span>@matchInfo.HomeTeam.Position</span>
-                            }
-                        </div>
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.AwayTeam.Name</h1>
-                            </div>
-                            @if (matchInfo.League.CurrentSeason.Round <= 1)
-                            {
-                                <span>-</span>
-                            }
-                            else
-                            {
-                                <span>@matchInfo.AwayTeam.Position</span>
-                            }
-                        </div>
+                                MatchResultType.Win => "W",
+                                MatchResultType.Draw => "D",
+                                MatchResultType.Lost => "L",
+                                _ => ""
+                            };
+                            <span data-form-score="@((int)form)">@formResult</span>
+                        }
                     </div>
                 </div>
-            </div>
-
-            <div class="match-detail-content-item">
-                <h1>Current Form <span>(Last 5 games)</span></h1>
                 <div>
-                    <div class="match-detail-content-data">
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.HomeTeam.Name</h1>
-                            </div>
-                            <span>@matchInfo.HomeTeam.LastFixtures.Wins<span>wins</span></span>
-                        </div>
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.AwayTeam.Name</h1>
-                            </div>
-                            <span>@matchInfo.AwayTeam.LastFixtures.Wins<span>wins</span></span>
-                        </div>
+                    <span>@matchInfo.AwayTeam.Name</span>
+                    <div>
+                        @foreach (var form in matchInfo.AwayTeam.Form)
+                        {
+                            var formResult = form switch
+                            {
+                                MatchResultType.Win => "W",
+                                MatchResultType.Draw => "D",
+                                MatchResultType.Lost => "L",
+                                _ => ""
+                            };
+                            <span data-form-score="@((int)form)">@formResult</span>
+                        }
                     </div>
                 </div>
-            </div>
-
-            <div class="match-detail-content-item">
-                <h1>Head to Head games <span>(Last @(matchInfo.HeadToHead.Count) games)</span></h1>
-                <div>
-                    <div class="match-detail-content-data">
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.HomeTeam.Name</h1>
-                            </div>
-                            <span>@matchInfo.HomeTeam.H2hWins</span>
-                        </div>
-                        <div class="match-detail-content-data-team">
-                            <div>
-                                <h1>@matchInfo.AwayTeam.Name</h1>
-                            </div>
-                            <span>@matchInfo.AwayTeam.H2hWins</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="match-detail-graph">
-                <h1>How much the score is affected</h1>
-                @{
-                    var totalScore = matchInfo.Score.Sum(c => c.Value);
-
-                    foreach (var score in matchInfo.Score)
-                    {
-                        if (score.Value == 0)
-                            continue;
-                        <div class="bar">
-                            <div class="bar-value" style="width:@(Math.Round((score.Value/totalScore) * 100, 2).ToString().Replace(',', '.'))%">
-                                <span>@score.Key</span>
-                            </div>
-                        </div>
-                    }
-                }
-            </div>
-            <div class="match-detail-description">
-                @{
-                    var firstReason = matchInfo.Score.OrderByDescending(c => c.Value).First().Key;
-                    var secondReason = matchInfo.Score.OrderByDescending(c => c.Value).Skip(1).First().Key;
-                }
             </div>
         </div>
+
+
     </div>
+    <div class="match-detail-content-right">
+
+        @if (matchInfo.IsLive)
+        {
+            <div class="match-detail-info match-detail-card match-detail-info-live">
+                <div class="match-detail-info-live-title">
+                    <p>Live</p>
+                    <div class="match-detail-info-live-title-score">
+                        <span>Score</span>
+                        <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.LiveExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.LiveExcitementScore * 100, 0))</div>
+                    </div>
+                </div>
+                <div class="match-detail-info-live-content">
+                    <div class="match-detail-teams">
+                        <div class="match-detail-team-info">
+                            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
+                        </div>
+                        <div class="eslive-map">
+                            <div id="heatmapContainer"></div>
+                        </div>
+                        <div class="match-detail-team-info">
+                            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="match-detail-info match-detail-card match-detail-info-esdetail">
+            <h1>Excitement Score Breakdown</h1>
+            <div class="match-detail-info-esdetail-content">
+                @foreach (var item in matchInfo.ExcitmentScoreDetail)
+                {
+                    var scoreValue = Math.Round(item.Value * 100, 0);
+
+                    <div class="esdetail-item">
+                        <div class="esdetail-title">
+                            <span class="esdetail-name">@item.Key</span>
+                            <span>@scoreValue</span>
+                        </div>
+
+                        <div class="progress esdetail-progress" role="progressbar" aria-label="@item.Key" aria-valuenow="@scoreValue" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width: @(scoreValue)%"></div>
+                        </div>
+
+                        @* <div class="text-xs text-gray-500 mt-1" data-id="element-66">Weight: 30%</div> *@
+                    </div>
+                }
+            </div>
+
+        </div>
+        <div class="match-detail-info match-detail-card match-detail-info-esinfo">
+            <div class="match-detail-info-esinfo-title">
+                <i class="bi bi-broadcast-pin"></i>
+                <span>Excitement Score</span>
+            </div>
+            <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitementScore * 100, 0))</div>
+            <p>This match has high excitement potential due to its significant impact on league standings and the historical rivalry between the teams.</p>
+        </div>
 
 
-
+    </div>
 </div>
-
-
-
 
 @section Scripts {
 
     <script>
+
+
 
         $(document).ready(function () {
             $("time").each(function (elem) {
@@ -210,9 +205,2014 @@
                 $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
             });
 
+            var isLive = $(".match-detail").attr("data-live") == "True";
+
+            if (isLive) {
+                SetupLiveGame();
+            }
+
+
+            $(".match-detail-back").on("click", function () {
+                history.back();
+            });
+
+            function SetupLiveGame() {
+
+
+                var heatmap = h337.create({
+                    container: document.getElementById('heatmapContainer'),
+                    radius: 10,
+                    maxOpacity: 0.5,
+                    minOpacity: 0,
+                    blur: 0.75,
+                    // Add more configuration options as needed
+                });
+
+                heatmap.addData([
+                    {
+                        x: 62,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 62,
+                        y: 16,
+                        value: 2
+                    },
+                    {
+                        x: 62,
+                        y: 92,
+                        value: 1
+                    },
+                    {
+                        x: 62,
+                        y: 36,
+                        value: 3
+                    },
+                    {
+                        x: 62,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 62,
+                        y: 80,
+                        value: 1
+                    },
+                    {
+                        x: 62,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 26,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 18,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 30,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 91,
+                        value: 1
+                    },
+                    {
+                        x: 75,
+                        y: 15,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 38,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 45,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 91,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 62,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 0,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 43,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 63,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 6,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 11,
+                        value: 1
+                    },
+                    {
+                        x: 86,
+                        y: 55,
+                        value: 1
+                    },
+                    {
+                        x: 43,
+                        y: 25,
+                        value: 1
+                    },
+                    {
+                        x: 43,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 43,
+                        y: 73,
+                        value: 1
+                    },
+                    {
+                        x: 43,
+                        y: 89,
+                        value: 1
+                    },
+                    {
+                        x: 43,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 56,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 41,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 67,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 30,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 81,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 25,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 76,
+                        y: 5,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 11,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 33,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 63,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 78,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 36,
+                        value: 2
+                    },
+                    {
+                        x: 89,
+                        y: 10,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 62,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 95,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 23,
+                        value: 2
+                    },
+                    {
+                        x: 89,
+                        y: 48,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 9,
+                        value: 1
+                    },
+                    {
+                        x: 89,
+                        y: 56,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 30,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 24,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 85,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 25,
+                        value: 2
+                    },
+                    {
+                        x: 96,
+                        y: 31,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 61,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 19,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 13,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 96,
+                        y: 62,
+                        value: 1
+                    },
+                    {
+                        x: 61,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 61,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 61,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 61,
+                        y: 23,
+                        value: 1
+                    },
+                    {
+                        x: 61,
+                        y: 84,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 74,
+                        value: 2
+                    },
+                    {
+                        x: 93,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 61,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 82,
+                        value: 2
+                    },
+                    {
+                        x: 93,
+                        y: 73,
+                        value: 2
+                    },
+                    {
+                        x: 93,
+                        y: 89,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 83,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 45,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 43,
+                        value: 1
+                    },
+                    {
+                        x: 93,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 8,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 31,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 13,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 12,
+                        value: 1
+                    },
+                    {
+                        x: 54,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 82,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 74,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 63,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 67,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 61,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 51,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 38,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 75,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 56,
+                        value: 2
+                    },
+                    {
+                        x: 87,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 59,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 62,
+                        value: 1
+                    },
+                    {
+                        x: 87,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 28,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 78,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 57,
+                        value: 1
+                    },
+                    {
+                        x: 74,
+                        y: 43,
+                        value: 1
+                    },
+                    {
+                        x: 59,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 59,
+                        y: 73,
+                        value: 1
+                    },
+                    {
+                        x: 59,
+                        y: 34,
+                        value: 1
+                    },
+                    {
+                        x: 59,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 59,
+                        y: 83,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 31,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 75,
+                        value: 2
+                    },
+                    {
+                        x: 94,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 94,
+                        y: 21,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 40,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 75,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 98,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 100,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 48,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 48,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 48,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 48,
+                        y: 41,
+                        value: 1
+                    },
+                    {
+                        x: 49,
+                        y: 50,
+                        value: 4
+                    },
+                    {
+                        x: 49,
+                        y: 33,
+                        value: 1
+                    },
+                    {
+                        x: 49,
+                        y: 49,
+                        value: 3
+                    },
+                    {
+                        x: 49,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 52,
+                        y: 9,
+                        value: 1
+                    },
+                    {
+                        x: 52,
+                        y: 81,
+                        value: 1
+                    },
+                    {
+                        x: 52,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 52,
+                        y: 14,
+                        value: 1
+                    },
+                    {
+                        x: 52,
+                        y: 34,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 95,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 48,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 73,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 27,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 46,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 70,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 53,
+                        y: 40,
+                        value: 1
+                    },
+                    {
+                        x: 53,
+                        y: 20,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 7,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 81,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 47,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 10,
+                        value: 1
+                    },
+                    {
+                        x: 77,
+                        y: 61,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 21,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 25,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 41,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 47,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 84,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 95,
+                        y: 71,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 25,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 63,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 43,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 32,
+                        value: 1
+                    },
+                    {
+                        x: 64,
+                        y: 82,
+                        value: 2
+                    },
+                    {
+                        x: 35,
+                        y: 19,
+                        value: 1
+                    },
+                    {
+                        x: 31,
+                        y: 18,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 17,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 55,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 12,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 71,
+                        value: 1
+                    },
+                    {
+                        x: 46,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 31,
+                        value: 2
+                    },
+                    {
+                        x: 92,
+                        y: 9,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 33,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 71,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 56,
+                        value: 1
+                    },
+                    {
+                        x: 92,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 85,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 85,
+                        y: 17,
+                        value: 1
+                    },
+                    {
+                        x: 85,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 85,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 66,
+                        y: 96,
+                        value: 1
+                    },
+                    {
+                        x: 66,
+                        y: 77,
+                        value: 1
+                    },
+                    {
+                        x: 66,
+                        y: 95,
+                        value: 1
+                    },
+                    {
+                        x: 66,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 73,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 50,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 49,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 67,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 55,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 81,
+                        value: 1
+                    },
+                    {
+                        x: 72,
+                        y: 8,
+                        value: 1
+                    },
+                    {
+                        x: 39,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 39,
+                        y: 10,
+                        value: 1
+                    },
+                    {
+                        x: 39,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 84,
+                        y: 75,
+                        value: 1
+                    },
+                    {
+                        x: 84,
+                        y: 47,
+                        value: 1
+                    },
+                    {
+                        x: 84,
+                        y: 93,
+                        value: 1
+                    },
+                    {
+                        x: 84,
+                        y: 71,
+                        value: 1
+                    },
+                    {
+                        x: 84,
+                        y: 92,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 83,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 59,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 40,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 67,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 23,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 75,
+                        value: 1
+                    },
+                    {
+                        x: 69,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 79,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 57,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 65,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 63,
+                        y: 37,
+                        value: 1
+                    },
+                    {
+                        x: 63,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 63,
+                        y: 8,
+                        value: 1
+                    },
+                    {
+                        x: 63,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 30,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 28,
+                        value: 2
+                    },
+                    {
+                        x: 91,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 50,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 55,
+                        value: 1
+                    },
+                    {
+                        x: 91,
+                        y: 79,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 58,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 21,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 49,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 77,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 59,
+                        value: 1
+                    },
+                    {
+                        x: 73,
+                        y: 26,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 50,
+                        value: 5
+                    },
+                    {
+                        x: 88,
+                        y: 34,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 77,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 87,
+                        value: 2
+                    },
+                    {
+                        x: 88,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 88,
+                        y: 20,
+                        value: 1
+                    },
+                    {
+                        x: 81,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 81,
+                        y: 6,
+                        value: 1
+                    },
+                    {
+                        x: 81,
+                        y: 81,
+                        value: 2
+                    },
+                    {
+                        x: 71,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 28,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 51,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 62,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 14,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 49,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 84,
+                        value: 1
+                    },
+                    {
+                        x: 71,
+                        y: 73,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 38,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 75,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 95,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 91,
+                        value: 2
+                    },
+                    {
+                        x: 68,
+                        y: 63,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 57,
+                        value: 1
+                    },
+                    {
+                        x: 68,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 28,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 64,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 48,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 27,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 85,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 36,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 79,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 95,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 58,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 94,
+                        value: 1
+                    },
+                    {
+                        x: 90,
+                        y: 8,
+                        value: 1
+                    },
+                    {
+                        x: 47,
+                        y: 68,
+                        value: 1
+                    },
+                    {
+                        x: 47,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 47,
+                        y: 40,
+                        value: 1
+                    },
+                    {
+                        x: 47,
+                        y: 66,
+                        value: 1
+                    },
+                    {
+                        x: 55,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 55,
+                        y: 7,
+                        value: 1
+                    },
+                    {
+                        x: 55,
+                        y: 13,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 14,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 21,
+                        value: 2
+                    },
+                    {
+                        x: 78,
+                        y: 69,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 43,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 51,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 20,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 32,
+                        value: 1
+                    },
+                    {
+                        x: 78,
+                        y: 94,
+                        value: 1
+                    },
+                    {
+                        x: 56,
+                        y: 34,
+                        value: 1
+                    },
+                    {
+                        x: 56,
+                        y: 37,
+                        value: 1
+                    },
+                    {
+                        x: 56,
+                        y: 49,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 20,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 77,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 96,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 12,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 83,
+                        value: 1
+                    },
+                    {
+                        x: 67,
+                        y: 72,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 22,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 47,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 52,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 13,
+                        value: 1
+                    },
+                    {
+                        x: 79,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 50,
+                        y: 50,
+                        value: 5
+                    },
+                    {
+                        x: 50,
+                        y: 49,
+                        value: 1
+                    },
+                    {
+                        x: 41,
+                        y: 86,
+                        value: 1
+                    },
+                    {
+                        x: 41,
+                        y: 5,
+                        value: 1
+                    },
+                    {
+                        x: 57,
+                        y: 31,
+                        value: 1
+                    },
+                    {
+                        x: 57,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 57,
+                        y: 60,
+                        value: 1
+                    },
+                    {
+                        x: 45,
+                        y: 19,
+                        value: 1
+                    },
+                    {
+                        x: 45,
+                        y: 74,
+                        value: 1
+                    },
+                    {
+                        x: 60,
+                        y: 16,
+                        value: 1
+                    },
+                    {
+                        x: 42,
+                        y: 16,
+                        value: 1
+                    },
+                    {
+                        x: 42,
+                        y: 74,
+                        value: 1
+                    },
+                    {
+                        x: 83,
+                        y: 53,
+                        value: 1
+                    },
+                    {
+                        x: 83,
+                        y: 29,
+                        value: 1
+                    },
+                    {
+                        x: 83,
+                        y: 10,
+                        value: 1
+                    },
+                    {
+                        x: 99,
+                        y: 76,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 57,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 42,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 88,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 27,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 58,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 32,
+                        value: 1
+                    },
+                    {
+                        x: 80,
+                        y: 87,
+                        value: 1
+                    },
+                    {
+                        x: 82,
+                        y: 55,
+                        value: 2
+                    },
+                    {
+                        x: 82,
+                        y: 65,
+                        value: 1
+                    },
+                    {
+                        x: 82,
+                        y: 61,
+                        value: 1
+                    },
+                    {
+                        x: 97,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 97,
+                        y: 71,
+                        value: 1
+                    },
+                    {
+                        x: 97,
+                        y: 17,
+                        value: 1
+                    },
+                    {
+                        x: 97,
+                        y: 70,
+                        value: 1
+                    },
+                    {
+                        x: 97,
+                        y: 82,
+                        value: 2
+                    },
+                    {
+                        x: 38,
+                        y: 90,
+                        value: 1
+                    },
+                    {
+                        x: 38,
+                        y: 91,
+                        value: 1
+                    },
+                    {
+                        x: 38,
+                        y: 24,
+                        value: 1
+                    },
+                    {
+                        x: 9,
+                        y: 39,
+                        value: 1
+                    },
+                    {
+                        x: 6,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 6,
+                        y: 44,
+                        value: 1
+                    },
+                    {
+                        x: 6,
+                        y: 46,
+                        value: 1
+                    },
+                    {
+                        x: 44,
+                        y: 55,
+                        value: 1
+                    },
+                    {
+                        x: 12,
+                        y: 35,
+                        value: 1
+                    },
+                    {
+                        x: 33,
+                        y: 54,
+                        value: 1
+                    },
+                    {
+                        x: 24,
+                        y: 19,
+                        value: 1
+                    },
+                    {
+                        x: 2,
+                        y: 56,
+                        value: 1
+                    }
+                ]);
+
+
+                heatmap.repaint();
+            }
+
         });
 
 
-
     </script>
+
 }

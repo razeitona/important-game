@@ -21,12 +21,14 @@ namespace important_game.web.Pages
             {
                 AwayTeam = match.AwayTeam,
                 ExcitementScore = match.ExcitementScore,
-                HeadToHead = match.HeadToHead,
+                Headtohead = match.Headtohead,
                 HomeTeam = match.HomeTeam,
                 Id = match.Id,
                 League = match.League,
                 MatchDate = match.MatchDate,
-                Score = match.Score,
+                ExcitmentScoreDetail = match.ExcitmentScoreDetail,
+                IsLive = match.IsLive,
+                //Score = match.Score,
             };
 
         }

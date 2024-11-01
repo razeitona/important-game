@@ -2,17 +2,28 @@
 .match-card-simple {
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to right, #3a3d3f, #2a2a33);
-    /*background-color: #2a2a33;*/
-    color: #FFFAFA;
     border-radius: 10px;
     margin-top: 10px;
     flex-grow: 1;
     font-size: 12px;
     font-weight: bold;
+    border-top: 5px solid var(--bgcolor);
+    border-right: 5px solid #ffffff;
+    border-bottom: 5px solid #ffffff;
+    border-left: 5px solid #ffffff;
 
+    .match-card-link{
+        text-decoration:none;
+        color:inherit;
+
+    } 
+    
     &.hide {
         display: none;
+    }
+
+    &:hover {
+        border: 5px solid var(--bgcolor);
     }
 
     .match-header {
@@ -31,35 +42,94 @@
             padding: 0 0.2rem;
             flex-grow: 1;
         }
+
+        .match-card-live {
+            background-color: #ff4444;
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 2px;
+        }
     }
 
 
     .match-card-body {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         font-size: 10px;
 
 
-        .match-card-teams {
+        .match-card-content {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             flex-grow: 1;
             gap: 8px;
 
             .match-card-team {
                 display: flex;
-                flex-direction: row;
+                flex-direction: column;
                 align-items: center;
+                flex-grow: 1;
                 gap: 10px;
+                width: 35%;
 
                 img {
-                    width: 2rem;
-                    max-width: 2rem;
+                    width: 60px;
+                    max-width: 60px;
                 }
 
                 .match-card-team-name {
-                    font-size: 0.8rem;
-                    text-transform: uppercase;
+                    font-size: 0.7rem;
+                }
+            }
+
+            .match-card-score {
+                display: flex;
+                flex-direction: column;
+                align-self: center;
+
+                a {
+                    text-decoration: none;
+                }
+
+
+                .match-card-score-value {
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.8rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                }
+                /* Ring background based on percentage */
+                [data-es] {
+                    color: var(--color);
+
+                    &:hover {
+                        color: #ffffff;
+                        background-color: var(--color);
+                    }
+                }
+                /* Color variations based on ES value */
+                [data-es^="0.0"],
+                [data-es^="0.1"],
+                [data-es^="0.2"] {
+                    --color: #ff4444; /* Red for ES < 25% */
+                }
+
+                [data-es^="0.3"],
+                [data-es^="0.4"] {
+                    --color: #ffbb33; /* Yellow for ES < 50% */
+                }
+
+                [data-es^="0.5"],
+                [data-es^="0.6"] {
+                    --color: #00C851; /* Green for ES < 70% */
+                }
+
+                [data-es^="0.7"],
+                [data-es^="0.8"],
+                [data-es^="0.9"],
+                [data-es="1"] {
+                    --color: #33b5e5; /* Blue for ES >= 70% */
                 }
             }
         }
@@ -68,19 +138,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction:column;
+            flex-direction: column;
 
 
-            .match-card-data-value {
-                text-align: center;
-                font-weight: bold;
-                font-size: 1.5rem;
-            }
+
 
 
             .match-card-see-more {
                 display: flex;
-
                 font-size: 0.8rem;
                 flex-grow: 1;
                 justify-content: flex-end;

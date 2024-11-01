@@ -1,4 +1,4 @@
-﻿$background-color: #FFFAFA;
+﻿$background-color: #21242c;
 $text-color: #525360;
 $fire-color: linear-gradient(to top, #ff0000, #ff6a00);
 
@@ -6,6 +6,8 @@ $fire-color: linear-gradient(to top, #ff0000, #ff6a00);
 
 html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -20,11 +22,11 @@ html {
 
 .page-title {
     display: flex;
-    flex-direction: column;
     align-items: center;
     flex: 1;
 
     span {
+        padding-left: 10px;
 
         &.subtitle {
             font-size: 10px;
@@ -33,17 +35,18 @@ html {
     }
 }
 
-html {
-    position: relative;
-    min-height: 100%;
+header {
+    height:80px;
 }
 
 body {
     margin-bottom: 60px;
+    font-family: 'Inter',sans-serif;
+    background-color: $background-color;
 }
 
 @import "_main.scss";
-@import "_match_section.scss";
+@import "_matches_section.scss";
 @import "_calendar.scss";
 @import "_match_detail.scss";
 @import "_league.scss";

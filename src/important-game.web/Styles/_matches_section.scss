@@ -1,0 +1,42 @@
+﻿.matches-section {
+    .matches-section-title {
+        display: flex;
+        margin: 0.5rem 0rem;
+
+        h1 {
+            flex-grow: 1;
+            font-size: 1.3rem;
+            color:#ffffff;
+        }
+
+        a {
+            justify-content: flex-end;
+            text-decoration: none;
+            color: $text-color;
+            font-size: 0.8rem;
+            align-self: center;
+            font-weight: bold;
+
+            &::after {
+                content: '>';
+                padding-left: 2px;
+            }
+        }
+    }
+
+    .matches-section-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1rem
+    }
+
+    @media (max-width: 768px) {
+        .matches-section-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    + .matches-section{
+        margin-top:1rem;
+    }
+}

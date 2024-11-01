@@ -1,4 +1,6 @@
-﻿using important_game.infrastructure.ImportantMatch.Models;
+﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Models;
+using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
 
@@ -204,7 +206,11 @@ namespace important_game.infrastructure.LeagueProcessors
 
             var fixtureScore = new TeamFixtureData();
 
-            foreach (var previousEvent in teamPreviousEvents.Events.OrderByDescending(c => c.StartTimestamp).Take(lastFixtureAmount))
+            //extract x amount of last features but sort by oldest
+            foreach (var previousEvent in teamPreviousEvents.Events
+                .OrderByDescending(c => c.StartTimestamp)
+                .Take(lastFixtureAmount)
+                .OrderBy(c => c.StartTimestamp))
             {
                 var eventResultData = GetEventResultStatus(teamId, previousEvent);
 
@@ -214,15 +220,15 @@ namespace important_game.infrastructure.LeagueProcessors
                 switch (eventResultData.EventResult)
                 {
                     case EventResultStatusEnum.Win:
-                        fixtureScore.FixtureResult.Add("w");
+                        fixtureScore.FixtureResult.Add(MatchResultType.Win);
                         fixtureScore.Wins += 1;
                         break;
                     case EventResultStatusEnum.Draw:
-                        fixtureScore.FixtureResult.Add("d");
+                        fixtureScore.FixtureResult.Add(MatchResultType.Draw);
                         fixtureScore.Draws += 1;
                         break;
                     case EventResultStatusEnum.Lost:
-                        fixtureScore.FixtureResult.Add("l");
+                        fixtureScore.FixtureResult.Add(MatchResultType.Lost);
                         fixtureScore.Lost += 1;
                         break;
 

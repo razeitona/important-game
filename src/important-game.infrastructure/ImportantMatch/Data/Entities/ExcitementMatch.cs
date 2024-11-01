@@ -1,6 +1,5 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Models
+﻿namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
-
     public class ExcitementMatch
     {
         public int Id { get; set; }
@@ -10,11 +9,7 @@
         public Team AwayTeam { get; set; }
         public double ExcitementScore { get; set; }
         public Dictionary<string, double> Score { get; set; }
-        public List<Fixture> HeadToHead { get; set; }
-    }
-
-    public class LiveExcitementMatch : ExcitementMatch
-    {
         public double LiveExcitementScore { get; set; }
+        public List<Fixture> HeadToHead { get; set; }
     }
 }

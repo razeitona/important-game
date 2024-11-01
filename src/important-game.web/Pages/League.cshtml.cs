@@ -13,10 +13,10 @@ namespace important_game.web.Pages
         {
             var allMatches = await _matchService.GetAllMatchesAsync();
 
-            Matches.Leagues = allMatches.OrderByDescending(c => c.League.LeagueRanking)
+            Matches.Leagues = allMatches.OrderByDescending(c => c.League.Id) //Ranking
                 .GroupBy(c => c.League.Id)
                 .ToDictionary(c => c.FirstOrDefault().League, v => v.OrderBy(c => c.MatchDate).ToList())
-                .OrderByDescending(c => c.Key.LeagueRanking)
+                .OrderByDescending(c => c.Key.Id) // Ranking
                 .ToDictionary(c => c.Key, v => v.Value);
 
         }

@@ -23,17 +23,15 @@ namespace important_game.web.Pages
             foreach (var match in liveGames)
             {
                 var liveES = await _liveProcessor.ProcessLiveMatchData(match.Id);
-                Matches.Matches.Add(new LiveExcitementMatch
+                Matches.Matches.Add(new ExcitementMatchDto
                 {
                     Id = match.Id,
                     AwayTeam = match.AwayTeam,
                     ExcitementScore = match.ExcitementScore,
-                    HeadToHead = match.HeadToHead,
                     HomeTeam = match.HomeTeam,
                     League = match.League,
                     LiveExcitementScore = liveES,
                     MatchDate = match.MatchDate,
-                    Score = match.Score
                 });
             }
 

@@ -4,7 +4,7 @@ namespace important_game.web.Models
 {
     public class ExcitmentMatchLiveResponse
     {
-        public List<LiveExcitementMatch> Matches { get; set; } = new();
+        public List<ExcitementMatchDto> Matches { get; set; } = new();
     }
 
 }

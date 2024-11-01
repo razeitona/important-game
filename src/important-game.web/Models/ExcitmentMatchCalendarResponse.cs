@@ -10,6 +10,6 @@ namespace important_game.web.Models
     public class ExcitmentMatchCalendarItem
     {
         public DateTime Month { get; set; }
-        public Dictionary<DateTime, List<ExcitementMatch>> Days { get; set; }
+        public Dictionary<DateTime, List<ExcitementMatchDto>> Days { get; set; }
     }
 }

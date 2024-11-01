@@ -1,4 +1,5 @@
-﻿using important_game.infrastructure.ImportantMatch.Models;
+﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Models.Processors;
 
 namespace important_game.infrastructure.LeagueProcessors
 {

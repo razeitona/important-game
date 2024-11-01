@@ -1,4 +1,4 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Models
+﻿namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     public class UpcomingFixture : Fixture
     {
