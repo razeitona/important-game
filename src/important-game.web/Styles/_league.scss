@@ -1,4 +1,4 @@
-﻿.match-league {
+﻿/*.match-league {
     display: flex;
 
     .match-league-item {
@@ -27,30 +27,30 @@
 
         .match-league-slider {
             width: calc(20rem * 14);
-            display: flex;
+            display: flex;*/
             /*pointer-events: none;*/
             /*         animation: scroll $animationSpeed linear infinite;*/
 
-            overflow-x: auto; /* Enable horizontal scroll */
-            white-space: nowrap; /* Prevent wrapping of items */
-            scroll-behavior: smooth; /* Optional: Smooth scroll */
-            cursor: grab; /* Show a grabbing cursor */
-            user-select: none; /* Disable text selection */
-            box-sizing: border-box;
-            scrollbar-width: none; /* For Firefox: hide scrollbar */
-            gap: 6px;
+            /*overflow-x: auto;*/ /* Enable horizontal scroll */
+            /*white-space: nowrap;*/ /* Prevent wrapping of items */
+            /*scroll-behavior: smooth;*/ /* Optional: Smooth scroll */
+            /*cursor: grab;*/ /* Show a grabbing cursor */
+            /*user-select: none;*/ /* Disable text selection */
+            /*box-sizing: border-box;
+            scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
+            /*gap: 6px;
 
             .match-card {
-                flex: 0 0 auto; /* Prevent cards from shrinking or growing */
-                margin: 0px 10px;
+                flex: 0 0 auto;*/ /* Prevent cards from shrinking or growing */
+                /*margin: 0px 10px;
                 display: flex;
             }
         }
 
 
         .match-section-slider::-webkit-scrollbar {
-            display: none; /* For Chrome: hide scrollbar */
-        }
+            display: none;*/ /* For Chrome: hide scrollbar */
+        /*}
     }
 }
 
@@ -84,4 +84,4 @@
     .match-card-simple {
         width:450px;
     }
-}
+}*/

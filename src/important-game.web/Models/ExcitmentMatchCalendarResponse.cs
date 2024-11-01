@@ -2,14 +2,9 @@
 
 namespace important_game.web.Models
 {
-    public class ExcitmentMatchCalendarResponse
+    public class ExcitmentMatchesResponse
     {
-        public List<ExcitmentMatchCalendarItem> Dates { get; set; } = new();
-    }
-
-    public class ExcitmentMatchCalendarItem
-    {
-        public DateTime Month { get; set; }
-        public Dictionary<DateTime, List<ExcitementMatchDto>> Days { get; set; }
+        public List<LeagueDto> Leagues { get; set; } = new();
+        public List<ExcitementMatchDto> Matches { get; set; } = new();
     }
 }

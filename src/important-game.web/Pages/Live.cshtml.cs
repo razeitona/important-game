@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace important_game.web.Pages
 {
-    public class LiveModel(ILogger<CalendarModel> _logger, IExcitmentMatchService _matchService
+    public class LiveModel(ILogger<LiveModel> _logger, IExcitmentMatchService _matchService
         , IExcitmentMatchLiveProcessor _liveProcessor) : PageModel
     {
         public ExcitmentMatchLiveResponse Matches { get; private set; } = new ExcitmentMatchLiveResponse();

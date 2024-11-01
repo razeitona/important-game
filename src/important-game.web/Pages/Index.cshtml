@@ -10,6 +10,7 @@
     <div class="matches-section">
         <div class="matches-section-title">
             <h1>Match of the week</h1>
+            <a href="/matches">See all</a>
         </div>
         <div class="matches-section-content">
             @foreach (var match in Model.TrendingMatches)
@@ -22,7 +23,7 @@
 <div class="matches-section">
     <div class="matches-section-title">
         <h1>Upcoming matches</h1>
-        <a href="calendar">See all</a>
+        <a href="/matches">See all</a>
     </div>
     <div class="matches-section-content">
         @if (Model.OtherMatches.Count == 0)

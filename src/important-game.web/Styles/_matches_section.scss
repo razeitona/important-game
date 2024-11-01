@@ -6,14 +6,14 @@
         h1 {
             flex-grow: 1;
             font-size: 1.3rem;
-            color:#ffffff;
+            color: #ffffff;
         }
 
         a {
             justify-content: flex-end;
             text-decoration: none;
-            color: $text-color;
             font-size: 0.8rem;
+            color: #ffffff;
             align-self: center;
             font-weight: bold;
 
@@ -36,7 +36,7 @@
         }
     }
 
-    + .matches-section{
-        margin-top:1rem;
+    + .matches-section {
+        margin-top: 1rem;
     }
 }

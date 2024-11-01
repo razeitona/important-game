@@ -1,0 +1,60 @@
+﻿.wm-matches {
+    display: flex;
+    flex-direction: row;
+
+    .match-league-filter {
+        display: flex;
+        flex-direction: column;
+        padding-right: 10px;
+        gap: 10px;
+
+        .match-league-item {
+            background-color: #ffffff;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: row;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+
+            img {
+                width: 20px;
+            }
+
+            &.league-active {
+                border-color: #d11111;
+                color: #d11111;
+            }
+
+            span {
+                padding-left: 10px;
+            }
+        }
+    }
+
+    .matches-section {
+        display: flex;
+        flex-grow: 1;
+
+        .matches-section-content {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 2fr));
+            gap: 1rem;
+
+            .match-card-simple,.match-card-team {
+                font-size: 0.6rem;
+            }
+
+            .match-card-score {
+                font-size: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .matches-section-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+}
