@@ -1,5 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
-using important_game.infrastructure.ImportantMatch.Models;
+﻿using important_game.infrastructure.ImportantMatch.Models;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
@@ -9,9 +8,9 @@ namespace important_game.infrastructure.LeagueProcessors
     internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
     {
 
-        public async Task<League> GetLeagueDataAsync(MatchImportanceLeague configLeague)
+        public async Task<League> GetLeagueDataAsync(int leagueId)
         {
-            var tournament = await _sofaScoreIntegration.GetTournamentAsync(configLeague.LeagueId);
+            var tournament = await _sofaScoreIntegration.GetTournamentAsync(leagueId);
 
             if (tournament?.UniqueTournament == null) { return null; }
 
@@ -27,15 +26,12 @@ namespace important_game.infrastructure.LeagueProcessors
             {
                 Id = uniqueTournament.Id,
                 Name = uniqueTournament.Name,
-                LeagueRanking = configLeague.Importance,
                 CurrentSeason = new LeagueSeason
                 {
                     Id = currentSeason.Id,
                     Name = currentSeason.Name,
                 },
-                PrimaryColor = configLeague.PrimaryColor,
-                BackgroundColor = configLeague.BackgroundColor,
-                TitleHolder = new Team
+                TitleHolder = new TeamTitleHolder
                 {
                     Id = uniqueTournament.TitleHolder.Id,
                     Name = uniqueTournament.TitleHolder.Name
@@ -45,7 +41,7 @@ namespace important_game.infrastructure.LeagueProcessors
             return league;
         }
 
-        public async Task<LeagueUpcomingFixtures> GetUpcomingFixturesAsync(int leagueId, int seasonId)
+        public async Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(int leagueId, int seasonId)
         {
             LeagueUpcomingFixtures upcomingFixtures = new();
 
@@ -63,20 +59,21 @@ namespace important_game.infrastructure.LeagueProcessors
 
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
-                if (gameStartTime > currentDate.AddHours(-3) && currentDate.AddDays(5) > gameStartTime)
+                //Get Events that start in 5 days
+                if (gameStartTime < currentDate.AddDays(5) && gameStartTime > currentDate.AddHours(-3))
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
                     {
                         Id = leagueEvent.Id,
                         MatchDate = gameStartTime,
-                        HomeTeam = new Team
+                        HomeTeam = new TeamInfo
                         {
                             Id = leagueEvent.HomeTeam.Id,
                             Name = leagueEvent.HomeTeam.Name,
                             LastFixtures = await ExtractTeamLastFixtureAsync(leagueEvent.HomeTeam.Id, 5)
                         },
-                        AwayTeam = new Team
+                        AwayTeam = new TeamInfo
                         {
                             Id = leagueEvent.AwayTeam.Id,
                             Name = leagueEvent.AwayTeam.Name,
@@ -88,7 +85,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 }
                 else
                 {
-                    //Leave, as this game is already in future
+                    //Leave, as this game is already in future or past
                     break;
                 }
 
@@ -128,7 +125,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 {
                     leagueStanding.Standings.Add(new Standing
                     {
-                        Team = new Team
+                        Team = new TeamInfo
                         {
                             Id = standingRow.Team.Id,
                             Name = standingRow.Team.Name,
@@ -176,13 +173,13 @@ namespace important_game.infrastructure.LeagueProcessors
                 {
                     Id = matchEvent.Id,
                     MatchDate = matchStartTime,
-                    HomeTeam = new Team
+                    HomeTeam = new TeamInfo
                     {
                         Id = matchEvent.HomeTeam.Id,
                         Name = matchEvent.HomeTeam.Name,
                     },
                     HomeTeamScore = matchEvent.HomeScore.Current,
-                    AwayTeam = new Team
+                    AwayTeam = new TeamInfo
                     {
                         Id = matchEvent.AwayTeam.Id,
                         Name = matchEvent.AwayTeam.Name,
@@ -299,12 +296,12 @@ namespace important_game.infrastructure.LeagueProcessors
             return new EventInfo
             {
                 Id = ssEventData.Id,
-                AwayTeam = new Team
+                AwayTeam = new TeamInfo
                 {
                     Id = ssEventData.AwayTeam.Id,
                 },
                 AwayTeamScore = ssEventData.AwayScore.Current,
-                HomeTeam = new Team
+                HomeTeam = new TeamInfo
                 {
                     Id = ssEventData.HomeTeam.Id,
                 },

@@ -1,6 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
-
-namespace important_game.infrastructure.ImportantMatch.Models.Processors
+﻿namespace important_game.infrastructure.ImportantMatch.Models.Processors
 {
     public class LeagueStanding
     {
@@ -12,7 +10,7 @@ namespace important_game.infrastructure.ImportantMatch.Models.Processors
 
     public class Standing
     {
-        public Team Team { get; set; }
+        public TeamInfo Team { get; set; }
         public int Position { get; set; }
         public int Matches { get; set; }
         public int Wins { get; set; }

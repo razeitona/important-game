@@ -1,39 +1,19 @@
 using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Live;
-using important_game.infrastructure.ImportantMatch.Models;
 using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace important_game.web.Pages
 {
-    public class LiveModel(ILogger<LiveModel> _logger, IExcitmentMatchService _matchService
-        , IExcitmentMatchLiveProcessor _liveProcessor) : PageModel
+    public class LiveModel(IExcitmentMatchService _matchService) : PageModel
     {
         public ExcitmentMatchLiveResponse Matches { get; private set; } = new ExcitmentMatchLiveResponse();
 
-        public async Task OnGet()
+        public void OnGet()
         {
-            var allMatches = await _matchService.GetAllMatchesAsync();
+            var liveGames = _matchService.GetLiveMatchesAsync().OrderBy(c => c.MatchDate);
 
-            var liveGames = allMatches
-                              .Where(c => c.MatchDate < DateTime.UtcNow && c.MatchDate > DateTime.UtcNow.AddMinutes(-110))
-                              .OrderByDescending(c => c.ExcitementScore)
-                              .ToList();
+            Matches.Matches.AddRange(liveGames);
 
-            foreach (var match in liveGames)
-            {
-                var liveES = await _liveProcessor.ProcessLiveMatchData(match.Id);
-                Matches.Matches.Add(new ExcitementMatchDto
-                {
-                    Id = match.Id,
-                    AwayTeam = match.AwayTeam,
-                    ExcitementScore = match.ExcitementScore,
-                    HomeTeam = match.HomeTeam,
-                    League = match.League,
-                    LiveExcitementScore = liveES,
-                    MatchDate = match.MatchDate,
-                });
-            }
 
         }
     }

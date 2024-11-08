@@ -1,7 +1,7 @@
 ﻿@using System.Globalization
 @using important_game.infrastructure.ImportantMatch.Models
 @using important_game.web.Models
-@model ExcitementMatchDto
+@model ExcitementMatchLiveDto
 
 <div class="card match-card-simple" data-game-day="@Model.MatchDate.ToString("MMMdd")" data-game-date="@Model.MatchDate.Ticks" data-game-score="@(Math.Round(Model.ExcitementScore * 100, 0))" data-game-league="@Model.League.Id">
     <div class="card-header match-header" >

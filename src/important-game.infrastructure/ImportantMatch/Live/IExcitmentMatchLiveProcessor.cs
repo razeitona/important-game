@@ -1,7 +1,9 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Live
+﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+
+namespace important_game.infrastructure.ImportantMatch.Live
 {
     public interface IExcitmentMatchLiveProcessor
     {
-        Task<double> ProcessLiveMatchData(long eventId);
+        Task<LiveMatch?> ProcessLiveMatchData(Match match);
     }
 }

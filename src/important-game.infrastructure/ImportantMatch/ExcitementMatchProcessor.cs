@@ -1,63 +1,74 @@
-﻿using important_game.infrastructure.Extensions;
+﻿using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
-using System.Collections.Concurrent;
 
 namespace important_game.infrastructure.ImportantMatch
 {
-    internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor) : IExcitmentMatchProcessor
+    internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor
+        , IExctimentMatchRepository matchRepository) : IExcitmentMatchProcessor
     {
-        public async Task<List<ExcitementMatch>> GetUpcomingExcitementMatchesAsync(ExctimentMatchOptions options)
+        public async Task CalculateUpcomingMatchsExcitment()
         {
-            if (!options.IsValid())
-            {
-                return null;
-            }
 
-            ConcurrentBag<ExcitementMatch> matches = new ConcurrentBag<ExcitementMatch>();
-
-            List<Task> leagueTasks = new List<Task>();
+            var listOfCompetition = matchRepository.GetActiveCompetitions();
 
             //Process all the leagues to identify the excitement match rating for each
-            foreach (var configLeague in options.Leagues)
+            foreach (var competition in listOfCompetition)
             {
-                Console.WriteLine($"{configLeague.Name}");
+                //Get all upcoming games (active) from processing competition
 
-                leagueTasks.Add(ProcessLeagueExcitmentMatchAsync(configLeague, matches));
+                var leagueInfo = await GetLeagueDataInfoAsync(competition);
+
+                if (leagueInfo == null)
+                    continue;
+
+                var activeMatches = matchRepository.GetCompetitionActiveMatches(competition.Id);
+
+                await ExtractUpcomingMatchesAsync(leagueInfo, activeMatches);
             }
 
-            await Task.WhenAll(leagueTasks);
-
-            return matches.ToList();
         }
 
-        private async Task ProcessLeagueExcitmentMatchAsync(MatchImportanceLeague configLeague, ConcurrentBag<ExcitementMatch> matches)
+        private async Task<League?> GetLeagueDataInfoAsync(Competition competition)
+        {
+            var league = await leagueProcessor.GetLeagueDataAsync(competition.Id);
+
+            if (league == null)
+                return league;
+
+            //Validate if it's to update Competition info or not
+            if (league.Name != competition.Name || competition.TitleHolderTeamId != (league.TitleHolder?.Id ?? null))
+            {
+                var updatedCompetition = new Competition
+                {
+                    Id = competition.Id,
+                    Name = league.Name,
+                    TitleHolderTeamId = league.TitleHolder?.Id ?? null,
+                };
+
+                await matchRepository.SaveCompetitionAsync(updatedCompetition);
+            }
+
+            league.Ranking = competition.LeagueRanking;
+            return league;
+        }
+
+        private async Task ExtractUpcomingMatchesAsync(League league, List<Match> activeMatches)
         {
             try
             {
-
-                var league = await leagueProcessor.GetLeagueDataAsync(configLeague);
-
-                Console.WriteLine($"Start to process {league.Name} for season {league.CurrentSeason.Name}");
-
                 //Get upcoming features
-                var upcomingFixtures = await leagueProcessor.GetUpcomingFixturesAsync(league.Id, league.CurrentSeason.Id);
-                if (upcomingFixtures == null)
+                var sourceUpcomingMatches = await leagueProcessor.GetUpcomingMatchesAsync(league.Id, league.CurrentSeason.Id);
+                if (sourceUpcomingMatches == null)
                 {
-                    Console.WriteLine($"No upcoming features to process for {league.Name}");
                     return;
                 }
 
                 //Get league standing
                 var leagueTable = await leagueProcessor.GetLeagueTableAsync(league.Id, league.CurrentSeason.Id);
 
-                var upcomingMatchesRating = await ProcessUpcomingFixturesImportantMatches(league, upcomingFixtures, leagueTable);
-
-                foreach (var match in upcomingMatchesRating)
-                {
-                    matches.Add(match);
-                }
+                await ProcessUpcomingFixturesImportantMatches(league, sourceUpcomingMatches, leagueTable, activeMatches);
 
             }
             catch (Exception e)
@@ -67,47 +78,38 @@ namespace important_game.infrastructure.ImportantMatch
         }
 
 
-        private async Task<List<ExcitementMatch>> ProcessUpcomingFixturesImportantMatches(
-            League league
-            , LeagueUpcomingFixtures leagueFixtures
-            , LeagueStanding leagueTable)
+        private async Task ProcessUpcomingFixturesImportantMatches(League league
+            , LeagueUpcomingFixtures leagueFixtures, LeagueStanding leagueTable, List<Match> activeMatches)
         {
-            Console.WriteLine($"Start process upcoming features for league {league.Name}");
 
-            var matchImportanceResult = new List<ExcitementMatch>();
+            var activeMatchesDict = activeMatches.ToDictionary(c => c.Id, c => c);
 
+            var validationDate = DateTime.UtcNow.AddDays(-1);
+
+            //Loop fixtures
             foreach (var fixture in leagueFixtures)
             {
-                var matchImportance = await CalculateMatchImportanceAsync(league, fixture, leagueTable);
-
-                if (matchImportance == null)
+                if (fixture == null || fixture.HomeTeam == null || fixture.AwayTeam == null)
                     continue;
 
-                matchImportance.League = new League
+                //Validate if match was updated recently
+                if (activeMatchesDict.TryGetValue(fixture.Id, out Match? activeMatch))
                 {
-                    Id = league.Id,
-                    Name = league.Name,
-                    PrimaryColor = league.PrimaryColor,
-                    BackgroundColor = league.BackgroundColor,
-                    LeagueRanking = league.LeagueRanking,
-                    CurrentSeason = new LeagueSeason
-                    {
-                        Round = leagueTable.CurrentRound
-                    }
-                };
+                    if (activeMatch.UpdatedDateUTC > validationDate)
+                        continue;
+                }
 
-                matchImportanceResult.Add(matchImportance);
+
+                var rivalry = matchRepository.GetRivalryByTeamId(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
+
+                var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable, rivalry);
+
             }
-
-            return matchImportanceResult;
         }
 
-        private async Task<ExcitementMatch> CalculateMatchImportanceAsync(
-            League league, UpcomingFixture fixture, LeagueStanding leagueTable)
+        private async Task<Match> CalculateMatchImportanceAsync(League league, UpcomingFixture fixture
+            , LeagueStanding leagueTable, Rivalry? rivalry)
         {
-            if (fixture == null || fixture.HomeTeam == null || fixture.AwayTeam == null)
-                return null;
-
             //var competitionCoef = 0.36d;
             //var rivalryCoef = 0.15d;
             //var tableRankCoef = 0.2d;
@@ -135,11 +137,8 @@ namespace important_game.infrastructure.ImportantMatch
             var h2hCoef = 0.1d;
             var titleHolderCoef = 0.05d;
 
-            if (fixture.Id == 12437616)
-                titleHolderCoef = 0.05d;
-
             // 0.2×CR
-            double competitionRankValue = league.LeagueRanking * competitionCoef;
+            double competitionRankValue = league.Ranking * competitionCoef;
             // 0.1×FN
             //fixture Number (fixtureNumber / total Fixtures)
             double fixtureValue = 1d;
@@ -180,10 +179,10 @@ namespace important_game.infrastructure.ImportantMatch
             // 0.15×T
             double titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder) * titleHolderCoef;
 
-            double rivalry = CalculateRivalry(fixture.HomeTeam, fixture.AwayTeam, league.LeagueRanking);
-            double rivalryValue = rivalry * rivalryCoef;
+            var rivalryData = (rivalry?.RivarlyValue ?? 0d);
+            double rivalryValue = rivalryData * rivalryCoef;
 
-            if (rivalry > 0.9d)
+            if (rivalryData > 0.9d)
             {
                 fixtureValue = 1 * fixtureCoef;
             }
@@ -194,41 +193,78 @@ namespace important_game.infrastructure.ImportantMatch
                 //teamsFormValue +
                 leagueTableValue + h2hValue
                 + titleHolderValue + rivalryValue;
-            return new ExcitementMatch
+
+
+            var homeTeam = await InsertTeamInfo(fixture.HomeTeam);
+            var awayTeam = await InsertTeamInfo(fixture.AwayTeam);
+
+            var match = new Match
             {
                 Id = fixture.Id,
-                MatchDate = fixture.MatchDate,
-                HomeTeam = fixture.HomeTeam,
-                AwayTeam = fixture.AwayTeam,
-                HeadToHead = fixture.HeadToHead,
-                ExcitementScore = excitementScore,
-                Score = new Dictionary<string, double>(){
-                    { MatchDataPoint.CompetitionRank.GetDescription(), competitionRankValue/competitionCoef  },
-                    { MatchDataPoint.FixtureValue.GetDescription(), fixtureValue /fixtureCoef  },
-                    { MatchDataPoint.TeamsLastFixtureFormValue.GetDescription(), teamsLastFixtureFormValue /teamFormCoef  },
-                    { MatchDataPoint.TeamsGoalsFormValue.GetDescription(), teamsGoalsFormValue /teamGoalsCoef  },
-                    { MatchDataPoint.LeagueTableValue.GetDescription(), leagueTableValue/tableRankCoef  },
-                    { MatchDataPoint.H2HValue.GetDescription(), h2hValue/h2hCoef  },
-                    { MatchDataPoint.TitleHolderValue.GetDescription(), titleHolderValue/titleHolderCoef  },
-                    { MatchDataPoint.RivalryValue.GetDescription(), rivalryValue/rivalryCoef  }
-                }
+                MatchDateUTC = fixture.MatchDate.UtcDateTime,
+                HomeTeamId = homeTeam.Id,
+                AwayTeamId = awayTeam.Id,
+                CompetitionId = league.Id,
+                UpdatedDateUTC = DateTime.UtcNow,
+                ExcitmentScore = excitementScore,
+                CompetitionScore = competitionRankValue / competitionCoef,
+                FixtureScore = fixtureValue / fixtureCoef,
+                FormScore = teamsLastFixtureFormValue / teamFormCoef,
+                GoalsScore = teamsGoalsFormValue / teamGoalsCoef,
+                CompetitionStandingScore = leagueTableValue / tableRankCoef,
+                HeadToHeadScore = h2hValue / h2hCoef,
+                TitleHolderScore = titleHolderValue / titleHolderCoef,
+                RivalryScore = rivalryValue / rivalryCoef,
+                HomeForm = PrepareTeamForm(fixture.HomeTeam),
+                AwayForm = PrepareTeamForm(fixture.AwayTeam),
             };
+
+            await matchRepository.SaveMatchAsync(match);
+
+            await ProcessHeadToHeadMatches(match.Id, fixture.HeadToHead);
+
+            return match;
+
         }
 
-        private double CalculateRivalry(Team homeTeam, Team awayTeam, double leagueRanking)
+        private string PrepareTeamForm(TeamInfo teamInfo)
         {
-            var rivalryInfo = ExctimentMatchOptions.Rivalry.Where(c =>
-            (c.TeamOneId == homeTeam.Id && c.TeamTwoId == awayTeam.Id)
-            ||
-            (c.TeamOneId == awayTeam.Id && c.TeamTwoId == homeTeam.Id)).FirstOrDefault();
-
-            if (rivalryInfo == null)
-                return 0d;
-
-            return rivalryInfo.Excitment;
+            return string.Join(",", teamInfo.LastFixtures.FixtureResult.Select(c => (int)c).ToList());
         }
 
-        private double CalculateTitleHolder(Team homeTeam, Team awayTeam, Team titleHolder)
+        private async Task ProcessHeadToHeadMatches(int id, List<Fixture> headToHeadFixtures)
+        {
+
+            List<Headtohead> headToHeadMatches = new();
+
+            foreach (var fixture in headToHeadFixtures)
+            {
+                headToHeadMatches.Add(new Headtohead
+                {
+                    MatchId = id,
+                    HomeTeamId = fixture.HomeTeam.Id,
+                    AwayTeamId = fixture.AwayTeam.Id,
+                    MatchDateUTC = fixture.MatchDate.UtcDateTime,
+                    HomeTeamScore = fixture.HomeTeamScore,
+                    AwayTeamScore = fixture.AwayTeamScore
+                });
+            }
+
+            await matchRepository.SaveHeadToHeadMatchesAsync(headToHeadMatches);
+        }
+
+        private async Task<Team> InsertTeamInfo(TeamInfo teamInfo)
+        {
+            var team = new Team
+            {
+                Id = teamInfo.Id,
+                Name = teamInfo.Name,
+            };
+
+            return await matchRepository.SaveTeamAsync(team);
+        }
+
+        private double CalculateTitleHolder(TeamInfo homeTeam, TeamInfo awayTeam, TeamTitleHolder titleHolder)
         {
             if (titleHolder == null)
                 return 0d;
@@ -239,7 +275,7 @@ namespace important_game.infrastructure.ImportantMatch
             return homeTeam.IsTitleHolder || awayTeam.IsTitleHolder ? 1 : 0;
         }
 
-        private double CalculateLeagueTableValue(Team homeTeam, Team awayTeam, LeagueStanding leagueTable)
+        private double CalculateLeagueTableValue(TeamInfo homeTeam, TeamInfo awayTeam, LeagueStanding leagueTable)
         {
             if (homeTeam == null || awayTeam == null || leagueTable == null || leagueTable.Standings.Count == 0)
                 return 0;
@@ -282,7 +318,7 @@ namespace important_game.infrastructure.ImportantMatch
 
         }
 
-        private async Task<double> CalculateHeadToHeadFormAsync(Team homeTeam, Team awayTeam, List<Fixture> fixtures)
+        private async Task<double> CalculateHeadToHeadFormAsync(TeamInfo homeTeam, TeamInfo awayTeam, List<Fixture> fixtures)
         {
             if (fixtures == null)
                 return 0;

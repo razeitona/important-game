@@ -6,16 +6,16 @@ namespace important_game.web.Pages
     public class CalculatorModel : PageModel
     {
         private readonly ILogger<CalculatorModel> _logger;
-        private readonly IExcitmentMatchService _excitmentMatchService;
-        public CalculatorModel(ILogger<CalculatorModel> logger, IExcitmentMatchService excitmentMatchService)
+        private readonly IExcitmentMatchProcessor _matchProcessor;
+        public CalculatorModel(ILogger<CalculatorModel> logger, IExcitmentMatchProcessor matchProcessor)
         {
             _logger = logger;
-            _excitmentMatchService = excitmentMatchService;
+            _matchProcessor = matchProcessor;
         }
 
         public async Task OnGet()
         {
-            await _excitmentMatchService.CalculateUpcomingMatchsExcitment();
+            await _matchProcessor.CalculateUpcomingMatchsExcitment();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using important_game.infrastructure.LeagueProcessors;
+﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.LeagueProcessors;
 
 namespace important_game.infrastructure.ImportantMatch.Live
 {
@@ -15,16 +16,15 @@ namespace important_game.infrastructure.ImportantMatch.Live
         private const string BALL_POSSESSION = "ballPossession";
         private const string BIG_CHANCE_CREATED = "bigChanceCreated";
 
-        public async Task<double> ProcessLiveMatchData(long eventId)
+        public async Task<LiveMatch?> ProcessLiveMatchData(Match match)
         {
-            var matchLiveData = await leagueProcessor.GetEventStatisticsAsync(eventId.ToString());
+            var matchLiveData = await leagueProcessor.GetEventStatisticsAsync(match.Id.ToString());
 
             if (matchLiveData == null)
-                return 0d;
+                return null;
 
-
-            var eventInfo = await leagueProcessor.GetEventInformationAsync(eventId.ToString());
-            if (eventInfo == null) return 0d;
+            var eventInfo = await leagueProcessor.GetEventInformationAsync(match.Id.ToString());
+            if (eventInfo == null) return null;
 
             var gameTime = eventInfo.Status.GetGameTime();
 
@@ -110,8 +110,34 @@ namespace important_game.infrastructure.ImportantMatch.Live
             var bigChancesValue = ((bigChancesTotal / totalShots) / 10d) * bigChangesCoef;
 
             //TOTAl
-            return scoreLineValue + shotTargetValue + xGoalsValue
+            var liveScore = scoreLineValue + shotTargetValue + xGoalsValue
                  + totalFoulsValue + totalCardsValue + possessionValue + bigChancesValue;
+
+            var liveMatch = new LiveMatch()
+            {
+                MatchId = match.Id,
+                RegisteredDate = DateTime.UtcNow,
+                HomeScore = eventInfo.HomeTeamScore,
+                AwayScore = eventInfo.AwayTeamScore,
+                Minutes = gameTime,
+                ExcitmentScore = liveScore,
+                ScoreLineScore = scoreLineValue / scoreLineCoef,
+                ShotTargetScore = shotTargetValue / shotTargetCoef,
+                XGoalsScore = xGoalsValue / xGoalsCoef,
+                TotalFoulsScore = totalFoulsValue / foulsCoef,
+                TotalCardsScore = totalCardsValue / cardsCoef,
+                PossesionScore = possessionValue / possessionCoef,
+                BigChancesScore = bigChancesValue / bigChangesCoef,
+            };
+
+            match.UpdatedDateUTC = DateTime.UtcNow;
+            match.HomeScore = eventInfo.HomeTeamScore;
+            match.AwayScore = eventInfo.AwayTeamScore;
+            match.ExcitmentScore = eventInfo.AwayTeamScore;
+            match.IsLive = true;
+
+
+            return liveMatch;
 
         }
 

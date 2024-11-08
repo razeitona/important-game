@@ -4,6 +4,7 @@ using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.SofaScoreAPI;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace important_game.infrastructure
 {
@@ -19,6 +20,11 @@ namespace important_game.infrastructure
             services.AddScoped<IExcitmentMatchService, ExcitmentMatchService>();
             services.AddScoped<ILeagueProcessor, SofaScoreLeagueProcessor>();
 
+
+            using (var context = new ImportantMatchDbContext())
+            {
+                context.Database.EnsureCreated();
+            }
             return services;
         }
     }

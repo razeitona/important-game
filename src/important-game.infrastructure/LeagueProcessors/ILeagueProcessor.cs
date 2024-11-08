@@ -1,5 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
-using important_game.infrastructure.ImportantMatch.Models.Processors;
+﻿using important_game.infrastructure.ImportantMatch.Models.Processors;
 
 namespace important_game.infrastructure.LeagueProcessors
 {
@@ -10,7 +9,7 @@ namespace important_game.infrastructure.LeagueProcessors
         /// </summary>
         /// <param name="leagueId">League Identifier</param>
         /// <returns>League data structure</returns>
-        Task<League> GetLeagueDataAsync(MatchImportanceLeague league);
+        Task<League> GetLeagueDataAsync(int leagueId);
 
         /// <summary>
         /// Get upcoming league fixtures
@@ -18,7 +17,7 @@ namespace important_game.infrastructure.LeagueProcessors
         /// <param name="leagueId">League Identifier</param>
         /// <param name="seasonId">Season Identifier</param>
         /// <returns></returns>
-        Task<LeagueUpcomingFixtures> GetUpcomingFixturesAsync(int leagueId, int seasonId);
+        Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(int leagueId, int seasonId);
 
         /// <summary>
         /// Get League current table
