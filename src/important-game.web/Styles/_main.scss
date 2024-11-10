@@ -71,3 +71,15 @@
         }
     }
 }
+
+.bmc-btn-container{
+    margin:10px 0px;
+    a.bmc-btn{
+        font-size:1.5rem;
+        height:50px;
+        min-width:auto;
+        &:hover{
+            color:inherit;
+        }
+    }
+}

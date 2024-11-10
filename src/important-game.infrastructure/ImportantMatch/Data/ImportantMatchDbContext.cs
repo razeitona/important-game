@@ -1,5 +1,6 @@
 ﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace important_game.infrastructure.ImportantMatch.Data
 {
@@ -21,6 +22,8 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new MatchConfiguration());
+
             SetupCompetitionDependencies(modelBuilder);
             SetupMatchDependencies(modelBuilder);
             SetupLiveMatchDependencies(modelBuilder);
@@ -235,5 +238,18 @@ namespace important_game.infrastructure.ImportantMatch.Data
             );
         }
 
+    }
+
+    public class MatchConfiguration : IEntityTypeConfiguration<Match>
+    {
+        public void Configure(EntityTypeBuilder<Match> builder)
+        {
+            builder.Property(m => m.MatchStatus)
+                   .HasConversion<int>() // Store as integer in database
+                   .IsRequired();
+
+            // Optional: Create an index for better query performance
+            builder.HasIndex(m => m.MatchStatus);
+        }
     }
 }

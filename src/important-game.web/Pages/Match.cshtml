@@ -9,11 +9,11 @@
 
     if (matchInfo != null)
     {
-        ViewData["Title"] = $"Excitment Matches - {matchInfo.HomeTeam.Name} v {matchInfo.AwayTeam.Name}";
+        ViewData["Title"] = $"{matchInfo.HomeTeam.Name} v {matchInfo.AwayTeam.Name} - Excitement Analysis & Live Updates";
     }
     else
     {
-        ViewData["Title"] = $"Excitment Matches - match not found";
+        ViewData["Title"] = $"Excitment Match Not Found";
     }
 }
 
@@ -70,7 +70,28 @@
                     {
                         <div class="match-detail-info-h2h-item">
                             <span class="h2h-date">@match.MatchDate.ToString("dd/MM/yyyy")</span>
-                            <span class="h2h-match">@(match.HomeTeamName) @(match.HomeTeamScore)-@(match.AwayTeamScore) @(match.AwayTeamName) </span>
+                            <div class="h2h-match">
+                                @if (match.HomeTeamScore > match.AwayTeamScore)
+                                {
+                                    <span>@(match.HomeTeamName)</span>
+                                    <span>@(match.HomeTeamScore)</span>
+                                    <span>-</span>
+                                    <span class="lost">@(match.AwayTeamScore)</span>
+                                    <span class="lost">@(match.AwayTeamName)</span>
+                                }
+                                else if (match.AwayTeamScore > match.HomeTeamScore)
+                                {
+                                    <span class="lost">@(match.HomeTeamName)</span>
+                                    <span class="lost">@(match.HomeTeamScore)</span>
+                                    <span>-</span>
+                                    <span>@(match.AwayTeamScore)</span>
+                                    <span>@(match.AwayTeamName)</span>
+                                }
+                                else
+                                {
+                                    <span>@(match.HomeTeamName) @(match.HomeTeamScore)-@(match.AwayTeamScore) @(match.AwayTeamName)</span>
+                                }
+                            </div>
                         </div>
                     }
                 }
@@ -176,7 +197,8 @@
                 <span>Excitement Score</span>
             </div>
             <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitementScore * 100, 0))</div>
-            <p>This match has high excitement potential due to its significant impact on league standings and the historical rivalry between the teams.</p>
+            @* <p>This match has high excitement potential due to its significant impact on league standings and the historical rivalry between the teams.</p> *@
+            <p>@matchInfo.Description</p>
         </div>
 
 

@@ -5,9 +5,9 @@ namespace important_game.infrastructure.ImportantMatch
     public interface IExcitmentMatchService
     {
         Task CalculateUpcomingMatchsExcitment();
-        Task CalculateLiveMatchExcitment();
+        Task CalculateUnfinishedMatchExcitment();
         Task<List<ExcitementMatchDto>> GetAllMatchesAsync();
-        List<ExcitementMatchLiveDto> GetLiveMatchesAsync();
-        ExcitementMatchDetailDto GetMatchByIdAsync(int id);
+        Task<List<ExcitementMatchLiveDto>> GetLiveMatchesAsync();
+        Task<ExcitementMatchDetailDto> GetMatchByIdAsync(int id);
     }
 }

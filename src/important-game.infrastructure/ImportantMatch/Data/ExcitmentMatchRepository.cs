@@ -14,7 +14,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                 // Disable change tracking for performance on bulk operations
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-                var existingRivalry = context.Competitions.FirstOrDefault(c => c.Id == competition.Id);
+                var existingRivalry = await context.Competitions.FirstOrDefaultAsync(c => c.Id == competition.Id);
 
                 if (existingRivalry != null)
                 {
@@ -37,7 +37,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
         {
             using (var context = new ImportantMatchDbContext())
             {
-                var existCompetition = context.Competitions.FirstOrDefault(c => c.Id == competition.Id);
+                var existCompetition = await context.Competitions.FirstOrDefaultAsync(c => c.Id == competition.Id);
                 if (existCompetition != null)
                 {
                     existCompetition.TitleHolderTeamId = competition.TitleHolderTeamId;
@@ -47,27 +47,27 @@ namespace important_game.infrastructure.ImportantMatch.Data
             }
         }
 
-        public Competition? GetCompetitionById(int id)
+        public async Task<Competition?> GetCompetitionByIdAsync(int id)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Competitions.FirstOrDefault(c => c.Id == id);
+                return await context.Competitions.FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
-        public List<Competition> GetCompetitions()
+        public async Task<List<Competition>> GetCompetitionsAsync()
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Competitions.ToList();
+                return await context.Competitions.ToListAsync();
             }
         }
 
-        public List<Competition> GetActiveCompetitions()
+        public async Task<List<Competition>> GetActiveCompetitionsAsync()
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Competitions.Where(c => c.IsActive).ToList();
+                return await context.Competitions.Where(c => c.IsActive).ToListAsync();
             }
         }
 
@@ -89,19 +89,19 @@ namespace important_game.infrastructure.ImportantMatch.Data
             }
         }
 
-        public async Task<Team?> GetTeamById(int id)
+        public async Task<Team?> GetTeamByIdAsync(int id)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Teams.FirstOrDefault(c => c.Id == id);
+                return await context.Teams.FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
-        public async Task<List<Team>> GetTeamsByIds(List<int> ids)
+        public async Task<List<Team>> GetTeamsByIdsAsync(List<int> ids)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Teams.Where(c => ids.Contains(c.Id)).ToList();
+                return await context.Teams.Where(c => ids.Contains(c.Id)).ToListAsync();
             }
         }
 
@@ -116,7 +116,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                 // Disable change tracking for performance on bulk operations
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-                var existingMatch = context.Matches.FirstOrDefault(c => c.Id == match.Id);
+                var existingMatch = await context.Matches.FirstOrDefaultAsync(c => c.Id == match.Id);
 
                 if (existingMatch != null)
                 {
@@ -130,8 +130,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                     existingMatch.HeadToHeadScore = match.HeadToHeadScore;
                     existingMatch.RivalryScore = match.RivalryScore;
                     existingMatch.TitleHolderScore = match.TitleHolderScore;
-                    existingMatch.isFinished = match.isFinished;
-                    existingMatch.IsLive = match.IsLive;
+                    existingMatch.MatchStatus = match.MatchStatus;
                     existingMatch.AwayScore = match.AwayScore;
                     existingMatch.HomeScore = match.HomeScore;
 
@@ -156,9 +155,9 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
                 // Get all existing fixture IDs from the database in a single query
                 var matchesIds = matches.Select(f => f.Id).ToList();
-                var existingMatches = context.Matches
+                var existingMatches = await context.Matches
                     .Where(f => matchesIds.Contains(f.Id))
-                    .ToDictionary(f => f.Id, f => f);
+                    .ToDictionaryAsync(f => f.Id, f => f);
 
                 var matchesToAdd = new List<Match>();
                 var matchesToUpdate = new List<Match>();
@@ -177,8 +176,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                         existingMatch.HeadToHeadScore = match.HeadToHeadScore;
                         existingMatch.RivalryScore = match.RivalryScore;
                         existingMatch.TitleHolderScore = match.TitleHolderScore;
-                        existingMatch.isFinished = match.isFinished;
-                        existingMatch.IsLive = match.IsLive;
+                        existingMatch.MatchStatus = match.MatchStatus;
                         existingMatch.AwayScore = match.AwayScore;
                         existingMatch.HomeScore = match.HomeScore;
 
@@ -211,17 +209,17 @@ namespace important_game.infrastructure.ImportantMatch.Data
             }
         }
 
-        public Match? GetMatchById(int id)
+        public async Task<Match?> GetMatchByIdAsync(int id)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches
+                return await context.Matches
                         .Include(c => c.LiveMatches)
                         .Include(c => c.Competition)
                         .Include(c => c.HomeTeam)
                         .Include(c => c.AwayTeam)
                         .Include(c => c.HeadToHead)
-                        .FirstOrDefault(c => c.Id == id);
+                        .FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
@@ -233,65 +231,68 @@ namespace important_game.infrastructure.ImportantMatch.Data
                         .Include(c => c.Competition)
                         .Include(c => c.HomeTeam)
                         .Include(c => c.AwayTeam)
-                        .Where(c => !c.isFinished && !c.IsLive)
+                        .Where(c => c.MatchStatus == 0)
                         .ToListAsync();
             }
         }
 
-        public List<Match> GetMatchesFromCompetition(int competitionId)
+        public async Task<List<Match>> GetMatchesFromCompetitionAsync(int competitionId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches.Where(c => c.CompetitionId == competitionId).ToList();
+                return await context.Matches.Where(c => c.CompetitionId == competitionId).ToListAsync();
             }
         }
 
 
-
-
-        public List<Match> GetCompetitionActiveMatches(int competitionId)
+        public async Task<List<Match>> GetCompetitionActiveMatchesAsync(int competitionId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches.Where(c => c.CompetitionId == competitionId && !c.isFinished).ToList();
+                return await context.Matches
+                    .Where(c => c.CompetitionId == competitionId && c.MatchStatus != MatchStatus.Finished)
+                    .ToListAsync();
             }
         }
 
-
-        public List<Match> GetUpcomingMatchesFromCompetition(int competitionId)
+        public async Task<List<Match>> GetUpcomingMatchesFromCompetitionAsync(int competitionId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches.Where(c => c.CompetitionId == competitionId && !c.isFinished && !c.IsLive).ToList();
+                return await context.Matches
+                    .Where(c => c.CompetitionId == competitionId && c.MatchStatus == MatchStatus.Upcoming)
+                    .ToListAsync();
             }
         }
 
-        public List<Match> GetLiveMatchesFromCompetition(int competitionId)
+        public async Task<List<Match>> GetLiveMatchesFromCompetitionAsync(int competitionId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches.Where(c => c.CompetitionId == competitionId && !c.isFinished && c.IsLive).ToList();
+                return await context.Matches
+                    .Where(c => c.CompetitionId == competitionId && c.MatchStatus == MatchStatus.Live)
+                    .ToListAsync();
             }
         }
 
-        public List<Match> GetLiveMatches()
+        public async Task<List<Match>> GetUnfinishedMatchesAsync()
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches
+                return await context.Matches
                     .Include(c => c.LiveMatches)
                     .Include(c => c.Competition)
                     .Include(c => c.HomeTeam)
                     .Include(c => c.AwayTeam)
-                    .Where(c => !c.isFinished && c.IsLive).ToList();
+                    .Where(c => c.MatchStatus != MatchStatus.Finished).ToListAsync();
             }
         }
 
-        public List<Match> GetFinishedMatchesFromCompetition(int competitionId)
+        public async Task<List<Match>> GetFinishedMatchesFromCompetitionAsync(int competitionId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Matches.Where(c => c.CompetitionId == competitionId && c.isFinished).ToList();
+                return await context.Matches.Where(c => c.CompetitionId == competitionId && c.MatchStatus == MatchStatus.Finished).ToListAsync();
             }
         }
 
@@ -303,7 +304,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                 // Disable change tracking for performance on bulk operations
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-                var existingLiveMatch = context.LiveMatches.FirstOrDefault(c => c.Id == liveMatch.Id);
+                var existingLiveMatch = await context.LiveMatches.FirstOrDefaultAsync(c => c.Id == liveMatch.Id);
 
                 if (existingLiveMatch != null)
                 {
@@ -338,9 +339,9 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
                 // Get all existing fixture IDs from the database in a single query
                 var liveMatchesIds = liveMatches.Select(f => f.Id).ToList();
-                var existingLiveMatches = context.LiveMatches
+                var existingLiveMatches = await context.LiveMatches
                     .Where(f => liveMatchesIds.Contains(f.Id))
-                    .ToDictionary(f => f.Id, f => f);
+                    .ToDictionaryAsync(f => f.Id, f => f);
 
                 var liveMatchesToAdd = new List<LiveMatch>();
                 var liveMatchesToUpdate = new List<LiveMatch>();
@@ -388,11 +389,11 @@ namespace important_game.infrastructure.ImportantMatch.Data
             }
         }
 
-        public async Task<LiveMatch?> GetLiveMatchById(int id)
+        public async Task<LiveMatch?> GetLiveMatchByIdAsync(int id)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.LiveMatches.FirstOrDefault(c => c.Id == id);
+                return await context.LiveMatches.FirstOrDefaultAsync(c => c.Id == id);
             }
         }
 
@@ -427,9 +428,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         #endregion
 
-
         #region Rivalry Methods
-
 
         public async Task SaveRivalryAsync(Rivalry rivalry)
         {
@@ -438,7 +437,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                 // Disable change tracking for performance on bulk operations
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-                var existingRivalry = context.Rivalries.FirstOrDefault(c => c.Id == rivalry.Id);
+                var existingRivalry = await context.Rivalries.FirstOrDefaultAsync(c => c.Id == rivalry.Id);
 
                 if (existingRivalry != null)
                 {
@@ -456,15 +455,15 @@ namespace important_game.infrastructure.ImportantMatch.Data
             }
         }
 
-        public Rivalry? GetRivalryByTeamId(int teamOneId, int teamTwoId)
+        public async Task<Rivalry?> GetRivalryByTeamIdAsync(int teamOneId, int teamTwoId)
         {
             using (var context = new ImportantMatchDbContext())
             {
-                return context.Rivalries.Where(c =>
+                return await context.Rivalries.Where(c =>
                             (c.TeamOneId == teamOneId && c.TeamTwoId == teamTwoId)
                             || (c.TeamTwoId == teamOneId && c.TeamOneId == teamTwoId)
                             )
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
             }
         }
 

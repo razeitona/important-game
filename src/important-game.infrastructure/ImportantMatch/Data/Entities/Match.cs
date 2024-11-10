@@ -21,19 +21,20 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         [ForeignKey(nameof(HomeTeam))]
         public int HomeTeamId { get; set; }
         public Team HomeTeam { get; set; }
+        public int HomeTeamPosition { get; set; }
 
 
         [ForeignKey(nameof(AwayTeam))]
         public int AwayTeamId { get; set; }
         public Team AwayTeam { get; set; }
+        public int AwayTeamPosition { get; set; }
 
         public int HomeScore { get; set; }
         public int AwayScore { get; set; }
 
         public string? HomeForm { get; set; }
         public string? AwayForm { get; set; }
-        public bool isFinished { get; set; }
-        public bool IsLive { get; set; }
+        public MatchStatus MatchStatus { get; set; }
 
         [Required]
         public double ExcitmentScore { get; set; }

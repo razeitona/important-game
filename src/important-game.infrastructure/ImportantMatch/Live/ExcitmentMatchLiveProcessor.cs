@@ -1,4 +1,5 @@
 ﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
 
 namespace important_game.infrastructure.ImportantMatch.Live
@@ -134,12 +135,22 @@ namespace important_game.infrastructure.ImportantMatch.Live
             match.HomeScore = eventInfo.HomeTeamScore;
             match.AwayScore = eventInfo.AwayTeamScore;
             match.ExcitmentScore = eventInfo.AwayTeamScore;
-            match.IsLive = true;
 
+            if (eventInfo.Status.StatusCode == EventMatchStatus.Finished)
+            {
+                match.MatchStatus = MatchStatus.Finished;
+            }
+            else if (eventInfo.Status.StatusCode == EventMatchStatus.NotStarted)
+            {
+                match.MatchStatus = MatchStatus.Upcoming;
+            }
+            else if (eventInfo.Status.StatusCode == EventMatchStatus.FirstHalf || eventInfo.Status.StatusCode == EventMatchStatus.SecondHalf)
+            {
+                match.MatchStatus = MatchStatus.Live;
+            }
 
             return liveMatch;
 
         }
-
     }
 }

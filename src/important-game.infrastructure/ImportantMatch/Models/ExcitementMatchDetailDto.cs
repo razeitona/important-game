@@ -15,5 +15,6 @@
         public Dictionary<string, double> ExcitmentScoreDetail { get; set; } = new();
         public double Minutes { get; set; }
         public double LiveExcitementScore { get; set; }
+        public string Description { get; set; }
     }
 }

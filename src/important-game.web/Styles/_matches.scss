@@ -10,7 +10,7 @@
 
         .match-league-item {
             background-color: #ffffff;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             display: flex;
             flex-direction: row;
             padding: 10px;
@@ -28,6 +28,8 @@
 
             span {
                 padding-left: 10px;
+                display: flex;
+                align-items: center;
             }
         }
     }
@@ -35,6 +37,13 @@
     .matches-section {
         display: flex;
         flex-grow: 1;
+        flex-direction: column;
+
+        .matches-date {
+            color: #ffffff;
+            font-size: 0.85rem;
+        }
+
 
         .matches-section-content {
             flex-grow: 1;
@@ -42,7 +51,8 @@
             grid-template-columns: repeat(auto-fill, minmax(300px, 2fr));
             gap: 1rem;
 
-            .match-card-simple,.match-card-team {
+
+            .match-card-simple, .match-card-team {
                 font-size: 0.6rem;
             }
 

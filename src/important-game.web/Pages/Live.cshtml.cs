@@ -8,9 +8,9 @@ namespace important_game.web.Pages
     {
         public ExcitmentMatchLiveResponse Matches { get; private set; } = new ExcitmentMatchLiveResponse();
 
-        public void OnGet()
+        public async Task OnGet()
         {
-            var liveGames = _matchService.GetLiveMatchesAsync().OrderBy(c => c.MatchDate);
+            var liveGames = (await _matchService.GetLiveMatchesAsync()).OrderBy(c => c.MatchDate);
 
             Matches.Matches.AddRange(liveGames);
 

@@ -13,9 +13,9 @@ namespace important_game.infrastructure.ImportantMatch
             await matchProcessor.CalculateUpcomingMatchsExcitment();
         }
 
-        public async Task CalculateLiveMatchExcitment()
+        public async Task CalculateUnfinishedMatchExcitment()
         {
-            var listOfLiveMatches = matchRepository.GetLiveMatches();
+            var listOfLiveMatches = await matchRepository.GetUnfinishedMatchesAsync();
 
             //Process all the leagues to identify the excitement match rating for each
             foreach (var match in listOfLiveMatches)
@@ -72,9 +72,9 @@ namespace important_game.infrastructure.ImportantMatch
             return matches.OrderBy(c => c.MatchDate).ToList();
         }
 
-        public List<ExcitementMatchLiveDto> GetLiveMatchesAsync()
+        public async Task<List<ExcitementMatchLiveDto>> GetLiveMatchesAsync()
         {
-            var rawMatches = matchRepository.GetLiveMatches();
+            var rawMatches = await matchRepository.GetUnfinishedMatchesAsync();
 
             var matches = new List<ExcitementMatchLiveDto>();
 
@@ -120,9 +120,9 @@ namespace important_game.infrastructure.ImportantMatch
         }
 
 
-        public ExcitementMatchDetailDto GetMatchByIdAsync(int id)
+        public async Task<ExcitementMatchDetailDto> GetMatchByIdAsync(int id)
         {
-            var rawMatch = matchRepository.GetMatchById(id);
+            var rawMatch = await matchRepository.GetMatchByIdAsync(id);
 
             if (rawMatch == null)
                 return null;
@@ -141,13 +141,15 @@ namespace important_game.infrastructure.ImportantMatch
                     Name = rawMatch.Competition.Name,
                     BackgroundColor = rawMatch.Competition.BackgroundColor
                 },
-                IsLive = rawMatch.IsLive,
+                IsLive = rawMatch.MatchStatus == MatchStatus.Live,
                 ExcitementScore = rawMatch.ExcitmentScore,
                 HomeTeam = SetupMatchDetailTeam(rawMatch.HomeTeam, rawMatch.HomeForm, rawMatch.Competition),
                 AwayTeam = SetupMatchDetailTeam(rawMatch.AwayTeam, rawMatch.AwayForm, rawMatch.Competition),
                 Headtohead = SetupMatchHeadToHead(rawMatch.HeadToHead.ToList()),
                 ExcitmentScoreDetail = SetupExcitmentScoreDetail(rawMatch, liveData)
             };
+
+            match.Description = BuildSentence(match.ExcitmentScoreDetail);
 
             if (liveData != null)
             {
@@ -156,6 +158,47 @@ namespace important_game.infrastructure.ImportantMatch
             }
 
             return match;
+        }
+
+        private readonly Dictionary<string, string> _highValuePhrases = new()
+        {
+            { "CompetitionScore", "significant impact on league standings" },
+            { "FixtureScore", "crucial stage in the season" },
+            { "FormScore", "both teams' impressive recent performances" },
+            { "CompetitionStandingScore", "high table impact" },
+            { "GoalsScore", "high scoring potential" },
+            { "HeadToHeadScore", "compelling head-to-head history" },
+            { "RivalryScore", "historical rivalry between the teams" },
+            { "TitleHolderScore", "presence of the defending champions" }
+        };
+
+
+        private string DetermineExcitementLevel(double averageScore)
+        {
+            return averageScore switch
+            {
+                >= 0.8 => "exceptional",
+                >= 0.6 => "high",
+                >= 0.4 => "moderate",
+                >= 0.2 => "modest",
+                _ => "low"
+            };
+        }
+
+        private string BuildSentence(Dictionary<string, double> excitmentScoreDetail)
+        {
+            if (!excitmentScoreDetail.Any())
+                return "This match has standard excitement potential.";
+
+            var excitement = DetermineExcitementLevel(excitmentScoreDetail.Average(f => f.Value));
+            var factors = excitmentScoreDetail.OrderByDescending(c => c.Value).Select(f => _highValuePhrases[f.Key]).ToList();
+
+            return factors.Count switch
+            {
+                1 => $"This match has {excitement} excitement potential due to {factors[0]}.",
+                2 => $"This match has {excitement} excitement potential due to {factors[0]} and {factors[1]}.",
+                _ => $"This match has {excitement} excitement potential due to {factors[0]}, {factors[1]}, and {factors[2]}."
+            };
         }
 
         private Dictionary<string, double> SetupExcitmentScoreDetail(Match rawMatch, LiveMatch? liveData)

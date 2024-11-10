@@ -10,9 +10,9 @@ namespace important_game.web.Pages
         public ExcitmentMatchDetailResponse MatchInfo { get; private set; }
 
 
-        public void OnGet([FromRoute] int id)
+        public async Task OnGet([FromRoute] int id)
         {
-            var match = _matchService.GetMatchByIdAsync(id);
+            var match = await _matchService.GetMatchByIdAsync(id);
 
             if (match == null)
                 return;
@@ -28,6 +28,7 @@ namespace important_game.web.Pages
                 MatchDate = match.MatchDate,
                 ExcitmentScoreDetail = match.ExcitmentScoreDetail,
                 IsLive = match.IsLive,
+                Description = match.Description
                 //Score = match.Score,
             };
 

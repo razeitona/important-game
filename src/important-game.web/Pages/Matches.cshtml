@@ -2,44 +2,8 @@
 @using System.Globalization
 @model MatchesModel
 @{
-    ViewData["Title"] = "All Matches";
+    ViewData["Title"] = "Upcoming Exciting Matches - Match to Watch";
 }
-
-@* <div class="match-calendar">
-    @foreach (var month in Model.Matches.Dates)
-    {
-        <div class="match-calendar-month">
-            <h1>@month.Month.ToString("MMMM")</h1>
-            <div class="match-calendar-day">
-                @{
-                    var index = 0;
-                    foreach (var day in month.Days)
-                    {
-
-                        <div class="match-calendar-day-item @(index == 0 ? "day-active" : "")" data-day="@day.Key.ToString("MMMdd")">
-                            <span class="calendar-day">@day.Key.ToString("dd")</span>
-                        </div>
-                        index++;
-                    }
-
-                }
-            </div>
-        </div>
-    }
-</div>
-
-<div class="match-calendar-options">
-    <div class="match-calendar-filter">
-        <label>Filter By:</label>
-        <a href="/League"> <i class="es-table"></i> Leagues</a>
-    </div>
-    <div class="match-calendar-filter filter-sort">
-        <label>Sort By:</label>
-        <button id="filter-date" data-filter-sort="desc" data-filter-field="data-game-date">Date</button>
-        <button id="filter-score" data-filter-sort="desc" data-filter-field="data-game-score">Score</button>
-    </div>
-
-</div> *@
 
 <div class="wm-matches">
     <div class="match-league-filter">
@@ -53,19 +17,23 @@
     </div>
 
     <div class="matches-section">
-        <div class="matches-section-content">
-            @if (Model.Matches.Matches.Count == 0)
+        @if (Model.Matches.Matches.Count == 0)
+        {
+            <label>No excitment match to watch this week. We are looking for one.</label>
+        }
+        else
+        {
+            @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDate.Date))
             {
-                <label>No excitment match to watch this week. We are looking for one.</label>
+                <h1 class="matches-date">@dates.Key.ToString("dd MM yyyy")</h1>
+                <div class="matches-section-content">
+                    @foreach (var match in dates.OrderByDescending(c => c.ExcitementScore))
+                    {
+                        <partial name="_MatchCardSimple" for="@match" />
+                    }
+                </div>
             }
-            else
-            {
-                foreach (var match in Model.Matches.Matches)
-                {
-                    <partial name="_MatchCardSimple" for="@match" />
-                }
-            }
-        </div>
+        }
     </div>
 </div>
 

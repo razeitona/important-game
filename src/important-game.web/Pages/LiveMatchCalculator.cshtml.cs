@@ -7,7 +7,7 @@ namespace important_game.web.Pages
     {
         public async Task OnGet()
         {
-            await matchService.CalculateLiveMatchExcitment();
+            await matchService.CalculateUnfinishedMatchExcitment();
         }
     }
 }

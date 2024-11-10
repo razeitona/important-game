@@ -309,6 +309,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 Status = new EventStatus
                 {
                     Status = ssEventData.Status.Type,
+                    StatusCode = (EventMatchStatus)(ssEventData.Status.Code ?? 0),
                     Period = ssEventData.LastPeriod,
                     MatchStartTimestamp = ssEventData.StartTimestamp,
                     MatchPeriodStartTimestamp = ssEventData.Time.CurrentPeriodStartTimestamp,

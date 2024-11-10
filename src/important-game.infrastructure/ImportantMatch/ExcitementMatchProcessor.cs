@@ -11,7 +11,7 @@ namespace important_game.infrastructure.ImportantMatch
         public async Task CalculateUpcomingMatchsExcitment()
         {
 
-            var listOfCompetition = matchRepository.GetActiveCompetitions();
+            var listOfCompetition = await matchRepository.GetActiveCompetitionsAsync();
 
             //Process all the leagues to identify the excitement match rating for each
             foreach (var competition in listOfCompetition)
@@ -23,7 +23,7 @@ namespace important_game.infrastructure.ImportantMatch
                 if (leagueInfo == null)
                     continue;
 
-                var activeMatches = matchRepository.GetCompetitionActiveMatches(competition.Id);
+                var activeMatches = await matchRepository.GetCompetitionActiveMatchesAsync(competition.Id);
 
                 await ExtractUpcomingMatchesAsync(leagueInfo, activeMatches);
             }
@@ -100,7 +100,7 @@ namespace important_game.infrastructure.ImportantMatch
                 }
 
 
-                var rivalry = matchRepository.GetRivalryByTeamId(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
+                var rivalry = await matchRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
 
                 var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable, rivalry);
 
@@ -204,6 +204,8 @@ namespace important_game.infrastructure.ImportantMatch
                 MatchDateUTC = fixture.MatchDate.UtcDateTime,
                 HomeTeamId = homeTeam.Id,
                 AwayTeamId = awayTeam.Id,
+                HomeTeamPosition = fixture.HomeTeam.Position,
+                AwayTeamPosition = fixture.AwayTeam.Position,
                 CompetitionId = league.Id,
                 UpdatedDateUTC = DateTime.UtcNow,
                 ExcitmentScore = excitementScore,
@@ -217,6 +219,7 @@ namespace important_game.infrastructure.ImportantMatch
                 RivalryScore = rivalryValue / rivalryCoef,
                 HomeForm = PrepareTeamForm(fixture.HomeTeam),
                 AwayForm = PrepareTeamForm(fixture.AwayTeam),
+                MatchStatus = MatchStatus.Upcoming
             };
 
             await matchRepository.SaveMatchAsync(match);

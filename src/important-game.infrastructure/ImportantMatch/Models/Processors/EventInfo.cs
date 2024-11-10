@@ -1,4 +1,6 @@
-﻿namespace important_game.infrastructure.ImportantMatch.Models.Processors
+﻿using important_game.infrastructure.SofaScoreAPI.Models;
+
+namespace important_game.infrastructure.ImportantMatch.Models.Processors
 {
     public class EventInfo : Fixture
     {
@@ -13,6 +15,7 @@
         public long MatchPeriodStartTimestamp { get; set; }
         public int? InjuryTime1 { get; set; }
         public int? InjuryTime2 { get; set; }
+        public EventMatchStatus StatusCode { get; set; }
 
         public int GetGameTime()
         {
@@ -39,6 +42,13 @@
 
 
         }
+    }
+    public enum EventMatchStatus
+    {
+        NotStarted = 0,
+        Finished = 100,
+        FirstHalf = 6,
+        SecondHalf = 7
     }
 
 
