@@ -7,7 +7,8 @@
      data-game-day="@Model.MatchDate.ToString("MMMdd")"
      data-game-date="@Model.MatchDate.Ticks"
      data-game-score="@(Math.Round(Model.ExcitementScore * 100, 0))"
-     data-game-league="@Model.League.Id">
+     data-game-league="@Model.League.Id"
+     id="game-@(Model.HomeTeam.Slug)v@(Model.AwayTeam.Slug)">
     <a href="/match/@(Model.Id)" class="match-card-link">
         <div class="card-header match-header">
             <div>

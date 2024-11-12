@@ -231,7 +231,8 @@ namespace important_game.infrastructure.ImportantMatch.Data
                         .Include(c => c.Competition)
                         .Include(c => c.HomeTeam)
                         .Include(c => c.AwayTeam)
-                        .Where(c => c.MatchStatus == 0)
+                        .Include(c => c.LiveMatches)
+                        .Where(c => c.MatchStatus != MatchStatus.Finished)
                         .ToListAsync();
             }
         }

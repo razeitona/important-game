@@ -17,5 +17,6 @@ namespace important_game.web.Pages
         {
             await _matchProcessor.CalculateUpcomingMatchsExcitment();
         }
+
     }
 }

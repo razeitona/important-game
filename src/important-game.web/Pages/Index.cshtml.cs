@@ -52,7 +52,7 @@ namespace important_game.web.Pages
             var upcomingMatches = allMatches.Where(c => c.IsLive).ToList();
 
             upcomingMatches.AddRange(allMatches
-                .Where(c => c.MatchDate > DateTime.UtcNow && !c.IsLive)
+                .Where(c => !c.IsLive)
                 .Take(10));
 
             return upcomingMatches;

@@ -25,7 +25,7 @@
 </script> *@
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm watch-header">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm watch-header navbar-light bg-light">
             <div class="container">
                 <a class="navbar-brand page-title" asp-area="" asp-page="/Index">
                     <img src="\matchtowatch.svg" alt="Logo" width="30" class="d-inline-block align-text-top">
@@ -41,19 +41,9 @@
                             <a class="nav-link" href="/matches">Matches</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/live">Live</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/league">Leagues</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="/about">About</a>
                         </li>
                         <li class="nav-item mw-menu-item">
-                            <div class="input-group mw-search">
-                                <i class="bi bi-search"></i>
-                                <input type="text" class="form-control" placeholder="Search match or team...">
-                            </div>
                         </li>
 
                     </ul>
@@ -70,7 +60,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.0/heatmap.min.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

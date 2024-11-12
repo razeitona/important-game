@@ -420,3 +420,16 @@
         }
     }
 }
+
+
+
+
+@media (max-width: 768px) {
+    .match-detail {
+        flex-direction: column;
+
+        .match-detail-content-left, .match-detail-content-right {
+            width:100%;
+        }
+    }
+}

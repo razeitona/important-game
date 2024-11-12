@@ -82,4 +82,8 @@
     <UpToDateCheckInput Remove="Styles\_matches.scss" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Styles\_about.scss" />
+  </ItemGroup>
+
 </Project>

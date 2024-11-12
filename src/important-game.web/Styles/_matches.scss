@@ -9,12 +9,11 @@
         gap: 10px;
 
         .match-league-item {
-            background-color: #ffffff;
-            font-size: 0.75rem;
+            background-color: #b7b7b7;
+            font-size: 0.6rem;
             display: flex;
-            flex-direction: row;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
 
             img {
@@ -22,8 +21,7 @@
             }
 
             &.league-active {
-                border-color: #d11111;
-                color: #d11111;
+                background-color: #ffffff;
             }
 
             span {
@@ -39,9 +37,50 @@
         flex-grow: 1;
         flex-direction: column;
 
-        .matches-date {
-            color: #ffffff;
-            font-size: 0.85rem;
+        .wm-match-date {
+            padding-bottom: 10px;
+            margin-top: 5px;
+
+            + .wm-match-date {
+                margin-top: 5px;
+            }
+
+            .wm-match-date-title {
+                color: #ffffff;
+                font-size: 0.85rem;
+                background-color: #22293b;
+                padding: 10px;
+                margin: 0;
+                border-radius: 5px;
+                cursor: pointer;
+
+                &.collapsed {
+
+                    &:before {
+                        margin-right: 10px;
+                        content: "\f27c";
+                        display: inline-block;
+                        font-family: bootstrap-icons !important;
+                        font-style: normal;
+                        font-weight: 400 !important;
+                        text-transform: none;
+                        vertical-align: -.125em;
+                        -webkit-font-smoothing: antialiased;
+                    }
+                }
+
+                &:before {
+                    margin-right: 10px;
+                    content: "\f279";
+                    display: inline-block;
+                    font-family: bootstrap-icons !important;
+                    font-style: normal;
+                    font-weight: 400 !important;
+                    text-transform: none;
+                    vertical-align: -.125em;
+                    -webkit-font-smoothing: antialiased;
+                }
+            }
         }
 
 
@@ -52,6 +91,10 @@
             gap: 1rem;
 
 
+            &.hide {
+                display: none;
+            }
+
             .match-card-simple, .match-card-team {
                 font-size: 0.6rem;
             }
@@ -61,9 +104,37 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .matches-section-content {
-                grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .wm-matches {
+        flex-direction: column;
+        margin-top:10px;
+
+        .match-league-filter {
+            flex-direction: row;
+            flex-wrap: wrap;
+
+            .match-league-item {
+                background-color: #b7b7b7;
+                font-size: 0.6rem;
+                display: flex;
+                width: 40px;
+                padding: 5px 10px;
+                cursor: pointer;
+
+                img {
+                    width: 20px;
+                }
+
+                &.league-active {
+                    background-color: #ffffff;
+                }
+
+                span {
+                    display: none;
+                }
             }
         }
     }

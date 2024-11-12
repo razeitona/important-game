@@ -134,7 +134,6 @@ namespace important_game.infrastructure.ImportantMatch.Live
             match.UpdatedDateUTC = DateTime.UtcNow;
             match.HomeScore = eventInfo.HomeTeamScore;
             match.AwayScore = eventInfo.AwayTeamScore;
-            match.ExcitmentScore = eventInfo.AwayTeamScore;
 
             if (eventInfo.Status.StatusCode == EventMatchStatus.Finished)
             {

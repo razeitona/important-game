@@ -1,4 +1,5 @@
-﻿using important_game.infrastructure.ImportantMatch.Data;
+﻿using important_game.infrastructure.Extensions;
+using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.ImportantMatch.Models;
@@ -38,7 +39,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             var matches = new List<ExcitementMatchDto>();
 
-            foreach (var rawMatch in rawMatches.Where(m => m.MatchDateUTC > DateTime.UtcNow.AddMinutes(-110)))
+            foreach (var rawMatch in rawMatches)
             {
                 var match = new ExcitementMatchDto
                 {
@@ -50,19 +51,21 @@ namespace important_game.infrastructure.ImportantMatch
                         Name = rawMatch.Competition.Name,
                         BackgroundColor = rawMatch.Competition.BackgroundColor
                     },
-                    IsLive = rawMatch.MatchDateUTC < DateTime.UtcNow,
+                    IsLive = rawMatch.MatchStatus == MatchStatus.Live,
                     ExcitementScore = rawMatch.ExcitmentScore,
-                    LiveExcitementScore = rawMatch.ExcitmentScore,
+                    LiveExcitementScore = rawMatch.LiveMatches?.LastOrDefault()?.ExcitmentScore ?? rawMatch.ExcitmentScore,
                     HomeTeam = new TeamDto
                     {
                         Id = rawMatch.HomeTeam.Id,
                         Name = rawMatch.HomeTeam.Name,
+                        Slug = SlugHelper.GenerateSlug(rawMatch.HomeTeam.Name),
                     },
                     AwayTeam = new TeamDto
                     {
                         Name = rawMatch.AwayTeam.Name,
                         Id = rawMatch.AwayTeam.Id,
-                    }
+                        Slug = SlugHelper.GenerateSlug(rawMatch.AwayTeam.Name),
+                    },
                 };
 
                 matches.Add(match);

@@ -1,11 +1,23 @@
 ﻿@page
 @using System.Globalization
+@using System.Text.Json
 @model MatchesModel
 @{
     ViewData["Title"] = "Upcoming Exciting Matches - Match to Watch";
 }
 
+<div class="wm-match-filter">
+    <div class="input-group mw-search">
+        <i class="bi bi-search"></i>
+        <input type="text" class="form-control" placeholder="Search match or team..." id="search-match">
+        <ul id="mw-search-result"></ul>
+    </div>
+</div>
+
+
 <div class="wm-matches">
+
+
     <div class="match-league-filter">
         @foreach (var league in Model.Matches.Leagues)
         {
@@ -25,12 +37,14 @@
         {
             @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDate.Date))
             {
-                <h1 class="matches-date">@dates.Key.ToString("dd MM yyyy")</h1>
-                <div class="matches-section-content">
-                    @foreach (var match in dates.OrderByDescending(c => c.ExcitementScore))
-                    {
-                        <partial name="_MatchCardSimple" for="@match" />
-                    }
+                <div class="wm-match-date">
+                    <h1 class="wm-match-date-title">@dates.Key.ToString("dd/MM/yyyy")</h1>
+                    <div class="matches-section-content">
+                        @foreach (var match in dates.OrderByDescending(c => c.ExcitementScore))
+                        {
+                            <partial name="_MatchCardSimple" for="@match" />
+                        }
+                    </div>
                 </div>
             }
         }
@@ -39,8 +53,13 @@
 
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
 
     <script>
+
+
+
+
         $(document).ready(function () {
             $("time").each(function (elem) {
                 var utctimeval = $(this).html().trim();
@@ -57,79 +76,108 @@
                 $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
             });
 
-            // $(".match-calendar-day-item").each(function (elem) {
-            //     if ($(this).hasClass("day-active")) {
-            //         var selectedDate = $(this).data("day");
-            //         updateGameHideStatus(selectedDate);
-            //         return;
-            //     }
+            var list = @Html.Raw(JsonSerializer.Serialize(Model.Matches.Matches
+          .Select(c => new { id = c.Id, home = c.HomeTeam.Name, away = c.AwayTeam.Name, homeslug = c.HomeTeam.Slug, awayslug = c.AwayTeam.Slug })));
+
+            const fuseOptions = {
+                threshold: 0.3,           // Adjust to control the fuzzy matching
+                minMatchCharLength: 3,     // Minimum length of the pattern to start matching
+                keys: [
+                    "home",
+                    "away"
+                ]
+            };
+
+            const fuse = new Fuse(list, fuseOptions);
+
+            // $("#search-match").on("input", function () {
+            //     console.log("asdasd");
             // });
+            document.getElementById('search-match').addEventListener('input', function () {
 
-            // $(".match-calendar-day-item").on("click", function () {
-            //     var mainItemselectedDate = $(this).data("day");
+                const query = this.value;
 
-            //     $(".match-calendar-day-item").each(function (elem) {
-            //         var selectedDate = $(this).data("day");
+                if (query.length < 3) {
+                    document.getElementById('mw-search-result').innerHTML = '';
+                    return;
+                }
 
-            //         if (mainItemselectedDate == selectedDate) {
-            //             $(this).addClass("day-active");
-            //         } else {
-            //             $(this).removeClass("day-active");
-            //         }
-            //     });
+                // Perform search
+                const results = fuse.search(query);
+                console.log(results);
 
-            //     updateGameHideStatus(mainItemselectedDate);
-            // });
+                // Render results
+                const resultsList = document.getElementById('mw-search-result');
+                resultsList.innerHTML = '';
 
-            // function updateGameHideStatus(selectedDate) {
-            //     $(".match-card-simple").each(function (idx, elem) {
-            //         var itemDay = $(elem).data("game-day");
-            //         if (selectedDate === itemDay) {
-            //             console.log(itemDay);
-            //             $(elem).removeClass("hide");
-            //         } else {
-            //             $(elem).addClass("hide");
-            //         }
-            //     });
-            // }
+                results.forEach(result => {
+                    const game = result.item;
+                    const li = document.createElement('li');
+                    li.textContent = `${game.home} v ${game.away}`;
+                    li.setAttribute('data-id', game.id);  // Set the id as a data attribute
 
-            // $("#filter-date,#filter-score").on("click", function () {
-            //     var sort = $(this).data("filter-sort");
-            //     var field = $(this).data("filter-field");
-            //     //data-filter-sort="desc" data-filter-field="data-game-score"
-            //     sortCards(sort, field);
+                    // Add click event to navigate to the item
+                    li.addEventListener('click', () => {
+                        window.location.href = `#game-${game.homeslug}v${game.awayslug}`;  // Update URL pattern to match your routes
+                        resultsList.innerHTML = '';
+                    });
 
-            //     if (sort == "asc") {
-            //         $(this).data("filter-sort", "desc");
-            //         $(this).removeClass("filter-change");
-            //     } else {
-            //         $(this).data("filter-sort", "asc");
-            //         $(this).addClass("filter-change");
-            //     }
-            // });
+                    resultsList.appendChild(li);
+                });
+            });
+
+            $(".match-league-item").each(function (elem) {
+                if ($(this).hasClass("league-active")) {
+                    var selectedDate = $(this).data("league");
+                    updateGameHideStatus(selectedDate);
+                    return;
+                }
+            });
+
+            var filterLeagues = [];
+
+            $(".match-league-item").on("click", function () {
+                var selectedLeague = $(this).data("league");
+
+                if (filterLeagues.indexOf(selectedLeague) == -1) {
+                    filterLeagues.push(selectedLeague);
+                    $(this).addClass("league-active");
+                } else {
+                    const index = filterLeagues.indexOf(selectedLeague);
+                    filterLeagues.splice(index, 1);
+                    $(this).removeClass("league-active");
+                }
+                updateGameHideStatus();
+
+            });
+
+            function updateGameHideStatus() {
+                $(".match-card-simple").each(function (idx, elem) {
+                    if (filterLeagues.length == 0) {
+                        $(elem).removeClass("hide");
+                    } else {
+                        var matchLeague = $(elem).data("game-league");
+
+                        if (filterLeagues.indexOf(matchLeague) > -1) {
+                            $(elem).removeClass("hide");
+                        } else {
+                            $(elem).addClass("hide");
+                        }
+                    }
+                });
+            }
+
+            $(".wm-match-date-title").on("click", function () {
+                if ($(this).parent().children("div.matches-section-content").hasClass("hide")) {
+                    $(this).removeClass("collapsed");
+                    $(this).parent().children("div.matches-section-content").removeClass("hide");
+                } else {
+                    $(this).addClass("collapsed");
+                    $(this).parent().children("div.matches-section-content").addClass("hide");
+                }
+            });
 
         });
-
-        // function sortCards(order = 'asc', sortField = 'data-game-date') {
-
-        //     const slider = document.querySelector('.match-calendar-content');
-        //     const cards = Array.from(slider.children); // Convert NodeList to Array
-
-        //     // Sort based on the data-game-id attribute
-        //     cards.sort((a, b) => {
-        //         const idA = parseInt(a.getAttribute(sortField));
-        //         const idB = parseInt(b.getAttribute(sortField));
-
-        //         if (order === 'asc') {
-        //             return idA - idB; // Sort in ascending order
-        //         } else {
-        //             return idB - idA; // Sort in descending order
-        //         }
-        //     });
-
-        //     // Append sorted cards back to the parent container
-        //     cards.forEach(card => slider.appendChild(card));
-        // }
 
     </script>
 }

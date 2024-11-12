@@ -60,7 +60,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
                 //Get Events that start in 5 days
-                if (gameStartTime < currentDate.AddDays(5) && gameStartTime > currentDate.AddHours(-3))
+                if (gameStartTime < currentDate.AddDays(10) && gameStartTime > currentDate.AddHours(-3))
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
