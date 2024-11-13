@@ -9,10 +9,11 @@
         public TeamMatchDetailDto AwayTeam { get; init; }
         public double ExcitementScore { get; init; }
         public bool IsLive { get; set; }
-        public bool IsTopTrend { get; set; }
+        public bool IsRivalry { get; set; }
+        public bool HasTitleHolder { get; set; }
         public int Favorites { get; set; }
         public List<FixtureDto> Headtohead { get; set; } = new();
-        public Dictionary<string, double> ExcitmentScoreDetail { get; set; } = new();
+        public Dictionary<string, (bool Show, double Value)> ExcitmentScoreDetail { get; set; } = new();
         public double Minutes { get; set; }
         public double LiveExcitementScore { get; set; }
         public string Description { get; set; }

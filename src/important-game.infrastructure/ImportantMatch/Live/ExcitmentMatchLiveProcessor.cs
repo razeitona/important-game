@@ -29,20 +29,20 @@ namespace important_game.infrastructure.ImportantMatch.Live
 
             var gameTime = eventInfo.Status.GetGameTime();
 
-            var scoreLineCoef = 0.25d;
-            var shotTargetCoef = 0.15d;
-            var xGoalsCoef = 0.15d;
-            var foulsCoef = 0.1d;
-            var cardsCoef = 0.1d;
-            var possessionCoef = 0.1d;
+            var scoreLineCoef = 0.2d;
+            //var shotTargetCoef = 0.2d;
+            var xGoalsCoef = 0.2d;
+            var foulsCoef = 0.15d;
+            var cardsCoef = 0.15d;
+            var possessionCoef = 0.15d;
             var bigChangesCoef = 0.15d;
 
 
             //Score line
             //--------
             var scoreGameDif = Math.Abs(eventInfo.HomeTeamScore - eventInfo.AwayTeamScore);
-            var scoreLineData = 1d - (scoreGameDif / 5d);
-            var scoreLineValue = scoreLineData * scoreLineCoef;
+            var scoreLineData = 1d - (scoreGameDif / 4d);
+            var scoreLineValue = scoreLineData * (1d + (gameTime / 100d));
 
             //Shots
             //---------
@@ -57,7 +57,7 @@ namespace important_game.infrastructure.ImportantMatch.Live
             var shotsOnTarget = homeShotsOnGoal + awayTotalShots;
             var shotsOnTargetAverage = shotsOnTarget / totalShots;
 
-            var shotTargetValue = (totalShotsPer10Max + shotsOnTargetAverage) * shotTargetCoef;
+            //var shotTargetValue = (totalShotsPer10Max + shotsOnTargetAverage) * shotTargetCoef;
 
             //Expected Goals
             //-----
@@ -65,7 +65,7 @@ namespace important_game.infrastructure.ImportantMatch.Live
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, XGOALS, out double xGoalsAway);
 
             var totalxGoals = xGoalsHome + xGoalsAway;
-            var xGoalsValue = (totalxGoals / 3d) * xGoalsCoef;
+            var xGoalsValue = (totalxGoals / 5d) * (1d + (gameTime / 90d));
 
 
             //Fouls
@@ -73,8 +73,8 @@ namespace important_game.infrastructure.ImportantMatch.Live
             _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, FOULS, out double homeFouls);
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, FOULS, out double awayFouls);
             var totalFouls = homeFouls + awayFouls;
-            var totalFoulsExp = 1 - (totalFouls / gameTime);
-            var totalFoulsValue = totalFoulsExp > 1 ? 0 : (totalFoulsExp * foulsCoef);
+            var totalFoulsExp = 1 - (totalFouls / 30d);
+            var totalFoulsValue = totalFoulsExp * (1d + (gameTime / 90d));
 
             //Cards
             //------
@@ -85,22 +85,48 @@ namespace important_game.infrastructure.ImportantMatch.Live
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, RED_CARDS, out double awayRedCards);
 
             var yellowCardsTotal = homeYellowCards + awayYellowCards;
-            var yellowCardsPer10Min = yellowCardsTotal / 10d;
+            //var yellowCardsPer10Min = yellowCardsTotal / 10d;
 
-            var homeTeamRedCards = (eventInfo.HomeTeamScore > eventInfo.AwayTeamScore && homeRedCards > awayRedCards) ? homeRedCards : 0d;
-            var awayTeamRedCards = (eventInfo.AwayTeamScore > eventInfo.HomeTeamScore && awayRedCards > homeRedCards) ? awayRedCards : 0d;
-            var redCards = homeTeamRedCards + awayTeamRedCards;
+            var homeTeamRedCards = (eventInfo.HomeTeamScore > eventInfo.AwayTeamScore && homeRedCards > awayRedCards) ? 0.10d * homeRedCards : 0d;
+            var awayTeamRedCards = (eventInfo.AwayTeamScore > eventInfo.HomeTeamScore && awayRedCards > homeRedCards) ? 0.10d * awayRedCards : 0d;
+            var redCards = homeRedCards + awayRedCards;
 
-            var cardsValue = yellowCardsPer10Min + (2 * redCards);
-            var totalCardsValue = (1 - cardsValue) * cardsCoef;
+            var redCardBoost = (redCards * 0.15d) + homeTeamRedCards + awayTeamRedCards;
+
+            var cardsValue = redCardBoost + (1d - ((yellowCardsTotal + redCards) / 10d));
+            var totalCardsValue = cardsValue * (1d + (gameTime / 90d));
 
             //Ball Possession
             //----
             _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, BALL_POSSESSION, out double homePosession);
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, BALL_POSSESSION, out double awayPosession);
-            var possessionTeam = Math.Abs(homePosession - 50);
-            var totalPossession = 1 - (possessionTeam / 50);
-            var possessionValue = totalPossession * possessionCoef;
+            //var totalPossession = pos1 - (possessionTeam / 50);
+            var losingTeamPossession = 0d;
+            if (eventInfo.HomeTeamScore > eventInfo.AwayTeamScore)
+            {
+                losingTeamPossession = awayPosession;
+            }
+            else if (eventInfo.HomeTeamScore < eventInfo.AwayTeamScore)
+            {
+                losingTeamPossession = homePosession;
+            }
+
+            var losingTeamPossessionBonus = 0d;
+            if (losingTeamPossession > 65d)
+            {
+                losingTeamPossessionBonus = 0.3d;
+            }
+            else if (losingTeamPossession > 55d && losingTeamPossession <= 60d)
+            {
+                losingTeamPossessionBonus = 0.1d;
+            }
+            else if (losingTeamPossession > 60d && losingTeamPossession <= 65d)
+            {
+                losingTeamPossessionBonus = 0.2d;
+            }
+
+            var possessionTeam = 1d - Math.Abs((homePosession - 50d) / 100d);
+            var possessionValue = possessionTeam * (1d + (gameTime / 90d)) + losingTeamPossessionBonus;
 
             //Big Chance
             //-----
@@ -108,11 +134,14 @@ namespace important_game.infrastructure.ImportantMatch.Live
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, BALL_POSSESSION, out double awayBigChance);
             var bigChancesTotal = (homeBigChance + awayBigChance);
 
-            var bigChancesValue = ((bigChancesTotal / totalShots) / 10d) * bigChangesCoef;
+            var bigChancesValue = (bigChancesTotal / 10d) * (1d + (gameTime / 90d));
 
             //TOTAl
-            var liveScore = scoreLineValue + shotTargetValue + xGoalsValue
+            var liveScore = scoreLineValue + xGoalsValue
                  + totalFoulsValue + totalCardsValue + possessionValue + bigChancesValue;
+
+            liveScore = (0.5d * liveScore) - 0.3d;
+            var liveExcitmenetScore = match.ExcitmentScore + liveScore;
 
             var liveMatch = new LiveMatch()
             {
@@ -121,9 +150,9 @@ namespace important_game.infrastructure.ImportantMatch.Live
                 HomeScore = eventInfo.HomeTeamScore,
                 AwayScore = eventInfo.AwayTeamScore,
                 Minutes = gameTime,
-                ExcitmentScore = liveScore,
+                ExcitmentScore = liveExcitmenetScore,
                 ScoreLineScore = scoreLineValue / scoreLineCoef,
-                ShotTargetScore = shotTargetValue / shotTargetCoef,
+                //ShotTargetScore = shotTargetValue / shotTargetCoef,
                 XGoalsScore = xGoalsValue / xGoalsCoef,
                 TotalFoulsScore = totalFoulsValue / foulsCoef,
                 TotalCardsScore = totalCardsValue / cardsCoef,

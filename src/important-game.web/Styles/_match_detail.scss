@@ -330,6 +330,20 @@
                             height: 10px;
                         }
                     }
+
+                    span {
+                        font-weight: 200;
+                        font-size: 0.7rem;
+
+                        i {
+                            padding: 0px 5px 0px 0px;
+                            font-size: 0.7rem;
+                        }
+
+                        +span {
+                            margin: 2px;
+                        }
+                    }
                 }
             }
 
@@ -429,7 +443,7 @@
         flex-direction: column;
 
         .match-detail-content-left, .match-detail-content-right {
-            width:100%;
+            width: 100%;
         }
     }
 }

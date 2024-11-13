@@ -152,7 +152,7 @@
                         <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.LiveExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.LiveExcitementScore * 100, 0))</div>
                     </div>
                 </div>
-                <div class="match-detail-info-live-content">
+                @* <div class="match-detail-info-live-content">
                     <div class="match-detail-teams">
                         <div class="match-detail-team-info">
                             <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
@@ -164,16 +164,16 @@
                             <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
                         </div>
                     </div>
-                </div>
+                </div> *@
             </div>
         }
 
         <div class="match-detail-info match-detail-card match-detail-info-esdetail">
             <h1>Excitement Score Breakdown</h1>
             <div class="match-detail-info-esdetail-content">
-                @foreach (var item in matchInfo.ExcitmentScoreDetail)
+                @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
                 {
-                    var scoreValue = Math.Round(item.Value * 100, 0);
+                    var scoreValue = Math.Round(item.Value.Value * 100, 0);
 
                     <div class="esdetail-item">
                         <div class="esdetail-title">
@@ -187,6 +187,14 @@
 
                         @* <div class="text-xs text-gray-500 mt-1" data-id="element-66">Weight: 30%</div> *@
                     </div>
+                }
+                @if (matchInfo.IsRivalry)
+                {
+                    <span><i class="bi bi-thermometer-high"></i>Rivalry</span>
+                }
+                @if (matchInfo.HasTitleHolder)
+                {
+                    <span><i class="bi bi-trophy"></i>Title Holder</span>
                 }
             </div>
 

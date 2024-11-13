@@ -165,14 +165,20 @@ namespace important_game.infrastructure.ImportantMatch
 
         private readonly Dictionary<string, string> _highValuePhrases = new()
         {
-            { "CompetitionScore", "significant impact on league standings" },
-            { "FixtureScore", "crucial stage in the season" },
-            { "FormScore", "both teams' impressive recent performances" },
-            { "CompetitionStandingScore", "high table impact" },
-            { "GoalsScore", "high scoring potential" },
-            { "HeadToHeadScore", "compelling head-to-head history" },
-            { "RivalryScore", "historical rivalry between the teams" },
-            { "TitleHolderScore", "presence of the defending champions" }
+            { "League Coeficient", "significant impact on league standings" },
+            { "League Standings", "high table impact" },
+            { "Fixture Importance", "crucial stage in the season" },
+            { "Teams Form", "teams recent performances" },
+            { "Teams Goals", "high scoring potential" },
+            { "Head to head", "compelling head-to-head history" },
+            { "Rivalry", "historical rivalry between the teams" },
+            { "Title Holder", "presence of the defending champions" },
+            { "Score Line", "tight match" },
+            { "xGoals", "high value of xGoals" },
+            { "Fouls", "few stoppages" },
+            { "Cards", "cards with high impact in the final result" },
+            { "Possession", "teams fighting for the win" },
+            { "Big chances", "amount of big chances" },
         };
 
 
@@ -188,12 +194,12 @@ namespace important_game.infrastructure.ImportantMatch
             };
         }
 
-        private string BuildSentence(Dictionary<string, double> excitmentScoreDetail)
+        private string BuildSentence(Dictionary<string, (bool show, double value)> excitmentScoreDetail)
         {
             if (!excitmentScoreDetail.Any())
                 return "This match has standard excitement potential.";
 
-            var excitement = DetermineExcitementLevel(excitmentScoreDetail.Average(f => f.Value));
+            var excitement = DetermineExcitementLevel(excitmentScoreDetail.Average(f => f.Value.value));
             var factors = excitmentScoreDetail.OrderByDescending(c => c.Value).Select(f => _highValuePhrases[f.Key]).ToList();
 
             return factors.Count switch
@@ -204,33 +210,33 @@ namespace important_game.infrastructure.ImportantMatch
             };
         }
 
-        private Dictionary<string, double> SetupExcitmentScoreDetail(Match rawMatch, LiveMatch? liveData)
+        private Dictionary<string, (bool Show, double Value)> SetupExcitmentScoreDetail(Match rawMatch, LiveMatch? liveData)
         {
 
             if (liveData != null)
             {
-                return new Dictionary<string, double>
+                return new Dictionary<string, (bool Show, double Value)>
                 {
-                    { "CompetitionScore", liveData.ScoreLineScore },
-                    { "FixtureScore", liveData.ShotTargetScore },
-                    { "FormScore", liveData.XGoalsScore },
-                    { "GoalsScore", liveData.TotalFoulsScore },
-                    { "CompetitionStandingScore", liveData.TotalCardsScore },
-                    { "HeadToHeadScore", liveData.PossesionScore },
-                    { "RivalryScore", liveData.BigChancesScore },
+                    { "Score Line", (true,liveData.ScoreLineScore) },
+                    //{ "ShotTargetScore", liveData.ShotTargetScore },
+                    { "xGoals", (true,liveData.XGoalsScore) },
+                    { "Fouls", (true,liveData.TotalFoulsScore) },
+                    { "Cards", (true,liveData.TotalCardsScore) },
+                    { "Possession", (true,liveData.PossesionScore) },
+                    { "Big chances", (true, liveData.BigChancesScore) },
                 };
             }
 
-            return new Dictionary<string, double>
+            return new Dictionary<string, (bool Show, double Value)>
             {
-                { "CompetitionScore", rawMatch.CompetitionScore },
-                { "FixtureScore", rawMatch.FixtureScore },
-                { "FormScore", rawMatch.FormScore },
-                { "GoalsScore", rawMatch.GoalsScore },
-                { "CompetitionStandingScore", rawMatch.CompetitionStandingScore },
-                { "HeadToHeadScore", rawMatch.HeadToHeadScore },
-                { "RivalryScore", rawMatch.RivalryScore },
-                { "TitleHolderScore", rawMatch.TitleHolderScore },
+                { "League Coeficient", (true,rawMatch.CompetitionScore) },
+                { "League Standings", (true, rawMatch.CompetitionStandingScore) },
+                { "Fixture Importance", (true, rawMatch.FixtureScore) },
+                { "Teams Form", (true, rawMatch.FormScore) },
+                { "Teams Goals", (true, rawMatch.GoalsScore) },
+                { "Head to head", (true, rawMatch.HeadToHeadScore) },
+                { "Rivalry", (false, rawMatch.RivalryScore) },
+                { "Title Holder", (false, rawMatch.TitleHolderScore) },
             };
         }
 

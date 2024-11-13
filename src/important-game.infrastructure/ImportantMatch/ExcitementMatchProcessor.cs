@@ -128,14 +128,14 @@ namespace important_game.infrastructure.ImportantMatch
             //var h2hCoef = 0.1d;
             //var titleHolderCoef = 0.02d;
 
-            var competitionCoef = 0.10d;
-            var rivalryCoef = 0.25d;
-            var fixtureCoef = 0.05d;
-            var teamFormCoef = 0.15d;
-            var teamGoalsCoef = 0.12d;
-            var tableRankCoef = 0.18d;
-            var h2hCoef = 0.1d;
-            var titleHolderCoef = 0.05d;
+            var competitionCoef = 0.15d;
+            var rivalryCoef = 0.15d;
+            var titleHolderCoef = 0.10d;
+            var teamFormCoef = 0.10d;
+            var teamGoalsCoef = 0.15d;
+            var h2hCoef = 0.10d;
+            var tableRankCoef = 0.15d;
+            var fixtureCoef = 0.10d;
 
             // 0.2×CR
             double competitionRankValue = league.Ranking * competitionCoef;
@@ -146,8 +146,6 @@ namespace important_game.infrastructure.ImportantMatch
             {
                 fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * fixtureCoef;
             }
-
-            //double fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * 0.2d;
 
             //0.2×(Form of Team A+Form of Team B / 2 )
             var homeLastFixturesData = fixture.HomeTeam.LastFixtures;
@@ -164,9 +162,6 @@ namespace important_game.infrastructure.ImportantMatch
             var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
 
             double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamGoalsCoef;
-            //double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.3d;
-
-            //double teamsFormValue = (teamsLastFixtureFormValue + teamsGoalsFormValue) * 0.3d;
 
             //0.2×TPD
             //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
@@ -184,7 +179,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             if (rivalryData > 0.9d)
             {
-                fixtureValue = 1 * fixtureCoef;
+                //fixtureValue = 1 * fixtureCoef;
             }
 
             double excitementScore =

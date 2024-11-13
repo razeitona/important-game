@@ -1,4 +1,5 @@
 using important_game.infrastructure.ImportantMatch;
+using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -28,6 +29,8 @@ namespace important_game.web.Pages
                 MatchDate = match.MatchDate,
                 ExcitmentScoreDetail = match.ExcitmentScoreDetail,
                 IsLive = match.IsLive,
+                IsRivalry = match.ExcitmentScoreDetail.Any(c => c.Key == "Rivalry" && c.Value.Value > 0d),
+                HasTitleHolder = match.HomeTeam.IsTitleHolder || match.AwayTeam.IsTitleHolder,
                 Description = match.Description
                 //Score = match.Score,
             };
