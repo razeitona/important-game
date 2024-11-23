@@ -1,7 +1,7 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+USER root
 WORKDIR /app
 
 # Configure environment variables
@@ -27,8 +27,15 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 USER root
-RUN chmod 777 /app/data.json
-USER app
+RUN mkdir -p /app/data && \
+    chown -R app:app /app/data && \
+    chmod -R 777 /app/data
+
+USER root
+
+VOLUME /app/data
+ENV ConnectionStrings__DefaultConnection=Data Source=/app/data/matchwatch.db
+
 
 
 EXPOSE 80

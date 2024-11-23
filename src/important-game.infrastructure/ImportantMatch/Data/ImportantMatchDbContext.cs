@@ -7,18 +7,18 @@ namespace important_game.infrastructure.ImportantMatch.Data
     // Define the DbContext
     public class ImportantMatchDbContext : DbContext
     {
+        public ImportantMatchDbContext(DbContextOptions<ImportantMatchDbContext> options)
+        : base(options)
+        {
+        }
+
+
         public DbSet<Team> Teams { get; set; }
         public DbSet<Competition> Competitions { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<LiveMatch> LiveMatches { get; set; }
         public DbSet<Headtohead> HeadtoheadMatches { get; set; }
         public DbSet<Rivalry> Rivalries { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // Configure the connection to the SQLite database
-            optionsBuilder.UseSqlite("Data Source=matchwatch.db");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

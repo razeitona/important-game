@@ -21,13 +21,16 @@ namespace important_game.infrastructure.ImportantMatch
             //Process all the leagues to identify the excitement match rating for each
             foreach (var match in listOfLiveMatches)
             {
+                if (match.MatchDateUTC > DateTime.UtcNow)
+                    continue;
+
                 //Get all upcoming games (active) from processing competition
                 var liveMatch = await liveProcessor.ProcessLiveMatchData(match);
 
+                await matchRepository.SaveMatchAsync(match);
                 if (liveMatch == null)
                     continue;
 
-                await matchRepository.SaveMatchAsync(match);
                 await matchRepository.SaveLiveMatchAsync(liveMatch);
             }
 
@@ -146,8 +149,8 @@ namespace important_game.infrastructure.ImportantMatch
                 },
                 IsLive = rawMatch.MatchStatus == MatchStatus.Live,
                 ExcitementScore = rawMatch.ExcitmentScore,
-                HomeTeam = SetupMatchDetailTeam(rawMatch.HomeTeam, rawMatch.HomeForm, rawMatch.Competition),
-                AwayTeam = SetupMatchDetailTeam(rawMatch.AwayTeam, rawMatch.AwayForm, rawMatch.Competition),
+                HomeTeam = SetupMatchDetailTeam(rawMatch.HomeTeam, rawMatch.HomeForm, rawMatch.HomeTeamPosition, rawMatch.Competition),
+                AwayTeam = SetupMatchDetailTeam(rawMatch.AwayTeam, rawMatch.AwayForm, rawMatch.AwayTeamPosition, rawMatch.Competition),
                 Headtohead = SetupMatchHeadToHead(rawMatch.HeadToHead.ToList()),
                 ExcitmentScoreDetail = SetupExcitmentScoreDetail(rawMatch, liveData)
             };
@@ -240,7 +243,7 @@ namespace important_game.infrastructure.ImportantMatch
             };
         }
 
-        private TeamMatchDetailDto SetupMatchDetailTeam(Team team, string? teamForm, Competition competition)
+        private TeamMatchDetailDto SetupMatchDetailTeam(Team team, string? teamForm, int teamPosition, Competition competition)
         {
             var form = teamForm?.Split(",").ToList() ?? new();
 
@@ -248,7 +251,8 @@ namespace important_game.infrastructure.ImportantMatch
             {
                 Id = team.Id,
                 Name = team.Name,
-                IsTitleHolder = team.Id == competition.TitleHolderTeamId
+                IsTitleHolder = team.Id == competition.TitleHolderTeamId,
+                TablePosition = teamPosition
             };
 
             if (form.Count > 0)

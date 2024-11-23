@@ -1,4 +1,5 @@
 using important_game.infrastructure.ImportantMatch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace important_game.web.Pages
@@ -13,9 +14,10 @@ namespace important_game.web.Pages
             _matchProcessor = matchProcessor;
         }
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet()
         {
             await _matchProcessor.CalculateUpcomingMatchsExcitment();
+            return new JsonResult("");
         }
 
     }

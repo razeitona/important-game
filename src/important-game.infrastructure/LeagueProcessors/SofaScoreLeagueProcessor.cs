@@ -60,7 +60,7 @@ namespace important_game.infrastructure.LeagueProcessors
                 var gameStartTime = DateTimeOffset.FromUnixTimeSeconds(leagueEvent.StartTimestamp);
 
                 //Get Events that start in 5 days
-                if (gameStartTime < currentDate.AddDays(10) && gameStartTime > currentDate.AddHours(-3))
+                if (gameStartTime < currentDate.AddDays(5) && gameStartTime > currentDate.AddHours(-3))
                 {
                     //Add upcoming fixture
                     upcomingFixtures.Add(new UpcomingFixture
@@ -107,16 +107,12 @@ namespace important_game.infrastructure.LeagueProcessors
 
             var leagueRoundsData = await _sofaScoreIntegration.GetTournamentSeasonRoundsAsync(leagueId, seasonId);
 
-            if (leagueRoundsData == null)
-                return null;
-
-
             var leagueStanding = new LeagueStanding()
             {
                 LeagueId = leagueId,
                 Standings = new List<Standing>(),
-                CurrentRound = leagueRoundsData.CurrentRound.Round,
-                TotalRounds = leagueRoundsData.Rounds.Count
+                CurrentRound = leagueRoundsData?.CurrentRound?.Round??1,
+                TotalRounds = leagueRoundsData?.Rounds?.Count??1
             };
 
             try

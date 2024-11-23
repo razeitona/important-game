@@ -12,7 +12,7 @@
     <a href="/match/@(Model.Id)" class="match-card-link">
         <div class="card-header match-header">
             <div>
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.League.Id  + "/image")" />
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.League.Id  + "/image")" alt="@Model.League.Name" width="1.2rem" />
             </div>
             <div class="match-header-title">
                 @Model.League.Name
@@ -27,7 +27,7 @@
             {
                 <div class="match-card-time">
                     <time>
-                        @Model.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                        @Model.MatchDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
             }
@@ -36,7 +36,7 @@
             <div class="match-card-content">
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeam.Id + "/image")" alt="@(Model.HomeTeam.Name)" />
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeam.Id + "/image")" alt="@(Model.HomeTeam.Name)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.HomeTeam.Name</span>
@@ -44,13 +44,19 @@
                 </div>
                 <div class="match-card-score">
                     <div class="match-card-score-value" title="Excitement Score" data-es="@(Math.Round(Model.ExcitementScore, 2).ToString().Replace(",", "."))">
-                        @(Math.Round(Model.ExcitementScore * 100, 0))
+                        @if (Model.IsLive)
+                        {
+                            @(Math.Round(Model.LiveExcitementScore * 100, 0))
+                        } else
+                        {
+                            @(Math.Round(Model.ExcitementScore * 100, 0))
+                        }
                     </div>
                     <span>Excitment score</span>
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeam.Id + "/image")" alt="@(Model.AwayTeam.Name)" />
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeam.Id + "/image")" alt="@(Model.AwayTeam.Name)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.AwayTeam.Name</span>

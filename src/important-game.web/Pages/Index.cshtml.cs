@@ -5,11 +5,10 @@ using System.Globalization;
 
 namespace important_game.web.Pages
 {
-    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService) : PageModel
+    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService, IConfiguration configuration) : PageModel
     {
         public List<ExcitementMatchDto> TrendingMatches { get; set; }
         public List<ExcitementMatchDto> OtherMatches { get; set; }
-
         public async Task OnGet()
         {
             var allMatches = await _matchService.GetAllMatchesAsync();

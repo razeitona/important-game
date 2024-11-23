@@ -12,6 +12,16 @@ services:
       - "443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/matchwatch.db
+    user: "root:root"
+    volumes:
+      # Mount a host directory to the container's /app/data directory
+      - type: bind
+        source: ./data
+        target: /app/data
+        # Add explicit permissions
+        bind:
+          create_host_path: true
     networks:
       - webapp-network
     # Add healthcheck

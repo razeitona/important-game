@@ -12,12 +12,11 @@
     border-bottom: 5px solid #ffffff;
     border-left: 5px solid #ffffff;
 
-    .match-card-link{
-        text-decoration:none;
-        color:inherit;
+    .match-card-link {
+        text-decoration: none;
+        color: inherit;
+    }
 
-    } 
-    
     &.hide {
         display: none;
     }
@@ -117,7 +116,7 @@
 
                 [data-es^="0.3"],
                 [data-es^="0.4"] {
-                    --color: #ffbb33; /* Yellow for ES < 50% */
+                    --color: #7D4D00; /* Yellow for ES < 50% */
                 }
 
                 [data-es^="0.5"],

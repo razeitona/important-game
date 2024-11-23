@@ -10,7 +10,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddSassCompiler();
 #endif
 
-builder.Services.MatchImportanceInfrastructure();
+builder.Services.MatchImportanceInfrastructure(builder.Configuration);
+
+//builder.Services.AddHostedService<MatchCalculatorJob>();
+//builder.Services.AddHostedService<LiveMatchCalculatorJob>();
 
 var app = builder.Build();
 

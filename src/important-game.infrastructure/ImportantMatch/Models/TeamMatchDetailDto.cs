@@ -4,6 +4,7 @@
     {
         public List<MatchResultType> Form { get; set; } = new List<MatchResultType>();
         public bool IsTitleHolder { get; internal set; }
+        public int TablePosition { get; internal set; }
     }
 
 

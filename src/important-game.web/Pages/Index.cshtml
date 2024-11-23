@@ -48,20 +48,20 @@
     <script>
 
         $(document).ready(function () {
-            $("time").each(function (elem) {
-                var utctimeval = $(this).html().trim();
-                var date = new Date(utctimeval);
-                var optionsDate = {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "2-digit",
-                };
-                var optionsTime = {
-                    hour: "numeric",
-                    minute: "numeric",
-                };
-                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            });
+            // $("time").each(function (elem) {
+            //     var utctimeval = $(this).html().trim();
+            //     var date = new Date(utctimeval);
+            //     var optionsDate = {
+            //         day: "2-digit",
+            //         month: "2-digit",
+            //         year: "2-digit",
+            //     };
+            //     var optionsTime = {
+            //         hour: "numeric",
+            //         minute: "numeric",
+            //     };
+            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            // });
 
         });
 

@@ -17,27 +17,43 @@
     }
 }
 
+
 @if (matchInfo == null)
 {
     <div>Sorry, we couldn't find any excitment report for this match</div>
     return;
 }
 
+@section Header {
+    @{
+        var teamId = matchInfo.HomeTeam.Id;
 
+        if (matchInfo.AwayTeam.IsTitleHolder || matchInfo.AwayTeam.TablePosition < matchInfo.HomeTeam.TablePosition)
+            teamId = matchInfo.AwayTeam.Id;
+
+        var url = "https://matchtowatch.net/match/" + matchInfo.Id;
+        var image = "https://api.sofascore.app/api/v1/team/" + teamId + "/image";
+    }
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@Html.Raw(matchInfo.HomeTeam.Name) vs @Html.Raw(matchInfo.AwayTeam.Name) - Match to watch">
+    <meta name="twitter:description" content="Follow the @Html.Raw(matchInfo.League.Name) match on @matchInfo.MatchDate.ToString("dd/MM/yyyy HH:mm") UTC time. Excitement Score: @(Math.Round((matchInfo.IsLive ? matchInfo.LiveExcitementScore : matchInfo.ExcitementScore)*100,0)). Key moments and stats here!">
+    <meta name="twitter:image" content="@image">
+    <meta name="twitter:url" content="@url">
+}
 <div class="match-detail" data-live="@matchInfo.IsLive">
     <div class="match-detail-content-left">
         <span class="match-detail-back"><i class="bi bi-arrow-left"></i>BACK</span>
         <div class="match-detail-info match-detail-card">
             <div class="match-detail-league">
                 <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id  + "/image")" />
+                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id + "/image")" alt="@(matchInfo.League.Name)" />
                 </div>
                 <div class="match-detail-league-title">
                     @matchInfo.League.Name
                 </div>
                 <div class="match-detail-time">
                     <time>
-                        @matchInfo.MatchDate.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture)
+                        @matchInfo.MatchDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
             </div>
@@ -55,7 +71,6 @@
                 </div>
             </div>
         </div>
-
         @* HEAD TO HEAD *@
         <div class="match-detail-info match-detail-card match-detail-info-h2h">
             <h1>Head to Head History</h1>
@@ -97,7 +112,6 @@
                 }
             </div>
         </div>
-
         @* TEAMS FORM *@
         <div class="match-detail-info match-detail-card match-detail-info-form">
             <h1>Recent Form</h1>
@@ -105,7 +119,6 @@
                 <div>
                     <span>@matchInfo.HomeTeam.Name</span>
                     <div>
-
                         @foreach (var form in matchInfo.HomeTeam.Form)
                         {
                             var formResult = form switch
@@ -137,11 +150,8 @@
                 </div>
             </div>
         </div>
-
-
     </div>
     <div class="match-detail-content-right">
-
         @if (matchInfo.IsLive)
         {
             <div class="match-detail-info match-detail-card match-detail-info-live">
@@ -153,38 +163,34 @@
                     </div>
                 </div>
                 @* <div class="match-detail-info-live-content">
-                    <div class="match-detail-teams">
-                        <div class="match-detail-team-info">
-                            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
-                        </div>
-                        <div class="eslive-map">
-                            <div id="heatmapContainer"></div>
-                        </div>
-                        <div class="match-detail-team-info">
-                            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
-                        </div>
-                    </div>
-                </div> *@
+            <div class="match-detail-teams">
+            <div class="match-detail-team-info">
+            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
+            </div>
+            <div class="eslive-map">
+            <div id="heatmapContainer"></div>
+            </div>
+            <div class="match-detail-team-info">
+            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
+            </div>
+            </div>
+            </div> *@
             </div>
         }
-
         <div class="match-detail-info match-detail-card match-detail-info-esdetail">
             <h1>Excitement Score Breakdown</h1>
             <div class="match-detail-info-esdetail-content">
                 @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
                 {
                     var scoreValue = Math.Round(item.Value.Value * 100, 0);
-
                     <div class="esdetail-item">
                         <div class="esdetail-title">
                             <span class="esdetail-name">@item.Key</span>
                             <span>@scoreValue</span>
                         </div>
-
                         <div class="progress esdetail-progress" role="progressbar" aria-label="@item.Key" aria-valuenow="@scoreValue" aria-valuemin="0" aria-valuemax="100">
                             <div class="progress-bar" style="width: @(scoreValue)%"></div>
                         </div>
-
                         @* <div class="text-xs text-gray-500 mt-1" data-id="element-66">Weight: 30%</div> *@
                     </div>
                 }
@@ -197,7 +203,6 @@
                     <span><i class="bi bi-trophy"></i>Title Holder</span>
                 }
             </div>
-
         </div>
         <div class="match-detail-info match-detail-card match-detail-info-esinfo">
             <div class="match-detail-info-esinfo-title">
@@ -217,20 +222,20 @@
 
     <script>
         $(document).ready(function () {
-            $("time").each(function (elem) {
-                var utctimeval = $(this).html().trim();
-                var date = new Date(utctimeval);
-                var optionsDate = {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                };
-                var optionsTime = {
-                    hour: "numeric",
-                    minute: "numeric",
-                };
-                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            });
+            // $("time").each(function (elem) {
+            //     var utctimeval = $(this).html().trim();
+            //     var date = new Date(utctimeval);
+            //     var optionsDate = {
+            //         day: "2-digit",
+            //         month: "2-digit",
+            //         year: "numeric",
+            //     };
+            //     var optionsTime = {
+            //         hour: "numeric",
+            //         minute: "numeric",
+            //     };
+            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            // });
 
 
 

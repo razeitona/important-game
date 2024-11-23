@@ -22,7 +22,7 @@
         @foreach (var league in Model.Matches.Leagues)
         {
             <div class="match-league-item" data-league="@league.Id">
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Id  + "/image")" />
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Id  + "/image")" alt="@league.Name" width="20px" />
                 <span>@league.Name</span>
             </div>
         }
@@ -61,20 +61,20 @@
 
 
         $(document).ready(function () {
-            $("time").each(function (elem) {
-                var utctimeval = $(this).html().trim();
-                var date = new Date(utctimeval);
-                var optionsDate = {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                };
-                var optionsTime = {
-                    hour: "numeric",
-                    minute: "numeric",
-                };
-                $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            });
+            // $("time").each(function (elem) {
+            //     var utctimeval = $(this).html().trim();
+            //     var date = new Date(utctimeval);
+            //     var optionsDate = {
+            //         day: "2-digit",
+            //         month: "2-digit",
+            //         year: "numeric",
+            //     };
+            //     var optionsTime = {
+            //         hour: "numeric",
+            //         minute: "numeric",
+            //     };
+            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
+            // });
 
             var list = @Html.Raw(JsonSerializer.Serialize(Model.Matches.Matches
           .Select(c => new { id = c.Id, home = c.HomeTeam.Name, away = c.AwayTeam.Name, homeslug = c.HomeTeam.Slug, awayslug = c.AwayTeam.Slug })));

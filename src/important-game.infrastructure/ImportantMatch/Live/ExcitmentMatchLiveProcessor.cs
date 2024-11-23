@@ -22,7 +22,10 @@ namespace important_game.infrastructure.ImportantMatch.Live
             var matchLiveData = await leagueProcessor.GetEventStatisticsAsync(match.Id.ToString());
 
             if (matchLiveData == null)
+            {
+                match.MatchStatus = MatchStatus.Finished;
                 return null;
+            }
 
             var eventInfo = await leagueProcessor.GetEventInformationAsync(match.Id.ToString());
             if (eventInfo == null) return null;
@@ -140,7 +143,7 @@ namespace important_game.infrastructure.ImportantMatch.Live
             var liveScore = scoreLineValue + xGoalsValue
                  + totalFoulsValue + totalCardsValue + possessionValue + bigChancesValue;
 
-            liveScore = (0.5d * liveScore) - 0.3d;
+            liveScore = ((0.5d * liveScore) - 0.3d) / 100d;
             var liveExcitmenetScore = match.ExcitmentScore + liveScore;
 
             var liveMatch = new LiveMatch()

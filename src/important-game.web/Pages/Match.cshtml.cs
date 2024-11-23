@@ -31,7 +31,8 @@ namespace important_game.web.Pages
                 IsLive = match.IsLive,
                 IsRivalry = match.ExcitmentScoreDetail.Any(c => c.Key == "Rivalry" && c.Value.Value > 0d),
                 HasTitleHolder = match.HomeTeam.IsTitleHolder || match.AwayTeam.IsTitleHolder,
-                Description = match.Description
+                Description = match.Description,
+                LiveExcitementScore = match.LiveExcitementScore
                 //Score = match.Score,
             };
 

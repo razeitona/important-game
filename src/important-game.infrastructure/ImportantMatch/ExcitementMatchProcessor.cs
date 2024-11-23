@@ -137,11 +137,23 @@ namespace important_game.infrastructure.ImportantMatch
             var tableRankCoef = 0.15d;
             var fixtureCoef = 0.10d;
 
+            if (((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) > 0.8d && leagueTable.TotalRounds > leagueTable.Standings.Count)
+            {
+                fixtureCoef = 0.25d;
+                tableRankCoef = 0.33d;
+                teamGoalsCoef = 0.2d;
+                teamFormCoef = 0.05d;
+                rivalryCoef = 0.02d;
+                titleHolderCoef = 0.05d;
+                competitionCoef = 0.05d;
+                h2hCoef = 0.05d;
+            }
+
             // 0.2×CR
             double competitionRankValue = league.Ranking * competitionCoef;
             // 0.1×FN
             //fixture Number (fixtureNumber / total Fixtures)
-            double fixtureValue = 1d;
+            double fixtureValue = 1d * fixtureCoef;
             if (leagueTable != null)
             {
                 fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * fixtureCoef;
@@ -276,30 +288,30 @@ namespace important_game.infrastructure.ImportantMatch
         private double CalculateLeagueTableValue(TeamInfo homeTeam, TeamInfo awayTeam, LeagueStanding leagueTable)
         {
             if (homeTeam == null || awayTeam == null || leagueTable == null || leagueTable.Standings.Count == 0)
-                return 0;
+                return 0d;
+
+            if (leagueTable.CurrentRound <= 1)
+                return 0.5d;
 
             //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
 
             var homeTeamPosition = leagueTable.Standings.FirstOrDefault(c => c.Team.Id == homeTeam.Id);
             if (homeTeamPosition == null)
-                return 0;
+                return 0d;
 
             homeTeam.Position = homeTeamPosition.Position;
 
             var awayTeamPosition = leagueTable.Standings.FirstOrDefault(c => c.Team.Id == awayTeam.Id);
             if (awayTeamPosition == null)
-                return 0;
-
-            if (leagueTable.CurrentRound <= 1)
-                return 0.5d;
+                return 0d;
 
             awayTeam.Position = awayTeamPosition.Position;
 
-            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position);
+            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position)-1;
             var totalTeams = (double)leagueTable.Standings.Count;
 
             //var positionValue = 1d - ((double)positionDiff / ((double)leagueTable.Standings.Count - 1d));
-            var positionValue = 1d / (1 + positionDiff / (totalTeams - 1d));
+            var positionValue = 1d / (1 + (positionDiff / (totalTeams - 1d)));
 
 
             var averageTeamPosition = ((double)homeTeamPosition.Position + (double)awayTeamPosition.Position) / 2d;
@@ -310,7 +322,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             var maxPointDifference = (double)(leagueTable.TotalRounds - Math.Max(homeTeamPosition.Matches, awayTeamPosition.Matches)) * 3d;
 
-            var pointImpactValue = 1d / (1 + pointDifference / (maxPointDifference - 1d));
+            var pointImpactValue = 1d / (1 + (pointDifference / (maxPointDifference - 1d)));
 
             return positionValue * topBottomMatchupValue * pointImpactValue;
 
@@ -348,7 +360,12 @@ namespace important_game.infrastructure.ImportantMatch
 
             var drawGames = (double)fixtures.Where(c => c.HomeTeamScore == c.AwayTeamScore).Count();
 
-            return Math.Abs(1d - ((homeTeamWins + awayTeamWins) * 3d + drawGames) / 15d);
+            var h2hValue =  (((homeTeamWins + awayTeamWins) * 3d) + drawGames) / 15d;
+
+            if (h2hValue > 1d)
+                h2hValue = 1d;
+
+            return h2hValue;
             //return ((3d / (double)difTeamWins) + (double)drawGames) / 5d;
         }
 
