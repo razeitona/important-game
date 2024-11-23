@@ -12,8 +12,8 @@ builder.Services.AddSassCompiler();
 
 builder.Services.MatchImportanceInfrastructure(builder.Configuration);
 
-//builder.Services.AddHostedService<MatchCalculatorJob>();
-//builder.Services.AddHostedService<LiveMatchCalculatorJob>();
+builder.Services.AddHostedService<MatchCalculatorJob>();
+builder.Services.AddHostedService<LiveMatchCalculatorJob>();
 
 var app = builder.Build();
 
