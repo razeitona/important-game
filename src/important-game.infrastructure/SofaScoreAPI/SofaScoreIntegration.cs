@@ -1,12 +1,12 @@
 ﻿using important_game.infrastructure.SofaScoreAPI.Models;
 using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
+using PuppeteerSharp;
 using System.Text.Json;
 
 namespace important_game.infrastructure.SofaScoreAPI
 {
-    internal class SofaScoreIntegration(HttpClient httpClient) : ISofaScoreIntegration
+    internal class SofaScoreIntegration : ISofaScoreIntegration
     {
-
         public async Task<SSTournament> GetTournamentAsync(int tournamentId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}";
@@ -61,21 +61,42 @@ namespace important_game.infrastructure.SofaScoreAPI
             return await Invoke<SSEventInfo>(url);
         }
 
+
         private async Task<T> Invoke<T>(string url) where T : class
         {
             try
             {
-                using var response = await httpClient.GetAsync(url);
+                var browserFetcher = new BrowserFetcher();
 
-                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                await browserFetcher.DownloadAsync();
+                await using var browser = await Puppeteer.LaunchAsync(
+                    new LaunchOptions { Headless = true });
+
+                await using var page = await browser.NewPageAsync();
+                await page.GoToAsync("https://www.sofascore.com");
+
+                var response = await page.GoToAsync(url);
+                var responseContent = await response.TextAsync();
 
                 return JsonSerializer.Deserialize<T>(responseContent);
 
+            }
+            catch (HttpRequestException ex)
+            {
+                // Log the full exception details
+                throw; // Re-throw to allow caller to handle
             }
             catch (Exception ex)
             {
                 return default;
             }
         }
+
+        private void ProcessResponse(object? sender, ResponseCreatedEventArgs e)
+        {
+        }
     }
+
+
 }

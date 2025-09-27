@@ -1,12 +1,14 @@
-﻿using important_game.infrastructure.ImportantMatch.Data;
+using System.Globalization;
+using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
+using important_game.infrastructure.Telegram;
 
 namespace important_game.infrastructure.ImportantMatch
 {
     internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor
-        , IExctimentMatchRepository matchRepository) : IExcitmentMatchProcessor
+        , IExctimentMatchRepository matchRepository, TelegramBot telegramBot) : IExcitmentMatchProcessor
     {
         public async Task CalculateUpcomingMatchsExcitment()
         {
@@ -104,7 +106,37 @@ namespace important_game.infrastructure.ImportantMatch
 
                 var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable, rivalry);
 
+                if (match.MatchDateUTC.Date == DateTime.UtcNow.Date)
+                    _ = telegramBot.SendMessageAsync(ProcessGameMessage(match));
             }
+        }
+
+        private string ProcessGameMessage(Match match)
+        {
+            var homeTeamName = match.HomeTeam?.Name ?? "Home team";
+            var awayTeamName = match.AwayTeam?.Name ?? "Away team";
+            var leagueName = match.Competition?.Name;
+            var kickOffTime = match.MatchDateUTC.ToString("ddd, MMM dd yyyy HH:mm", CultureInfo.InvariantCulture);
+            var excitementScore = Math.Round(match.ExcitmentScore * 100, 0);
+
+            var statusLine = match.MatchStatus switch
+            {
+                MatchStatus.Live => $"Score: {match.HomeScore}-{match.AwayScore} (live)",
+                MatchStatus.Finished => $"Final score: {match.HomeScore}-{match.AwayScore}",
+                _ => $"Kick-off: {kickOffTime} UTC"
+            };
+
+            var lines = new List<string?>
+            {
+                "MATCH TO WATCH ALERT",
+                leagueName != null ? $"Competition: {leagueName}" : null,
+                $"{homeTeamName} vs {awayTeamName}",
+                statusLine,
+                $"Excitement Score: {excitementScore}/100",
+                $"Full breakdown: https://matchtowatch.net/match/{match.Id}"
+            };
+
+            return string.Join("\n", lines.Where(line => !string.IsNullOrWhiteSpace(line)));
         }
 
         private async Task<Match> CalculateMatchImportanceAsync(League league, UpcomingFixture fixture
@@ -307,7 +339,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             awayTeam.Position = awayTeamPosition.Position;
 
-            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position)-1;
+            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position) - 1;
             var totalTeams = (double)leagueTable.Standings.Count;
 
             //var positionValue = 1d - ((double)positionDiff / ((double)leagueTable.Standings.Count - 1d));
@@ -360,7 +392,7 @@ namespace important_game.infrastructure.ImportantMatch
 
             var drawGames = (double)fixtures.Where(c => c.HomeTeamScore == c.AwayTeamScore).Count();
 
-            var h2hValue =  (((homeTeamWins + awayTeamWins) * 3d) + drawGames) / 15d;
+            var h2hValue = (((homeTeamWins + awayTeamWins) * 3d) + drawGames) / 15d;
 
             if (h2hValue > 1d)
                 h2hValue = 1d;
