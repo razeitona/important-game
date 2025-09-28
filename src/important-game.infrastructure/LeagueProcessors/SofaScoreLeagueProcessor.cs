@@ -1,11 +1,13 @@
-﻿using important_game.infrastructure.ImportantMatch.Models;
+using System.Diagnostics.CodeAnalysis;
+using important_game.infrastructure.ImportantMatch.Models;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
 
 namespace important_game.infrastructure.LeagueProcessors
 {
-    internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
+    [ExcludeFromCodeCoverage]
+internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
     {
 
         public async Task<League> GetLeagueDataAsync(int leagueId)
@@ -389,3 +391,4 @@ namespace important_game.infrastructure.LeagueProcessors
         }
     }
 }
+

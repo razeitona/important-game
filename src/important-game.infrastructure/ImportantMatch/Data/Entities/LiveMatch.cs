@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     [Table("live_match")]
+    [ExcludeFromCodeCoverage]
     public class LiveMatch
     {
         [Key]
@@ -37,3 +39,4 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         public double BigChancesScore { get; set; }
     }
 }
+

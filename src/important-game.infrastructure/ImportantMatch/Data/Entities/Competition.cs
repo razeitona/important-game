@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     [Table("competition")]
+    [ExcludeFromCodeCoverage]
     public class Competition
     {
         [Key]
@@ -35,3 +37,4 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         public ICollection<Match> Fixtures { get; set; }
     }
 }
+

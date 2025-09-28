@@ -1,8 +1,10 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using System.Diagnostics.CodeAnalysis;
+using important_game.infrastructure.ImportantMatch.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace important_game.infrastructure.ImportantMatch.Data
 {
+    [ExcludeFromCodeCoverage]
     public class ExcitmentMatchRepository : IExctimentMatchRepository
     {
         #region Competition Methods
@@ -16,25 +18,30 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         public async Task SaveCompetitionAsync(Competition competition)
         {
-            // Disable change tracking for performance on bulk operations
+            var previousTracking = _context.ChangeTracker.QueryTrackingBehavior;
             _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            var existingRivalry = await _context.Competitions.FirstOrDefaultAsync(c => c.Id == competition.Id);
-
-            if (existingRivalry != null)
+            try
             {
-                // Update properties of the existing competition
-                existingRivalry.Name = competition.Name;
-                existingRivalry.TitleHolderTeamId = competition.TitleHolderTeamId;
-                _context.Competitions.Update(existingRivalry);
-            }
-            else
-            {
-                // Add new competition to the list for insertion
-                _context.Competitions.Add(competition);
-            }
+                var existingCompetition = await _context.Competitions.FirstOrDefaultAsync(c => c.Id == competition.Id);
 
-            await _context.SaveChangesAsync();
+                if (existingCompetition != null)
+                {
+                    existingCompetition.Name = competition.Name;
+                    existingCompetition.TitleHolderTeamId = competition.TitleHolderTeamId;
+                    _context.Competitions.Update(existingCompetition);
+                }
+                else
+                {
+                    _context.Competitions.Add(competition);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.ChangeTracker.QueryTrackingBehavior = previousTracking;
+            }
         }
 
         public async Task UpdateCompetitionAsync(Competition competition)
@@ -69,8 +76,14 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         public async Task<Team> SaveTeamAsync(Team team)
         {
-            if (_context.Teams.Where(c => c.Id == team.Id).Count() > 0)
+            var teamExists = await _context.Teams
+                .AsNoTracking()
+                .AnyAsync(c => c.Id == team.Id);
+
+            if (teamExists)
+            {
                 return team;
+            }
 
             _context.Teams.Add(team);
             await _context.SaveChangesAsync();
@@ -253,88 +266,96 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         public async Task SaveLiveMatchAsync(LiveMatch liveMatch)
         {
-            // Disable change tracking for performance on bulk operations
+            var previousTracking = _context.ChangeTracker.QueryTrackingBehavior;
             _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            var existingLiveMatch = await _context.LiveMatches.FirstOrDefaultAsync(c => c.Id == liveMatch.Id);
-
-            if (existingLiveMatch != null)
+            try
             {
-                // Update properties of the existing fixture
-                existingLiveMatch.ExcitmentScore = liveMatch.ExcitmentScore;
-                existingLiveMatch.ScoreLineScore = liveMatch.ScoreLineScore;
-                existingLiveMatch.ShotTargetScore = liveMatch.ShotTargetScore;
-                existingLiveMatch.XGoalsScore = liveMatch.XGoalsScore;
-                existingLiveMatch.TotalFoulsScore = liveMatch.TotalFoulsScore;
-                existingLiveMatch.TotalCardsScore = liveMatch.TotalCardsScore;
-                existingLiveMatch.PossesionScore = liveMatch.PossesionScore;
-                existingLiveMatch.BigChancesScore = liveMatch.BigChancesScore;
+                var existingLiveMatch = await _context.LiveMatches.FirstOrDefaultAsync(c => c.Id == liveMatch.Id);
 
-                _context.LiveMatches.Update(existingLiveMatch);
+                if (existingLiveMatch != null)
+                {
+                    existingLiveMatch.ExcitmentScore = liveMatch.ExcitmentScore;
+                    existingLiveMatch.ScoreLineScore = liveMatch.ScoreLineScore;
+                    existingLiveMatch.ShotTargetScore = liveMatch.ShotTargetScore;
+                    existingLiveMatch.XGoalsScore = liveMatch.XGoalsScore;
+                    existingLiveMatch.TotalFoulsScore = liveMatch.TotalFoulsScore;
+                    existingLiveMatch.TotalCardsScore = liveMatch.TotalCardsScore;
+                    existingLiveMatch.PossesionScore = liveMatch.PossesionScore;
+                    existingLiveMatch.BigChancesScore = liveMatch.BigChancesScore;
+
+                    _context.LiveMatches.Update(existingLiveMatch);
+                }
+                else
+                {
+                    _context.LiveMatches.Add(liveMatch);
+                }
+
+                await _context.SaveChangesAsync();
             }
-            else
+            finally
             {
-                // Add new fixture to the list for insertion
-                _context.LiveMatches.Add(liveMatch);
+                _context.ChangeTracker.QueryTrackingBehavior = previousTracking;
             }
-
-            await _context.SaveChangesAsync();
         }
 
         public async Task SaveLiveMatchesAsync(List<LiveMatch> liveMatches)
         {
-            // Disable change tracking for performance on bulk operations
+            var previousTracking = _context.ChangeTracker.QueryTrackingBehavior;
             _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            // Get all existing fixture IDs from the database in a single query
-            var liveMatchesIds = liveMatches.Select(f => f.Id).ToList();
-            var existingLiveMatches = await _context.LiveMatches
-                .Where(f => liveMatchesIds.Contains(f.Id))
-                .ToDictionaryAsync(f => f.Id, f => f);
-
-            var liveMatchesToAdd = new List<LiveMatch>();
-            var liveMatchesToUpdate = new List<LiveMatch>();
-
-            foreach (var liveMatch in liveMatches)
+            try
             {
-                if (existingLiveMatches.TryGetValue(liveMatch.Id, out var existingMatch))
+                var liveMatchesIds = liveMatches.Select(f => f.Id).ToList();
+                var existingLiveMatches = await _context.LiveMatches
+                    .Where(f => liveMatchesIds.Contains(f.Id))
+                    .ToDictionaryAsync(f => f.Id, f => f);
+
+                var liveMatchesToAdd = new List<LiveMatch>();
+                var liveMatchesToUpdate = new List<LiveMatch>();
+
+                foreach (var liveMatch in liveMatches)
                 {
-                    // Update properties of the existing fixture
-                    existingMatch.ExcitmentScore = liveMatch.ExcitmentScore;
-                    existingMatch.ScoreLineScore = liveMatch.ScoreLineScore;
-                    existingMatch.ShotTargetScore = liveMatch.ShotTargetScore;
-                    existingMatch.XGoalsScore = liveMatch.XGoalsScore;
-                    existingMatch.TotalFoulsScore = liveMatch.TotalFoulsScore;
-                    existingMatch.TotalCardsScore = liveMatch.TotalCardsScore;
-                    existingMatch.PossesionScore = liveMatch.PossesionScore;
-                    existingMatch.BigChancesScore = liveMatch.BigChancesScore;
+                    if (existingLiveMatches.TryGetValue(liveMatch.Id, out var existingMatch))
+                    {
+                        existingMatch.ExcitmentScore = liveMatch.ExcitmentScore;
+                        existingMatch.ScoreLineScore = liveMatch.ScoreLineScore;
+                        existingMatch.ShotTargetScore = liveMatch.ShotTargetScore;
+                        existingMatch.XGoalsScore = liveMatch.XGoalsScore;
+                        existingMatch.TotalFoulsScore = liveMatch.TotalFoulsScore;
+                        existingMatch.TotalCardsScore = liveMatch.TotalCardsScore;
+                        existingMatch.PossesionScore = liveMatch.PossesionScore;
+                        existingMatch.BigChancesScore = liveMatch.BigChancesScore;
 
-                    liveMatchesToUpdate.Add(existingMatch);
+                        liveMatchesToUpdate.Add(existingMatch);
+                    }
+                    else
+                    {
+                        liveMatchesToAdd.Add(liveMatch);
+                    }
                 }
-                else
+
+                if (!liveMatchesToAdd.Any() && !liveMatchesToUpdate.Any())
                 {
-                    // Add new fixture to the list for insertion
-                    liveMatchesToAdd.Add(liveMatch);
+                    return;
                 }
-            }
 
-            // Perform bulk insert for new fixtures
-            if (liveMatchesToAdd.Any())
+                if (liveMatchesToAdd.Any())
+                {
+                    _context.LiveMatches.AddRange(liveMatchesToAdd);
+                }
+
+                if (liveMatchesToUpdate.Any())
+                {
+                    _context.LiveMatches.UpdateRange(liveMatchesToUpdate);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            finally
             {
-                _context.LiveMatches.AddRange(liveMatchesToAdd);
+                _context.ChangeTracker.QueryTrackingBehavior = previousTracking;
             }
-
-            // Perform bulk update for existing fixtures
-            if (liveMatchesToUpdate.Any())
-            {
-                _context.LiveMatches.UpdateRange(liveMatchesToUpdate);
-            }
-
-            // Save changes in a single transaction for efficiency
-            await _context.SaveChangesAsync();
-
-            // Re-enable tracking
-            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
         }
 
         public async Task<LiveMatch?> GetLiveMatchByIdAsync(int id)
@@ -345,53 +366,60 @@ namespace important_game.infrastructure.ImportantMatch.Data
 
         public async Task SaveHeadToHeadMatchesAsync(List<Headtohead> headtoheadMatches)
         {
-            // Disable change tracking for performance on bulk operations
+            if (headtoheadMatches == null || headtoheadMatches.Count == 0)
+            {
+                return;
+            }
+
+            var previousTracking = _context.ChangeTracker.QueryTrackingBehavior;
             _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            if (headtoheadMatches.Count == 0)
-                return;
+            try
+            {
+                var matchId = headtoheadMatches[0].MatchId;
 
-            var matchId = headtoheadMatches!.FirstOrDefault()!.MatchId;
+                var existingHeadToHeadMatches = _context.HeadtoheadMatches
+                    .Where(f => f.MatchId == matchId);
 
-            // Get all existing fixture IDs from the database in a single query
-            var existingHeadToHeadMatches = _context.HeadtoheadMatches
-                .Where(f => f.MatchId == matchId);
+                _context.HeadtoheadMatches.RemoveRange(existingHeadToHeadMatches);
+                _context.HeadtoheadMatches.AddRange(headtoheadMatches);
 
-            _context.HeadtoheadMatches.RemoveRange(existingHeadToHeadMatches);
-
-            _context.HeadtoheadMatches.AddRange(headtoheadMatches);
-
-            // Save changes in a single transaction for efficiency
-            await _context.SaveChangesAsync();
-
-            // Re-enable tracking
-            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.ChangeTracker.QueryTrackingBehavior = previousTracking;
+            }
         }
-
         #endregion
 
         #region Rivalry Methods
 
         public async Task SaveRivalryAsync(Rivalry rivalry)
         {
-            // Disable change tracking for performance on bulk operations
+            var previousTracking = _context.ChangeTracker.QueryTrackingBehavior;
             _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-            var existingRivalry = await _context.Rivalries.FirstOrDefaultAsync(c => c.Id == rivalry.Id);
-
-            if (existingRivalry != null)
+            try
             {
-                // Update properties of the existing rivalry
-                existingRivalry.RivarlyValue = rivalry.RivarlyValue;
-                _context.Rivalries.Update(existingRivalry);
-            }
-            else
-            {
-                // Add new rivalry to the list for insertion
-                _context.Rivalries.Add(rivalry);
-            }
+                var existingRivalry = await _context.Rivalries.FirstOrDefaultAsync(c => c.Id == rivalry.Id);
 
-            await _context.SaveChangesAsync();
+                if (existingRivalry != null)
+                {
+                    existingRivalry.RivarlyValue = rivalry.RivarlyValue;
+                    _context.Rivalries.Update(existingRivalry);
+                }
+                else
+                {
+                    _context.Rivalries.Add(rivalry);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            finally
+            {
+                _context.ChangeTracker.QueryTrackingBehavior = previousTracking;
+            }
         }
 
         public async Task<Rivalry?> GetRivalryByTeamIdAsync(int teamOneId, int teamTwoId)

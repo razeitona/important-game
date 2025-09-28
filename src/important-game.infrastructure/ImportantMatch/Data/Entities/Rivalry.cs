@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     [Table("rivalry")]
+    [ExcludeFromCodeCoverage]
     public class Rivalry
     {
         [Key]
@@ -24,3 +26,4 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         public double RivarlyValue { get; set; }
     }
 }
+

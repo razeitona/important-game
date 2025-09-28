@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace important_game.infrastructure.ImportantMatch.Data.Entities
 {
     [Table("team")]
+    [ExcludeFromCodeCoverage]
     public class Team
     {
         [Key]
@@ -22,3 +24,4 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         public ICollection<Headtohead> AwayHeadToHead { get; set; }
     }
 }
+

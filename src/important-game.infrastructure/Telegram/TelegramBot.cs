@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace important_game.infrastructure.Telegram
 {
@@ -10,44 +13,71 @@ namespace important_game.infrastructure.Telegram
         100 orders per 10 seconds
         200,000 orders per 24 hours
      */
-    public class TelegramBot
+    [ExcludeFromCodeCoverage]
+    public class TelegramBot : ITelegramBot
     {
-        // You'll get these from setting up your bot
         private readonly HttpClient _client;
-        private const string _botToken = "8148610785:AAEyE6D2xynWbnSYMlTsDjzDteuU5vCtInU";
-        private const string _chatId = "-1002296682304";
+        private readonly TelegramOptions _options;
+        private readonly ILogger<TelegramBot> _logger;
 
-        public TelegramBot()
+        public TelegramBot(HttpClient client, IOptions<TelegramOptions> options, ILogger<TelegramBot> logger)
         {
-            _client = new HttpClient()
-            {
-                BaseAddress = new Uri($"https://api.telegram.org/bot{_botToken}/")
-            };
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task SendMessageAsync(string message)
         {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.BotToken))
+            {
+                _logger.LogDebug("Telegram bot token not configured; skipping message.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.ChatId))
+            {
+                _logger.LogWarning("Telegram chat id not configured; skipping message.");
+                return;
+            }
+
             try
             {
+                var chatId = Uri.EscapeDataString(_options.ChatId);
+                var encodedMessage = Uri.EscapeDataString(message);
+                var path = $"sendMessage?chat_id={chatId}&text={encodedMessage}&parse_mode=HTML";
 
-                var parameters = new
+                if (_client.BaseAddress is null)
                 {
-                    chat_id = _chatId,
-                    text = message,
-                    parse_mode = "HTML" // Allows basic HTML formatting
-                };
+                    var absoluteUri = new Uri($"https://api.telegram.org/bot{_options.BotToken}/{path}");
+                    using var absoluteResponse = await _client.GetAsync(absoluteUri).ConfigureAwait(false);
+                    await LogOnFailureAsync(absoluteResponse).ConfigureAwait(false);
+                    return;
+                }
 
-                var url = $"sendMessage?chat_id={_chatId}&text={Uri.EscapeDataString(message)}";
-                var response = await _client.GetAsync(url);
-
-                var content = await response.Content.ReadAsStringAsync();
-                response.EnsureSuccessStatusCode();
+                using var response = await _client.GetAsync(path).ConfigureAwait(false);
+                await LogOnFailureAsync(response).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending message: {ex.Message}");
+                _logger.LogError(ex, "Error sending telegram message");
             }
         }
 
+        private async Task LogOnFailureAsync(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            _logger.LogError("Telegram API returned {StatusCode}: {Content}", response.StatusCode, content);
+        }
     }
 }

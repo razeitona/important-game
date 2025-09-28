@@ -1,12 +1,23 @@
-﻿using important_game.infrastructure.SofaScoreAPI.Models;
+using important_game.infrastructure.SofaScoreAPI.Models;
 using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
 using PuppeteerSharp;
+using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace important_game.infrastructure.SofaScoreAPI
 {
+    [ExcludeFromCodeCoverage]
     internal class SofaScoreIntegration : ISofaScoreIntegration
     {
+        private static readonly MemoryCache ResponseCache = new(new MemoryCacheOptions
+        {
+            SizeLimit = 128
+        });
+
+        private static readonly TimeSpan CacheEntrySlidingExpiration = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan CacheEntryAbsoluteExpiration = TimeSpan.FromMinutes(20);
+
         public async Task<SSTournament> GetTournamentAsync(int tournamentId)
         {
             var url = $"{SofaScoreConstants.BaseUrl}api/v1/unique-tournament/{tournamentId}";
@@ -64,10 +75,14 @@ namespace important_game.infrastructure.SofaScoreAPI
 
         private async Task<T> Invoke<T>(string url) where T : class
         {
+            if (ResponseCache.TryGetValue(url, out var cached) && cached is T cachedValue)
+            {
+                return cachedValue;
+            }
+
             try
             {
                 var browserFetcher = new BrowserFetcher();
-
 
                 await browserFetcher.DownloadAsync();
                 await using var browser = await Puppeteer.LaunchAsync(
@@ -77,21 +92,37 @@ namespace important_game.infrastructure.SofaScoreAPI
                 await page.GoToAsync("https://www.sofascore.com");
 
                 var response = await page.GoToAsync(url);
+                if (response == null)
+                {
+                    return default;
+                }
+
                 var responseContent = await response.TextAsync();
+                var result = JsonSerializer.Deserialize<T>(responseContent);
 
-                return JsonSerializer.Deserialize<T>(responseContent);
+                if (result != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSize(1)
+                        .SetSlidingExpiration(CacheEntrySlidingExpiration)
+                        .SetAbsoluteExpiration(CacheEntryAbsoluteExpiration);
+
+                    ResponseCache.Set(url, result, cacheEntryOptions);
+                }
+
+                return result;
 
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
-                // Log the full exception details
-                throw; // Re-throw to allow caller to handle
+                throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return default;
             }
         }
+
 
         private void ProcessResponse(object? sender, ResponseCreatedEventArgs e)
         {
@@ -100,3 +131,4 @@ namespace important_game.infrastructure.SofaScoreAPI
 
 
 }
+

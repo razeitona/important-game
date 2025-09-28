@@ -1,4 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
 
@@ -32,6 +32,8 @@ namespace important_game.infrastructure.ImportantMatch.Live
 
             var gameTime = eventInfo.Status.GetGameTime();
 
+            var safeGameTime = Math.Max(gameTime, 1d);
+
             var scoreLineCoef = 0.2d;
             //var shotTargetCoef = 0.2d;
             var xGoalsCoef = 0.2d;
@@ -52,13 +54,13 @@ namespace important_game.infrastructure.ImportantMatch.Live
             _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, TOTAL_SHOTS_GOAL, out double homeTotalShots);
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, TOTAL_SHOTS_GOAL, out double awayTotalShots);
             var totalShots = homeTotalShots + awayTotalShots;
-            var totalShotsPerGameTime = (totalShots / gameTime);
-            var totalShotsPer10Max = (totalShotsPerGameTime / 10d);
+            var totalShotsPerGameTime = totalShots > 0d ? totalShots / safeGameTime : 0d;
+            var totalShotsPer10Max = totalShotsPerGameTime / 10d;
 
             _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, SHOTS_ON_GOAL, out double homeShotsOnGoal);
             _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, SHOTS_ON_GOAL, out double awayShotsOnGoal);
-            var shotsOnTarget = homeShotsOnGoal + awayTotalShots;
-            var shotsOnTargetAverage = shotsOnTarget / totalShots;
+            var shotsOnTarget = homeShotsOnGoal + awayShotsOnGoal;
+            var shotsOnTargetAverage = totalShots > 0d ? shotsOnTarget / totalShots : 0d;
 
             //var shotTargetValue = (totalShotsPer10Max + shotsOnTargetAverage) * shotTargetCoef;
 
@@ -133,8 +135,8 @@ namespace important_game.infrastructure.ImportantMatch.Live
 
             //Big Chance
             //-----
-            _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, BALL_POSSESSION, out double homeBigChance);
-            _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, BALL_POSSESSION, out double awayBigChance);
+            _ = matchLiveData.GetHomeStatValue(ALL, MATCH_OVERVIEW, BIG_CHANCE_CREATED, out double homeBigChance);
+            _ = matchLiveData.GetAwayStatValue(ALL, MATCH_OVERVIEW, BIG_CHANCE_CREATED, out double awayBigChance);
             var bigChancesTotal = (homeBigChance + awayBigChance);
 
             var bigChancesValue = (bigChancesTotal / 10d) * (1d + (gameTime / 90d));
@@ -185,3 +187,4 @@ namespace important_game.infrastructure.ImportantMatch.Live
         }
     }
 }
+

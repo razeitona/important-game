@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <ExcludeByAttribute>
+            <Attribute>System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute</Attribute>
+          </ExcludeByAttribute>
+          <Include>
+            <Class>important_game.infrastructure.ImportantMatch.*</Class>
+            <Class>important_game.infrastructure.Extensions.*</Class>
+          </Include>
+          <ExcludeByFile>
+            <File>**/ImportantMatch/Data/**/*.cs</File>
+            <File>**/SofaScoreAPI/**/*.cs</File>
+            <File>**/Telegram/**/*.cs</File>
+            <File>**/obj/**</File>
+            <File>**\ImportantMatch\Data\**\*.cs</File>
+          <File>**\SofaScoreAPI\**\*.cs</File>
+          <File>**\Telegram\**\*.cs</File>
+        </ExcludeByFile>
+          <Exclude>
+            <Class>important_game.infrastructure.SofaScoreAPI.*</Class>
+            <Class>important_game.infrastructure.ImportantMatch.Data.*</Class>
+            <Class>important_game.infrastructure.Telegram.*</Class>
+          </Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
+
+
+
+
+

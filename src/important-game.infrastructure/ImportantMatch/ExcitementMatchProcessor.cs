@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Threading;
 using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
@@ -10,25 +11,79 @@ namespace important_game.infrastructure.ImportantMatch
     internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor
         , IExctimentMatchRepository matchRepository, TelegramBot telegramBot) : IExcitmentMatchProcessor
     {
+        // Limit concurrent SofaScore calls to avoid throttling by the upstream API.
+        private const int MaxConcurrentLeagueRequests = 3;
+        private readonly SemaphoreSlim _repositoryLock = new(1, 1);
+
         public async Task CalculateUpcomingMatchsExcitment()
         {
 
-            var listOfCompetition = await matchRepository.GetActiveCompetitionsAsync();
+            var competitions = await matchRepository.GetActiveCompetitionsAsync();
 
-            //Process all the leagues to identify the excitement match rating for each
-            foreach (var competition in listOfCompetition)
+            if (competitions == null || competitions.Count == 0)
             {
-                //Get all upcoming games (active) from processing competition
+                return;
+            }
 
+            using var throttler = new SemaphoreSlim(MaxConcurrentLeagueRequests, MaxConcurrentLeagueRequests);
+
+            var processingTasks = competitions
+                .Select(competition => ProcessCompetitionAsync(competition, throttler))
+                .ToList();
+
+            await Task.WhenAll(processingTasks);
+        }
+
+        private async Task ProcessCompetitionAsync(Competition competition, SemaphoreSlim throttler)
+        {
+            await throttler.WaitAsync();
+
+            try
+            {
                 var leagueInfo = await GetLeagueDataInfoAsync(competition);
 
                 if (leagueInfo == null)
-                    continue;
+                {
+                    return;
+                }
 
-                var activeMatches = await matchRepository.GetCompetitionActiveMatchesAsync(competition.Id);
+                var activeMatches = await WithRepositoryLock(() => matchRepository.GetCompetitionActiveMatchesAsync(competition.Id));
 
                 await ExtractUpcomingMatchesAsync(leagueInfo, activeMatches);
             }
+            finally
+            {
+                throttler.Release();
+            }
+        }
+
+        private async Task<TResult> WithRepositoryLock<TResult>(Func<Task<TResult>> action)
+        {
+            await _repositoryLock.WaitAsync();
+
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                _repositoryLock.Release();
+            }
+        }
+
+        private async Task WithRepositoryLock(Func<Task> action)
+        {
+            await _repositoryLock.WaitAsync();
+
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                _repositoryLock.Release();
+            }
+        }
 
         }
 
@@ -49,7 +104,7 @@ namespace important_game.infrastructure.ImportantMatch
                     TitleHolderTeamId = league.TitleHolder?.Id ?? null,
                 };
 
-                await matchRepository.SaveCompetitionAsync(updatedCompetition);
+                await WithRepositoryLock(() => matchRepository.SaveCompetitionAsync(updatedCompetition));
             }
 
             league.Ranking = competition.LeagueRanking;
@@ -85,6 +140,7 @@ namespace important_game.infrastructure.ImportantMatch
         {
 
             var activeMatchesDict = activeMatches.ToDictionary(c => c.Id, c => c);
+            var rivalryCache = new Dictionary<(int, int), Rivalry?>();
 
             var validationDate = DateTime.UtcNow.AddDays(-1);
 
@@ -102,13 +158,24 @@ namespace important_game.infrastructure.ImportantMatch
                 }
 
 
-                var rivalry = await matchRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
+                var cacheKey = CreateRivalryCacheKey(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
+
+                if (!rivalryCache.TryGetValue(cacheKey, out var rivalry))
+                {
+                    rivalry = await WithRepositoryLock(() => matchRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id));
+                    rivalryCache[cacheKey] = rivalry;
+                }
 
                 var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable, rivalry);
 
                 if (match.MatchDateUTC.Date == DateTime.UtcNow.Date)
                     _ = telegramBot.SendMessageAsync(ProcessGameMessage(match));
             }
+        }
+
+        private static (int FirstTeamId, int SecondTeamId) CreateRivalryCacheKey(int teamOneId, int teamTwoId)
+        {
+            return teamOneId <= teamTwoId ? (teamOneId, teamTwoId) : (teamTwoId, teamOneId);
         }
 
         private string ProcessGameMessage(Match match)
@@ -204,7 +271,6 @@ namespace important_game.infrastructure.ImportantMatch
             //0.18×(Goals of Team A+Goals of Team B / 2 )
             var homeGoalsFormScoreValue = CalculateTeamGoalsForm(homeLastFixturesData);
             var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
-
             double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamGoalsCoef;
 
             //0.2×TPD
@@ -261,7 +327,7 @@ namespace important_game.infrastructure.ImportantMatch
                 MatchStatus = MatchStatus.Upcoming
             };
 
-            await matchRepository.SaveMatchAsync(match);
+            await WithRepositoryLock(() => matchRepository.SaveMatchAsync(match));
 
             await ProcessHeadToHeadMatches(match.Id, fixture.HeadToHead);
 
@@ -292,7 +358,7 @@ namespace important_game.infrastructure.ImportantMatch
                 });
             }
 
-            await matchRepository.SaveHeadToHeadMatchesAsync(headToHeadMatches);
+            await WithRepositoryLock(() => matchRepository.SaveHeadToHeadMatchesAsync(headToHeadMatches));
         }
 
         private async Task<Team> InsertTeamInfo(TeamInfo teamInfo)
@@ -303,7 +369,7 @@ namespace important_game.infrastructure.ImportantMatch
                 Name = teamInfo.Name,
             };
 
-            return await matchRepository.SaveTeamAsync(team);
+            return await WithRepositoryLock(() => matchRepository.SaveTeamAsync(team));
         }
 
         private double CalculateTitleHolder(TeamInfo homeTeam, TeamInfo awayTeam, TeamTitleHolder titleHolder)
@@ -422,3 +488,4 @@ namespace important_game.infrastructure.ImportantMatch
 
     }
 }
+

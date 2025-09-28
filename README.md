@@ -9,7 +9,7 @@ Important Game surfaces the most exciting football fixtures of the day by combin
 - Trending matches section that highlights the top fixtures for the current week alongside other noteworthy games.
 - Match detail view with head-to-head history, team form, excitement factor explanations, and shareable metadata.
 - Telegram notification hook that broadcasts high-priority matches to a configured channel.
-- Puppeteer-driven SofaScore integration that fetches tournament, standings, fixture, and live event data directly from the public site.
+- SofaScore integration that uses a throttled HttpClient with browser-like headers to fetch tournament, standings, fixture, and live event data directly from the public site.
 
 ## Solution Overview
 
@@ -23,7 +23,6 @@ Important Game surfaces the most exciting football fixtures of the day by combin
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/).
 - SQLite (only required if you want to inspect or modify the `matchwatch.db` file manually).
-- The first run of the SofaScore integration downloads a headless Chromium build via PuppeteerSharp; make sure the host can write to its user profile folder.
 
 ## Local Development
 
@@ -66,7 +65,7 @@ Important Game surfaces the most exciting football fixtures of the day by combin
 
 - Update `ConnectionStrings:DefaultConnection` in `src/important-game.web/appsettings.json` or provide `ConnectionStrings__DefaultConnection` as an environment variable when deploying.
 - To use Telegram notifications, replace the placeholder token and chat id in `src/important-game.infrastructure/Telegram/TelegramBot.cs` or refactor the class to pull secrets from user secrets or environment variables before deploying.
-- SofaScore calls rely on PuppeteerSharp. If your deployment environment restricts outbound network calls or headless browsers, configure an alternative league processor in `DependencyInjectionSetup`.
+- SofaScore calls are throttled Http requests. If your deployment environment restricts outbound network calls, adjust the HttpClient configuration in `DependencyInjectionSetup` or provide an alternative league processor.
 
 ## Docker
 
@@ -87,3 +86,10 @@ Stop the stack with `docker compose down`. The mounted volume keeps `matchwatch.
 ## Project Status
 
 There are currently no automated tests in the repository. Before extending the calculators or integrations, consider adding unit tests around the excitement processor and an end-to-end smoke check for the Razor pages.
+
+## Engineering Guidelines
+
+- Follow the SOLID principles when adding or refactoring code so each component stays focused, extensible, and replaceable.
+- Keep abstractions explicit: introduce interfaces or base classes when a class has multiple consumers or seams for substitution.
+- Prefer dependency injection over direct instantiation to honour the Dependency Inversion principle and keep infrastructure concerns isolated.
+- When collaborating with AI assistance, review generated changes for SOLID adherence before merging.
