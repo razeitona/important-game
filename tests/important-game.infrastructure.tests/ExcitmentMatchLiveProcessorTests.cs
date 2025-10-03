@@ -263,28 +263,28 @@ public class ExcitmentMatchLiveProcessorTests
 
         var scoreLineDiff = Math.Abs(eventInfo.HomeTeamScore - eventInfo.AwayTeamScore);
         var scoreLineData = 1d - (scoreLineDiff / 4d);
-        var scoreLineValue = scoreLineData * (1d + (gameTime / 100d));
+        var scoreLineValue = scoreLineData * (1d + (gameTime / 90d));
 
         var totalShots = homeShots + awayShots;
-        var totalShotsPerGameTime = totalShots / gameTime;
-        var _ = totalShotsPerGameTime / 10d; // maintained for parity
+        var totalShotsPerGameTime = totalShots / Math.Max(1, gameTime);
+        var shotsTimeValue = Math.Min(1.0, totalShotsPerGameTime / 8d);
 
-        var shotsOnTarget = homeShotsOnTarget + awayShots;
-        var _unused = shotsOnTarget / totalShots;
+        var shotsOnTarget = homeShotsOnTarget + awayShotsOnTarget;
+        var shotsOnTargetRatio = totalShots > 0 ? shotsOnTarget / totalShots : 0;
 
         var totalXGoals = xGoalsHome + xGoalsAway;
-        var xGoalsValue = (totalXGoals / 5d) * (1d + (gameTime / 90d));
+        var xGoalsValue = (totalXGoals / 3d) * (1d + (gameTime / 90d));
 
         var totalFouls = foulsHome + foulsAway;
-        var totalFoulsExp = 1d - (totalFouls / 30d);
+        var totalFoulsExp = 1d - Math.Min(1.0, totalFouls / 25d);
         var totalFoulsValue = totalFoulsExp * (1d + (gameTime / 90d));
 
         var yellowTotal = yellowHome + yellowAway;
         var redTotal = redHome + redAway;
-        var homeRedBoost = (eventInfo.HomeTeamScore > eventInfo.AwayTeamScore && redHome > redAway) ? 0.10d * redHome : 0d;
-        var awayRedBoost = (eventInfo.AwayTeamScore > eventInfo.HomeTeamScore && redAway > redHome) ? 0.10d * redAway : 0d;
-        var redCardBoost = (redTotal * 0.15d) + homeRedBoost + awayRedBoost;
-        var cardsValue = redCardBoost + (1d - ((yellowTotal + redTotal) / 10d));
+        var homeRedBoost = (eventInfo.HomeTeamScore > eventInfo.AwayTeamScore && redHome > redAway) ? 0.15d * redHome : 0d;
+        var awayRedBoost = (eventInfo.AwayTeamScore > eventInfo.HomeTeamScore && redAway > redHome) ? 0.15d * redAway : 0d;
+        var redCardBoost = (redTotal * 0.2d) + homeRedBoost + awayRedBoost;
+        var cardsValue = redCardBoost + (1d - ((yellowTotal + redTotal) / 8d));
         var totalCardsValue = cardsValue * (1d + (gameTime / 90d));
 
         double losingTeamPossession;
@@ -298,41 +298,53 @@ public class ExcitmentMatchLiveProcessorTests
         }
         else
         {
-            losingTeamPossession = 0d;
+            losingTeamPossession = Math.Min(possessionHome, possessionAway);
         }
 
         double losingTeamBonus = 0d;
         if (losingTeamPossession > 65d)
         {
-            losingTeamBonus = 0.3d;
+            losingTeamBonus = 0.4d;
         }
-        else if (losingTeamPossession > 55d && losingTeamPossession <= 60d)
+        else if (losingTeamPossession > 60d)
         {
-            losingTeamBonus = 0.1d;
+            losingTeamBonus = 0.25d;
         }
-        else if (losingTeamPossession > 60d && losingTeamPossession <= 65d)
+        else if (losingTeamPossession > 55d)
         {
-            losingTeamBonus = 0.2d;
+            losingTeamBonus = 0.15d;
         }
 
-        var possessionTeam = 1d - Math.Abs((possessionHome - 50d) / 100d);
-        var possessionValue = possessionTeam * (1d + (gameTime / 90d)) + losingTeamBonus;
+        var possessionDiff = Math.Abs(possessionHome - possessionAway) / 200d;
+        var possessionTeam = 1d - possessionDiff;
+        var possessionValue = (possessionTeam * (1d + (gameTime / 90d))) + losingTeamBonus;
 
-        var bigChancesTotal = possessionHome + possessionAway;
-        var bigChancesValue = (bigChancesTotal / 10d) * (1d + (gameTime / 90d));
+        var bigChancesTotal = (shotsOnTargetRatio * totalShots) / 2d + totalXGoals;
+        var bigChancesValue = (bigChancesTotal / 8d) * (1d + (gameTime / 90d));
 
-        var liveScore = scoreLineValue + xGoalsValue + totalFoulsValue + totalCardsValue + possessionValue + bigChancesValue;
-        liveScore = ((0.5d * liveScore) - 0.3d) / 100d;
-        var liveExcitement = baseExcitement + liveScore;
+        var componentScores = new[]
+        {
+            scoreLineValue * scoreLineCoef,
+            xGoalsValue * xGoalsCoef,
+            totalFoulsValue * foulsCoef,
+            totalCardsValue * cardsCoef,
+            possessionValue * possessionCoef,
+            bigChancesValue * bigChanceCoef
+        };
+
+        var weightedSum = componentScores.Sum();
+        var normalizedScore = weightedSum + (shotsTimeValue * 0.1);
+        var excitementDelta = ((normalizedScore * 0.4d) + 0.1d);
+        var liveExcitement = baseExcitement + excitementDelta;
 
         return new ExpectedScores(
-            liveExcitement,
-            scoreLineValue / scoreLineCoef,
-            xGoalsValue / xGoalsCoef,
-            totalFoulsValue / foulsCoef,
-            totalCardsValue / cardsCoef,
-            possessionValue / possessionCoef,
-            bigChancesValue / bigChanceCoef);
+            Math.Min(1.0, liveExcitement),
+            scoreLineValue,
+            xGoalsValue,
+            totalFoulsValue,
+            totalCardsValue,
+            possessionValue,
+            bigChancesValue);
     }
 
     private sealed record ExpectedScores(
@@ -344,6 +356,7 @@ public class ExcitmentMatchLiveProcessorTests
         double PossessionScore,
         double BigChancesScore);
 }
+
 
 
 

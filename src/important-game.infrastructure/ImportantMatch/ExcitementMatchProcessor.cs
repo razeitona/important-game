@@ -9,10 +9,28 @@ using important_game.infrastructure.Telegram;
 namespace important_game.infrastructure.ImportantMatch
 {
     internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor
-        , IExctimentMatchRepository matchRepository, TelegramBot telegramBot) : IExcitmentMatchProcessor
+        , IExctimentMatchRepository matchRepository, ITelegramBot telegramBot) : IExcitmentMatchProcessor
     {
+        private const double CompetitionCoef = 0.15d;
+        private const double FixtureCoef = 0.10d;
+        private const double TeamFormCoef = 0.10d;
+        private const double TeamGoalsCoef = 0.15d;
+        private const double TableRankCoef = 0.15d;
+        private const double HeadToHeadCoef = 0.10d;
+        private const double TitleHolderCoef = 0.10d;
+        private const double RivalryCoef = 0.15d;
+
+        private const double LateCompetitionCoef = 0.05d;
+        private const double LateFixtureCoef = 0.25d;
+        private const double LateTeamFormCoef = 0.05d;
+        private const double LateTeamGoalsCoef = 0.2d;
+        private const double LateTableRankCoef = 0.33d;
+        private const double LateHeadToHeadCoef = 0.05d;
+        private const double LateTitleHolderCoef = 0.05d;
+        private const double LateRivalryCoef = 0.02d;
+
         // Limit concurrent SofaScore calls to avoid throttling by the upstream API.
-        private const int MaxConcurrentLeagueRequests = 3;
+        private const int MaxConcurrentLeagueRequests = 1;
         private readonly SemaphoreSlim _repositoryLock = new(1, 1);
 
         public async Task CalculateUpcomingMatchsExcitment()
@@ -83,8 +101,6 @@ namespace important_game.infrastructure.ImportantMatch
             {
                 _repositoryLock.Release();
             }
-        }
-
         }
 
         private async Task<League?> GetLeagueDataInfoAsync(Competition competition)
@@ -209,96 +225,18 @@ namespace important_game.infrastructure.ImportantMatch
         private async Task<Match> CalculateMatchImportanceAsync(League league, UpcomingFixture fixture
             , LeagueStanding leagueTable, Rivalry? rivalry)
         {
-            //var competitionCoef = 0.36d;
-            //var rivalryCoef = 0.15d;
-            //var tableRankCoef = 0.2d;
-            //var fixtureCoef = 0.09d;
-            //var teamFormCoef = 0.13d;
-            //var teamGoalsCoef = 0.02d;
-            //var h2hCoef = 0.02d;
-            //var titleHolderCoef = 0.02d;
-
-            //var competitionCoef = 0.15d;
-            //var rivalryCoef = 0.1d;
-            //var fixtureCoef = 0.1d;
-            //var teamFormCoef = 0.25d;
-            //var teamGoalsCoef = 0.18d;
-            //var tableRankCoef = 0.1d;
-            //var h2hCoef = 0.1d;
-            //var titleHolderCoef = 0.02d;
-
-            var competitionCoef = 0.15d;
-            var rivalryCoef = 0.15d;
-            var titleHolderCoef = 0.10d;
-            var teamFormCoef = 0.10d;
-            var teamGoalsCoef = 0.15d;
-            var h2hCoef = 0.10d;
-            var tableRankCoef = 0.15d;
-            var fixtureCoef = 0.10d;
-
-            if (((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) > 0.8d && leagueTable.TotalRounds > leagueTable.Standings.Count)
-            {
-                fixtureCoef = 0.25d;
-                tableRankCoef = 0.33d;
-                teamGoalsCoef = 0.2d;
-                teamFormCoef = 0.05d;
-                rivalryCoef = 0.02d;
-                titleHolderCoef = 0.05d;
-                competitionCoef = 0.05d;
-                h2hCoef = 0.05d;
-            }
-
-            // 0.2×CR
-            double competitionRankValue = league.Ranking * competitionCoef;
-            // 0.1×FN
-            //fixture Number (fixtureNumber / total Fixtures)
-            double fixtureValue = 1d * fixtureCoef;
-            if (leagueTable != null)
-            {
-                fixtureValue = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) * fixtureCoef;
-            }
-
-            //0.2×(Form of Team A+Form of Team B / 2 )
-            var homeLastFixturesData = fixture.HomeTeam.LastFixtures;
-            var awayLastFixturesData = fixture.AwayTeam.LastFixtures;
-
-            var homeLastFixturesScoreValue = CalculateTeamLastFixturesForm(homeLastFixturesData);
-            var awaitLastFixturesScoreValue = CalculateTeamLastFixturesForm(awayLastFixturesData);
-
-            double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamFormCoef;
-            //double teamsLastFixtureFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * 0.7d;
-
-            //0.18×(Goals of Team A+Goals of Team B / 2 )
-            var homeGoalsFormScoreValue = CalculateTeamGoalsForm(homeLastFixturesData);
-            var awayGoalsFormScoreValue = CalculateTeamGoalsForm(awayLastFixturesData);
-            double teamsGoalsFormValue = ((homeLastFixturesScoreValue + awaitLastFixturesScoreValue) / 2d) * teamGoalsCoef;
-
-            //0.2×TPD
-            //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
-            var leagueTableValue = CalculateLeagueTableValue(fixture.HomeTeam, fixture.AwayTeam, leagueTable) * tableRankCoef;
-
-            //0.15×H2H
-            double h2hLast5Games = await CalculateHeadToHeadFormAsync(fixture.HomeTeam, fixture.AwayTeam, fixture.HeadToHead);
-            double h2hValue = h2hLast5Games * h2hCoef;
-
-            // 0.15×T
-            double titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder) * titleHolderCoef;
-
-            var rivalryData = (rivalry?.RivarlyValue ?? 0d);
-            double rivalryValue = rivalryData * rivalryCoef;
-
-            if (rivalryData > 0.9d)
-            {
-                //fixtureValue = 1 * fixtureCoef;
-            }
-
-            double excitementScore =
-                competitionRankValue + fixtureValue +
-                teamsLastFixtureFormValue + teamsGoalsFormValue +
-                //teamsFormValue +
-                leagueTableValue + h2hValue
-                + titleHolderValue + rivalryValue;
-
+            var competitionRankValue = league.Ranking;
+            var fixtureValue = CalculateFixtureValue(leagueTable);
+            var homeLastFixturesScoreValue = CalculateTeamLastFixturesForm(fixture.HomeTeam.LastFixtures);
+            var awayLastFixturesScoreValue = CalculateTeamLastFixturesForm(fixture.AwayTeam.LastFixtures);
+            var teamsLastFixtureFormValue = (homeLastFixturesScoreValue + awayLastFixturesScoreValue) / 2d;
+            var homeGoalsFormScoreValue = CalculateTeamGoalsForm(fixture.HomeTeam.LastFixtures);
+            var awayGoalsFormScoreValue = CalculateTeamGoalsForm(fixture.AwayTeam.LastFixtures);
+            var teamsGoalsFormValue = homeGoalsFormScoreValue + awayGoalsFormScoreValue; // Changed from average to sum
+            var leagueTableValue = CalculateLeagueTableValue(fixture.HomeTeam, fixture.AwayTeam, leagueTable);
+            var h2hValue = await CalculateHeadToHeadFormAsync(fixture.HomeTeam, fixture.AwayTeam, fixture.HeadToHead);
+            var titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder);
+            var rivalryValue = rivalry?.RivarlyValue ?? 0d;
 
             var homeTeam = await InsertTeamInfo(fixture.HomeTeam);
             var awayTeam = await InsertTeamInfo(fixture.AwayTeam);
@@ -313,19 +251,40 @@ namespace important_game.infrastructure.ImportantMatch
                 AwayTeamPosition = fixture.AwayTeam.Position,
                 CompetitionId = league.Id,
                 UpdatedDateUTC = DateTime.UtcNow,
-                ExcitmentScore = excitementScore,
-                CompetitionScore = competitionRankValue / competitionCoef,
-                FixtureScore = fixtureValue / fixtureCoef,
-                FormScore = teamsLastFixtureFormValue / teamFormCoef,
-                GoalsScore = teamsGoalsFormValue / teamGoalsCoef,
-                CompetitionStandingScore = leagueTableValue / tableRankCoef,
-                HeadToHeadScore = h2hValue / h2hCoef,
-                TitleHolderScore = titleHolderValue / titleHolderCoef,
-                RivalryScore = rivalryValue / rivalryCoef,
+                CompetitionScore = competitionRankValue,
+                FixtureScore = fixtureValue,
+                FormScore = teamsLastFixtureFormValue,
+                GoalsScore = teamsGoalsFormValue,
+                CompetitionStandingScore = leagueTableValue,
+                HeadToHeadScore = h2hValue,
+                TitleHolderScore = titleHolderValue,
+                RivalryScore = rivalryValue,
                 HomeForm = PrepareTeamForm(fixture.HomeTeam),
                 AwayForm = PrepareTeamForm(fixture.AwayTeam),
                 MatchStatus = MatchStatus.Upcoming
             };
+
+            var isLateStage = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) > 0.8d 
+                && leagueTable.TotalRounds > leagueTable.Standings.Count;
+
+            double competitionCoef = isLateStage ? LateCompetitionCoef : CompetitionCoef;
+            double rivalryCoef = isLateStage ? LateRivalryCoef : RivalryCoef;
+            double titleHolderCoef = isLateStage ? LateTitleHolderCoef : TitleHolderCoef;
+            double teamFormCoef = isLateStage ? LateTeamFormCoef : TeamFormCoef;
+            double teamGoalsCoef = isLateStage ? LateTeamGoalsCoef : TeamGoalsCoef;
+            double h2hCoef = isLateStage ? LateHeadToHeadCoef : HeadToHeadCoef;
+            double tableRankCoef = isLateStage ? LateTableRankCoef : TableRankCoef;
+            double fixtureCoef = isLateStage ? LateFixtureCoef : FixtureCoef;
+
+            match.ExcitmentScore =
+                match.CompetitionScore * competitionCoef +
+                match.FixtureScore * fixtureCoef +
+                match.FormScore * teamFormCoef +
+                match.GoalsScore * teamGoalsCoef +
+                match.CompetitionStandingScore * tableRankCoef +
+                match.HeadToHeadScore * h2hCoef +
+                match.TitleHolderScore * titleHolderCoef +
+                match.RivalryScore * rivalryCoef;
 
             await WithRepositoryLock(() => matchRepository.SaveMatchAsync(match));
 
@@ -385,13 +344,11 @@ namespace important_game.infrastructure.ImportantMatch
 
         private double CalculateLeagueTableValue(TeamInfo homeTeam, TeamInfo awayTeam, LeagueStanding leagueTable)
         {
-            if (homeTeam == null || awayTeam == null || leagueTable == null || leagueTable.Standings.Count == 0)
+            if (homeTeam == null || awayTeam == null || leagueTable == null || leagueTable.Standings == null || leagueTable.Standings.Count == 0)
                 return 0d;
 
             if (leagueTable.CurrentRound <= 1)
                 return 0.5d;
-
-            //table position difference ( 1 - [(teamA-teamB)/totalTeams-1])
 
             var homeTeamPosition = leagueTable.Standings.FirstOrDefault(c => c.Team.Id == homeTeam.Id);
             if (homeTeamPosition == null)
@@ -405,22 +362,16 @@ namespace important_game.infrastructure.ImportantMatch
 
             awayTeam.Position = awayTeamPosition.Position;
 
-            var positionDiff = (double)Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position) - 1;
+            var positionDiff = Math.Abs(homeTeamPosition.Position - awayTeamPosition.Position) - 1d;
             var totalTeams = (double)leagueTable.Standings.Count;
 
-            //var positionValue = 1d - ((double)positionDiff / ((double)leagueTable.Standings.Count - 1d));
-            var positionValue = 1d / (1 + (positionDiff / (totalTeams - 1d)));
-
-
-            var averageTeamPosition = ((double)homeTeamPosition.Position + (double)awayTeamPosition.Position) / 2d;
-
+            var positionValue = 1d / (1d + (positionDiff / (totalTeams - 1d)));
+            var averageTeamPosition = (homeTeamPosition.Position + awayTeamPosition.Position) / 2d;
             var topBottomMatchupValue = 1d - (averageTeamPosition - 1d) / (totalTeams - 1d);
 
-            var pointDifference = (double)Math.Abs(homeTeamPosition.Points - awayTeamPosition.Points);
-
-            var maxPointDifference = (double)(leagueTable.TotalRounds - Math.Max(homeTeamPosition.Matches, awayTeamPosition.Matches)) * 3d;
-
-            var pointImpactValue = 1d / (1 + (pointDifference / (maxPointDifference - 1d)));
+            var pointDifference = Math.Abs(homeTeamPosition.Points - awayTeamPosition.Points);
+            var maxPointDifference = (leagueTable.TotalRounds - Math.Max(homeTeamPosition.Matches, awayTeamPosition.Matches)) * 3d;
+            var pointImpactValue = 1d / (1d + (pointDifference / (maxPointDifference - 1d)));
 
             return positionValue * topBottomMatchupValue * pointImpactValue;
 
@@ -428,43 +379,29 @@ namespace important_game.infrastructure.ImportantMatch
 
         private async Task<double> CalculateHeadToHeadFormAsync(TeamInfo homeTeam, TeamInfo awayTeam, List<Fixture> fixtures)
         {
-            if (fixtures == null)
-                return 0;
-
-            if (fixtures.Count == 0)
+            if (fixtures == null || fixtures.Count == 0)
                 return 0.5d;
 
-            var homeTeamWins = fixtures.Where(c =>
-                c.HomeTeam.Id == homeTeam.Id && c.HomeTeamScore > c.AwayTeamScore
-                || c.AwayTeam.Id == homeTeam.Id && c.AwayTeamScore > c.HomeTeamScore
-                ).Count();
+            var homeTeamWins = fixtures.Count(c =>
+                (c.HomeTeam.Id == homeTeam.Id && c.HomeTeamScore > c.AwayTeamScore) ||
+                (c.AwayTeam.Id == homeTeam.Id && c.AwayTeamScore > c.HomeTeamScore));
 
             homeTeam.H2hWins = homeTeamWins;
             homeTeam.Goals = fixtures.Where(c => c.HomeTeam.Id == homeTeam.Id).Sum(c => c.HomeTeamScore) +
                 fixtures.Where(c => c.AwayTeam.Id == homeTeam.Id).Sum(c => c.AwayTeamScore);
 
-            var awayTeamWins = fixtures.Where(c =>
-                c.HomeTeam.Id == awayTeam.Id && c.HomeTeamScore > c.AwayTeamScore
-                || c.AwayTeam.Id == awayTeam.Id && c.AwayTeamScore > c.HomeTeamScore
-                ).Count();
+            var awayTeamWins = fixtures.Count(c =>
+                (c.HomeTeam.Id == awayTeam.Id && c.HomeTeamScore > c.AwayTeamScore) ||
+                (c.AwayTeam.Id == awayTeam.Id && c.AwayTeamScore > c.HomeTeamScore));
 
             awayTeam.H2hWins = awayTeamWins;
             awayTeam.Goals = fixtures.Where(c => c.HomeTeam.Id == awayTeam.Id).Sum(c => c.HomeTeamScore) +
                 fixtures.Where(c => c.AwayTeam.Id == awayTeam.Id).Sum(c => c.AwayTeamScore);
 
+            var drawGames = fixtures.Count(c => c.HomeTeamScore == c.AwayTeamScore);
 
-            var difTeamWins = Math.Abs(homeTeamWins - awayTeamWins);
-            difTeamWins = difTeamWins == 0 ? 3 : difTeamWins;
-
-            var drawGames = (double)fixtures.Where(c => c.HomeTeamScore == c.AwayTeamScore).Count();
-
-            var h2hValue = (((homeTeamWins + awayTeamWins) * 3d) + drawGames) / 15d;
-
-            if (h2hValue > 1d)
-                h2hValue = 1d;
-
-            return h2hValue;
-            //return ((3d / (double)difTeamWins) + (double)drawGames) / 5d;
+            var value = ((homeTeamWins + awayTeamWins) * 3d + drawGames) / 15d;
+            return value > 1d ? 1d : value;
         }
 
         private double CalculateTeamLastFixturesForm(TeamFixtureData teamFixtureData)
@@ -481,11 +418,15 @@ namespace important_game.infrastructure.ImportantMatch
             if (teamFixtureData == null || teamFixtureData.AmountOfGames == 0)
                 return 0;
 
-            return (double)teamFixtureData.GoalsFor / (double)teamFixtureData.AmountOfGames;
-            //return ((double)teamFixtureData.GoalsAgainst + (double)teamFixtureData.GoalsFor) / (double)teamFixtureData.AmountOfGames;
-
+            return (double)teamFixtureData.GoalsFor / (double)teamFixtureData.AmountOfGames * 2.0;
         }
 
+        private double CalculateFixtureValue(LeagueStanding leagueStanding)
+        {
+            if (leagueStanding == null || leagueStanding.TotalRounds == 0)
+                return 0d;
+
+            return ((double)leagueStanding.CurrentRound / (double)leagueStanding.TotalRounds);
+        }
     }
 }
-

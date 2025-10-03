@@ -8,7 +8,7 @@ using System.Text.Json;
 namespace important_game.infrastructure.SofaScoreAPI
 {
     [ExcludeFromCodeCoverage]
-    internal class SofaScoreIntegration : ISofaScoreIntegration
+    public class SofaScoreIntegration(HttpClient client) : ISofaScoreIntegration
     {
         private static readonly MemoryCache ResponseCache = new(new MemoryCacheOptions
         {
@@ -96,7 +96,7 @@ namespace important_game.infrastructure.SofaScoreAPI
                 {
                     return default;
                 }
-
+                var x = await client.GetAsync(url);
                 var responseContent = await response.TextAsync();
                 var result = JsonSerializer.Deserialize<T>(responseContent);
 

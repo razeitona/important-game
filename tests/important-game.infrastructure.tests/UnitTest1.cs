@@ -415,9 +415,12 @@ public class ExcitementMatchProcessorTests
     private static double ComputeGoalsScoreBase(TeamFixtureData homeFixtures, TeamFixtureData awayFixtures)
     {
         static double ComputeSingle(TeamFixtureData data)
-            => data.AmountOfGames == 0 ? 0d : (double)data.GoalsFor / data.AmountOfGames;
+        {
+            if (data.AmountOfGames == 0) return 0d;
+            return (double)data.GoalsFor / data.AmountOfGames * 2.0;
+        }
 
-        return (ComputeSingle(homeFixtures) + ComputeSingle(awayFixtures)) / 2d;
+        return ComputeSingle(homeFixtures) + ComputeSingle(awayFixtures);
     }
 
     private static double ComputeTableScoreBase(TeamInfo homeTeam, TeamInfo awayTeam, LeagueStanding leagueStanding)
@@ -495,10 +498,3 @@ public class ExcitementMatchProcessorTests
         LeagueStanding LeagueStanding,
         Rivalry Rivalry);
 }
-
-
-
-
-
-
-

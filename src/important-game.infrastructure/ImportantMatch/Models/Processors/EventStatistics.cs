@@ -49,7 +49,7 @@
     }
 
     public record StatisticsItem(string Key, string Name, string HomeStat, double HomeValue
-        , double? HomeTotal, string AwayStat, double AwayValue, double? AwaytTotal, int CompareCode)
+        , double? HomeTotal, string AwayStat, double AwayValue, double? AwayTotal, int CompareCode)
     {
         //public string Name { get; set; }
         ////public string Key { get; set; }
