@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
-using important_game.infrastructure;
 using important_game.infrastructure.ImportantMatch;
 using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.Telegram;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
@@ -43,10 +38,6 @@ public class DependencyInjectionSetupTests
 
         services.Should().ContainSingle(d => d.ServiceType == typeof(IExcitmentMatchService)
             && d.ImplementationType == typeof(ExcitmentMatchService)
-            && d.Lifetime == ServiceLifetime.Scoped);
-
-        services.Should().ContainSingle(d => d.ServiceType == typeof(IExctimentMatchRepository)
-            && d.ImplementationType == typeof(ExcitmentMatchRepository)
             && d.Lifetime == ServiceLifetime.Scoped);
 
         services.Should().ContainSingle(d => d.ServiceType == typeof(ILeagueProcessor)

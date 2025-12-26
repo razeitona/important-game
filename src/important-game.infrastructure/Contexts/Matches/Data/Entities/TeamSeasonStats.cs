@@ -49,7 +49,7 @@ namespace important_game.infrastructure.Contexts.Matches.Data.Entities
         // Navigation properties
         public virtual Team? Team { get; set; }
 
-        public virtual Competition? Competition { get; set; }
+        public virtual CompetitionEntity? Competition { get; set; }
 
         /// <summary>
         /// Average goals scored per match (last 5).

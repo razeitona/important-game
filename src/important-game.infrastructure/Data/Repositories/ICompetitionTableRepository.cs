@@ -11,23 +11,23 @@ namespace important_game.infrastructure.Data.Repositories
         /// <summary>
         /// Save or update a competition table entry.
         /// </summary>
-        Task SaveAsync(CompetitionTable table);
+        Task SaveAsync(CompetitionTableEntity table);
 
         /// <summary>
         /// Save or update multiple competition table entries for a competition.
         /// Replaces all existing entries for that competition.
         /// </summary>
-        Task SaveAllAsync(List<CompetitionTable> tables);
+        Task SaveAllAsync(List<CompetitionTableEntity> tables);
 
         /// <summary>
         /// Get all standings for a specific competition, ordered by position.
         /// </summary>
-        Task<List<CompetitionTable>> GetByCompetitionIdAsync(int competitionId);
+        Task<List<CompetitionTableEntity>> GetByCompetitionIdAsync(int competitionId);
 
         /// <summary>
         /// Get standing for a specific team in a competition.
         /// </summary>
-        Task<CompetitionTable?> GetByTeamAndCompetitionAsync(int teamId, int competitionId);
+        Task<CompetitionTableEntity?> GetByTeamAndCompetitionAsync(int teamId, int competitionId);
 
         /// <summary>
         /// Get the last update timestamp for a competition's standings.

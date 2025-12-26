@@ -51,7 +51,7 @@ namespace important_game.infrastructure.ImportantMatch
                     MatchDate = rawMatch.MatchDateUTC,
                     League = new LeagueDto
                     {
-                        Id = rawMatch.Competition.Id,
+                        Id = rawMatch.Competition.CompetitionId,
                         Name = rawMatch.Competition.Name,
                         BackgroundColor = rawMatch.Competition.BackgroundColor
                     },
@@ -92,7 +92,7 @@ namespace important_game.infrastructure.ImportantMatch
                     MatchDate = rawMatch.MatchDateUTC,
                     League = new LeagueDto
                     {
-                        Id = rawMatch.Competition.Id,
+                        Id = rawMatch.Competition.CompetitionId,
                         Name = rawMatch.Competition.Name,
                         BackgroundColor = rawMatch.Competition.BackgroundColor
                     },
@@ -138,7 +138,7 @@ namespace important_game.infrastructure.ImportantMatch
                 MatchDate = rawMatch.MatchDateUTC,
                 League = new LeagueDto
                 {
-                    Id = rawMatch.Competition.Id,
+                    Id = rawMatch.Competition.CompetitionId,
                     Name = rawMatch.Competition.Name,
                     BackgroundColor = rawMatch.Competition.BackgroundColor
                 },
@@ -235,7 +235,7 @@ namespace important_game.infrastructure.ImportantMatch
             };
         }
 
-        private TeamMatchDetailDto SetupMatchDetailTeam(Team team, string? teamForm, int teamPosition, Competition competition)
+        private TeamMatchDetailDto SetupMatchDetailTeam(Team team, string? teamForm, int teamPosition, CompetitionEntity competition)
         {
             var form = teamForm?.Split(",").ToList() ?? new();
 

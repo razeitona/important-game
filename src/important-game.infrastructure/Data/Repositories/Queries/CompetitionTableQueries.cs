@@ -11,10 +11,10 @@ namespace important_game.infrastructure.Data.Repositories.Queries
         internal const string InsertCompetitionTable = @"
             INSERT INTO competition_table (
                 competition_id, team_id, position, points, matches, wins, draws, losses,
-                goals_for, goals_against, updated_at
+                goals_for, goals_against
             ) VALUES (
                 @CompetitionId, @TeamId, @Position, @Points, @Matches, @Wins, @Draws, @Losses,
-                @GoalsFor, @GoalsAgainst, @UpdatedAt
+                @GoalsFor, @GoalsAgainst
             )";
 
         internal const string UpdateCompetitionTable = @"

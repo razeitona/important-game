@@ -1,21 +1,21 @@
 # Important Game - Arquitetura e Princípios SOLID
 
-## ????? Nível de Complexidade: Senior C# Developer
+##  Nível de Complexidade: Senior C# Developer
 
 Este projeto requer conhecimento avançado de C# e arquitetura de software. O código segue rigorosamente os princípios SOLID e padrões de design modernos.
 
 ---
 
-## ??? Princípios SOLID Implementados
+##  Princípios SOLID Implementados
 
 ### **S - Single Responsibility Principle**
 - Cada repositório é responsável por apenas um agregado:
-  - `CompetitionRepository` ? operações de Competition
-  - `TeamRepository` ? operações de Team
-  - `MatchRepository` (MatchRepositoryDapper) ? operações de Match
-  - `LiveMatchRepository` ? operações de LiveMatch
-  - `RivalryRepository` ? operações de Rivalry
-  - `HeadToHeadRepository` ? operações de HeadToHead
+  - `CompetitionRepository`  operações de Competition
+  - `TeamRepository`  operações de Team
+  - `MatchRepository` (MatchRepositoryDapper)  operações de Match
+  - `LiveMatchRepository`  operações de LiveMatch
+  - `RivalryRepository`  operações de Rivalry
+  - `HeadToHeadRepository`  operações de HeadToHead
 
 ### **O - Open/Closed Principle**
 - Repositórios são abertos para extensão através de interfaces:
@@ -39,7 +39,7 @@ Este projeto requer conhecimento avançado de C# e arquitetura de software. O cód
 
 ---
 
-## ??? Arquitetura de Dados
+##  Arquitetura de Dados
 
 ### Camada de Queries
 **Local:** `Data/Repositories/Queries/`
@@ -75,25 +75,25 @@ Cada repositório:
 
 ---
 
-## ?? Fluxo de Dados
+##  Fluxo de Dados
 
 ```
 Serviço (e.g., ExcitementMatchProcessor)
-    ?
+    
 Interface de Repositório (e.g., IMatchRepository)
-    ?
+    
 Implementação de Repositório (e.g., MatchRepositoryDapper)
-    ?
+    
 Query Estática (e.g., MatchQueries.SelectMatchById)
-    ?
+    
 IDbConnectionFactory (SqliteConnectionFactory)
-    ?
+    
 SQLite Database
 ```
 
 ---
 
-## ?? Padrões de Design Utilizados
+##  Padrões de Design Utilizados
 
 ### Factory Pattern
 - `IDbConnectionFactory` cria instâncias de `IDbConnection`
@@ -109,7 +109,7 @@ SQLite Database
 
 ---
 
-## ?? Guidelines para Desenvolvimento
+##  Guidelines para Desenvolvimento
 
 ### Ao Adicionar Uma Nova Entidade:
 
@@ -118,7 +118,7 @@ SQLite Database
    public interface INewEntityRepository
    {
        Task SaveNewEntityAsync(NewEntity entity);
-       Task<NewEntity?> GetNewEntityByIdAsync(int id);
+       Task<NewEntity> GetNewEntityByIdAsync(int id);
    }
    ```
 
@@ -141,7 +141,7 @@ SQLite Database
            _connectionFactory = connectionFactory;
        }
        
-       public async Task<NewEntity?> GetNewEntityByIdAsync(int id)
+       public async Task<NewEntity> GetNewEntityByIdAsync(int id)
        {
            using (var connection = _connectionFactory.CreateConnection())
            {
@@ -166,25 +166,25 @@ SQLite Database
 
 ---
 
-## ?? Regras Importantes
+##  Regras Importantes
 
 ### NÃO FAZER:
-- ? Colocar lógica de negócio em repositórios
-- ? Usar `IMatchRepository` para operações de múltiplas entidades
-- ? Queries hardcoded em repositórios (devem estar em `*Queries.cs`)
-- ? Modificar `IDbConnectionFactory` sem avaliar impacto
+-  Colocar lógica de negócio em repositórios
+-  Usar `IMatchRepository` para operações de múltiplas entidades
+-  Queries hardcoded em repositórios (devem estar em `*Queries.cs`)
+-  Modificar `IDbConnectionFactory` sem avaliar impacto
 
 ### FAZER:
-- ? Uma interface por agregado/entidade
-- ? Queries centralizadas como constantes
-- ? Tratamento de nulo em métodos públicos
-- ? Usar `ArgumentNullException.ThrowIfNull()` para validação
-- ? Documentação XML em interfaces e métodos públicos
-- ? Injetar apenas dependências necessárias
+-  Uma interface por agregado/entidade
+-  Queries centralizadas como constantes
+-  Tratamento de nulo em métodos públicos
+-  Usar `ArgumentNullException.ThrowIfNull()` para validação
+-  Documentação XML em interfaces e métodos públicos
+-  Injetar apenas dependências necessárias
 
 ---
 
-## ?? Testing
+##  Testing
 
 Ao escrever testes:
 
@@ -202,7 +202,7 @@ var repository = new MatchRepository(mockFactory.Object);
 
 ---
 
-## ?? Referências
+##  Referências
 
 - **SOLID Principles**: https://en.wikipedia.org/wiki/SOLID
 - **Repository Pattern**: https://martinfowler.com/eaaCatalog/repository.html
@@ -211,44 +211,44 @@ var repository = new MatchRepository(mockFactory.Object);
 
 ---
 
-## ?? Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 src/important-game.infrastructure/
-??? Data/
-?   ??? Connections/
-?   ?   ??? IDbConnectionFactory.cs
-?   ?   ??? SqliteConnectionFactory.cs
-?   ??? Repositories/
-?       ??? Queries/
-?       ?   ??? CompetitionQueries.cs
-?       ?   ??? TeamQueries.cs
-?       ?   ??? MatchQueries.cs
-?       ?   ??? LiveMatchQueries.cs
-?       ?   ??? RivalryQueries.cs
-?       ?   ??? HeadToHeadQueries.cs
-?       ??? ICompetitionRepository.cs
-?       ??? CompetitionRepository.cs
-?       ??? ITeamRepository.cs
-?       ??? TeamRepository.cs
-?       ??? IMatchRepository.cs
-?       ??? MatchRepositoryDapper.cs
-?       ??? ILiveMatchRepository.cs
-?       ??? LiveMatchRepository.cs
-?       ??? IRivalryRepository.cs
-?       ??? RivalryRepository.cs
-?       ??? IHeadToHeadRepository.cs
-?       ??? HeadToHeadRepository.cs
-??? ImportantMatch/
-?   ??? ExcitementMatchProcessor.cs
-?   ??? ExcitmentMatchService.cs
-?   ??? ...
-??? DependencyInjectionSetup.cs
+ Data/
+    Connections/
+       IDbConnectionFactory.cs
+       SqliteConnectionFactory.cs
+    Repositories/
+        Queries/
+           CompetitionQueries.cs
+           TeamQueries.cs
+           MatchQueries.cs
+           LiveMatchQueries.cs
+           RivalryQueries.cs
+           HeadToHeadQueries.cs
+        ICompetitionRepository.cs
+        CompetitionRepository.cs
+        ITeamRepository.cs
+        TeamRepository.cs
+        IMatchRepository.cs
+        MatchRepositoryDapper.cs
+        ILiveMatchRepository.cs
+        LiveMatchRepository.cs
+        IRivalryRepository.cs
+        RivalryRepository.cs
+        IHeadToHeadRepository.cs
+        HeadToHeadRepository.cs
+ ImportantMatch/
+    ExcitementMatchProcessor.cs
+    ExcitmentMatchService.cs
+    ...
+ DependencyInjectionSetup.cs
 ```
 
 ---
 
-## ?? Notas Importantes
+##  Notas Importantes
 
 1. **Migrations**: As queries foram criadas para SQLite. Adaptar conforme necessário para outros DBs.
 

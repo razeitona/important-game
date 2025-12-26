@@ -152,9 +152,9 @@ public class ExcitmentMatchLiveProcessorTests
 
     private static MatchEntity CreateMatch()
     {
-        var competition = new Competition
+        var competition = new CompetitionEntity
         {
-            Id = 10,
+            CompetitionId = 10,
             Name = "League",
             PrimaryColor = "#111111",
             BackgroundColor = "#222222",
@@ -168,7 +168,7 @@ public class ExcitmentMatchLiveProcessorTests
         return new MatchEntity
         {
             Id = 999,
-            CompetitionId = competition.Id,
+            CompetitionId = competition.CompetitionId,
             Competition = competition,
             MatchDateUTC = DateTime.UtcNow,
             MatchStatus = MatchStatus.Upcoming,

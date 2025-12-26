@@ -20,7 +20,7 @@ namespace important_game.infrastructure.Data.Repositories
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
-        public async Task SaveAsync(CompetitionTable table)
+        public async Task SaveAsync(CompetitionTableEntity table)
         {
             ArgumentNullException.ThrowIfNull(table);
 
@@ -43,8 +43,7 @@ namespace important_game.infrastructure.Data.Repositories
                         table.Draws,
                         table.Losses,
                         table.GoalsFor,
-                        table.GoalsAgainst,
-                        table.UpdatedAt
+                        table.GoalsAgainst
                     });
                 }
                 else
@@ -60,14 +59,13 @@ namespace important_game.infrastructure.Data.Repositories
                         table.Draws,
                         table.Losses,
                         table.GoalsFor,
-                        table.GoalsAgainst,
-                        table.UpdatedAt
+                        table.GoalsAgainst
                     });
                 }
             }
         }
 
-        public async Task SaveAllAsync(List<CompetitionTable> tables)
+        public async Task SaveAllAsync(List<CompetitionTableEntity> tables)
         {
             if (tables == null || tables.Count == 0)
                 return;
@@ -95,29 +93,28 @@ namespace important_game.infrastructure.Data.Repositories
                         table.Draws,
                         table.Losses,
                         table.GoalsFor,
-                        table.GoalsAgainst,
-                        table.UpdatedAt
+                        table.GoalsAgainst
                     });
                 }
             }
         }
 
-        public async Task<List<CompetitionTable>> GetByCompetitionIdAsync(int competitionId)
+        public async Task<List<CompetitionTableEntity>> GetByCompetitionIdAsync(int competitionId)
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
-                var result = await connection.QueryAsync<CompetitionTable>(
+                var result = await connection.QueryAsync<CompetitionTableEntity>(
                     CompetitionTableQueries.SelectCompetitionTableByCompetitionId,
                     new { CompetitionId = competitionId });
                 return result.ToList();
             }
         }
 
-        public async Task<CompetitionTable?> GetByTeamAndCompetitionAsync(int teamId, int competitionId)
+        public async Task<CompetitionTableEntity?> GetByTeamAndCompetitionAsync(int teamId, int competitionId)
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<CompetitionTable>(
+                return await connection.QueryFirstOrDefaultAsync<CompetitionTableEntity>(
                     CompetitionTableQueries.SelectCompetitionTableByTeamAndCompetition,
                     new { CompetitionId = competitionId, TeamId = teamId });
             }

@@ -286,9 +286,9 @@ public class ExcitmentMatchServiceTests
         double[]? liveScores = null,
         double[]? liveMinutes = null)
     {
-        var competition = new Competition
+        var competition = new CompetitionEntity
         {
-            Id = 100 + id,
+            CompetitionId = 100 + id,
             Name = $"League {id}",
             BackgroundColor = "#123456",
             PrimaryColor = "#654321",
@@ -304,7 +304,7 @@ public class ExcitmentMatchServiceTests
         {
             Id = id,
             MatchDateUTC = kickoff,
-            CompetitionId = competition.Id,
+            CompetitionId = competition.CompetitionId,
             Competition = competition,
             MatchStatus = status,
             HomeTeamId = homeTeam.Id,

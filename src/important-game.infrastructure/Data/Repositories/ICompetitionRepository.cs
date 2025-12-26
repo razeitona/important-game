@@ -11,21 +11,21 @@ namespace important_game.infrastructure.Data.Repositories
         /// <summary>
         /// Saves a competition (insert or update).
         /// </summary>
-        Task SaveCompetitionAsync(Competition competition);
+        Task SaveCompetitionAsync(CompetitionEntity competition);
 
         /// <summary>
         /// Gets a competition by its ID.
         /// </summary>
-        Task<Competition?> GetCompetitionByIdAsync(int id);
+        Task<CompetitionEntity?> GetCompetitionByIdAsync(int id);
 
         /// <summary>
         /// Gets all competitions.
         /// </summary>
-        Task<List<Competition>> GetCompetitionsAsync();
+        Task<List<CompetitionEntity>> GetCompetitionsAsync();
 
         /// <summary>
         /// Gets all active competitions.
         /// </summary>
-        Task<List<Competition>> GetActiveCompetitionsAsync();
+        Task<List<CompetitionEntity>> GetActiveCompetitionsAsync();
     }
 }

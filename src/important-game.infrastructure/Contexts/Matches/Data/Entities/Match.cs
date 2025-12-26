@@ -14,7 +14,7 @@ namespace important_game.infrastructure.Contexts.Matches.Data.Entities
 
         [ForeignKey(nameof(Competition))]
         public int CompetitionId { get; set; }
-        public Competition Competition { get; set; }
+        public CompetitionEntity Competition { get; set; }
 
         [Required]
         public DateTime MatchDateUTC { get; set; }

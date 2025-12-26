@@ -1,11 +1,10 @@
-using System.Globalization;
-using System.Threading;
-using important_game.infrastructure.Data.Repositories;
-using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using important_game.infrastructure.Contexts.Competitions.Data.Entities;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Data.Repositories;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.Telegram;
+using System.Globalization;
 
 namespace important_game.infrastructure.ImportantMatch
 {
@@ -58,7 +57,7 @@ namespace important_game.infrastructure.ImportantMatch
             await Task.WhenAll(processingTasks);
         }
 
-        private async Task ProcessCompetitionAsync(Competition competition, SemaphoreSlim throttler)
+        private async Task ProcessCompetitionAsync(CompetitionEntity competition, SemaphoreSlim throttler)
         {
             await throttler.WaitAsync();
 
@@ -71,7 +70,7 @@ namespace important_game.infrastructure.ImportantMatch
                     return;
                 }
 
-                var activeMatches = await WithRepositoryLock(() => matchRepository.GetCompetitionActiveMatchesAsync(competition.Id));
+                var activeMatches = await WithRepositoryLock(() => matchRepository.GetCompetitionActiveMatchesAsync(competition.CompetitionId));
 
                 await ExtractUpcomingMatchesAsync(leagueInfo, activeMatches);
             }
@@ -109,9 +108,9 @@ namespace important_game.infrastructure.ImportantMatch
             }
         }
 
-        private async Task<League?> GetLeagueDataInfoAsync(Competition competition)
+        private async Task<League?> GetLeagueDataInfoAsync(CompetitionEntity competition)
         {
-            var leagueIdentifier = string.IsNullOrWhiteSpace(competition.Code) ? competition.Id.ToString() : competition.Code;
+            var leagueIdentifier = competition.CompetitionId.ToString();
             var league = await leagueProcessor.GetLeagueDataAsync(leagueIdentifier);
 
             if (league == null)
@@ -120,11 +119,12 @@ namespace important_game.infrastructure.ImportantMatch
             //Validate if it's to update Competition info or not
             if (league.Name != competition.Name || competition.TitleHolderTeamId != (league.TitleHolder?.Id ?? null))
             {
-                var updatedCompetition = new Competition
+                var updatedCompetition = new CompetitionEntity
                 {
-                    Id = competition.Id,
+                    CompetitionId = competition.CompetitionId,
                     Name = league.Name,
-                    Code = competition.Code,
+                    PrimaryColor = "",
+                    BackgroundColor = "",
                     TitleHolderTeamId = league.TitleHolder?.Id ?? null,
                 };
 
