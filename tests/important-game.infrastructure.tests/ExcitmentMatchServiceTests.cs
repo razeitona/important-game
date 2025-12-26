@@ -4,35 +4,38 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Data;
-using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.Data.Repositories;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.ImportantMatch.Models;
 using Moq;
-using HeadToHeadEntity = important_game.infrastructure.ImportantMatch.Data.Entities.Headtohead;
-using MatchEntity = important_game.infrastructure.ImportantMatch.Data.Entities.Match;
+using HeadToHeadEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Headtohead;
+using MatchEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Match;
 
 namespace important_game.infrastructure.tests.ImportantMatch;
 
 public class ExcitmentMatchServiceTests
 {
     private static ExcitmentMatchService CreateService(
-        out Mock<IExctimentMatchRepository> repository,
+        out Mock<IMatchRepository> repository,
+        out Mock<ILiveMatchRepository> liveRepository,
         out Mock<IExcitmentMatchProcessor> processor,
         out Mock<IExcitmentMatchLiveProcessor> liveProcessor)
     {
-        repository = new Mock<IExctimentMatchRepository>(MockBehavior.Strict);
+        repository = new Mock<IMatchRepository>(MockBehavior.Strict);
+        liveRepository = new Mock<ILiveMatchRepository>(MockBehavior.Strict);
         processor = new Mock<IExcitmentMatchProcessor>(MockBehavior.Strict);
         liveProcessor = new Mock<IExcitmentMatchLiveProcessor>(MockBehavior.Strict);
 
-        return new ExcitmentMatchService(repository.Object, processor.Object, liveProcessor.Object);
+        return new ExcitmentMatchService(repository.Object, liveRepository.Object, processor.Object, liveProcessor.Object);
     }
 
     [Fact]
     public async Task CalculateUpcomingMatchsExcitment_ShouldDelegateToProcessor()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
         processor.Setup(p => p.CalculateUpcomingMatchsExcitment()).Returns(Task.CompletedTask).Verifiable();
 
         // Act
@@ -41,6 +44,7 @@ public class ExcitmentMatchServiceTests
         // Assert
         processor.Verify();
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
 
@@ -48,7 +52,7 @@ public class ExcitmentMatchServiceTests
     public async Task CalculateUnfinishedMatchExcitment_PersistsLiveUpdatesAndSkipsFutureFixtures()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
 
         var pastMatch = CreateMatch(1, DateTime.UtcNow.AddMinutes(-45));
         var futureMatch = CreateMatch(2, DateTime.UtcNow.AddHours(2));
@@ -57,7 +61,7 @@ public class ExcitmentMatchServiceTests
             .ReturnsAsync(new List<MatchEntity> { pastMatch, futureMatch });
 
         repository.Setup(r => r.SaveMatchAsync(pastMatch)).Returns(Task.CompletedTask).Verifiable();
-        repository.Setup(r => r.SaveLiveMatchAsync(It.IsAny<LiveMatch>())).Returns(Task.CompletedTask).Verifiable();
+        liveRepository.Setup(r => r.SaveLiveMatchAsync(It.IsAny<LiveMatch>())).Returns(Task.CompletedTask).Verifiable();
 
         liveProcessor.Setup(lp => lp.ProcessLiveMatchData(pastMatch))
             .ReturnsAsync(new LiveMatch { MatchId = pastMatch.Id, ExcitmentScore = 0.9, Minutes = 65 });
@@ -69,8 +73,9 @@ public class ExcitmentMatchServiceTests
         repository.Verify(r => r.GetUnfinishedMatchesAsync(), Times.Once);
         repository.Verify(r => r.SaveMatchAsync(pastMatch), Times.Once);
         repository.Verify(r => r.SaveMatchAsync(futureMatch), Times.Never);
-        repository.Verify(r => r.SaveLiveMatchAsync(It.Is<LiveMatch>(lm => lm.MatchId == pastMatch.Id && lm.ExcitmentScore == 0.9)), Times.Once);
+        liveRepository.Verify(r => r.SaveLiveMatchAsync(It.Is<LiveMatch>(lm => lm.MatchId == pastMatch.Id && lm.ExcitmentScore == 0.9)), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
 
         liveProcessor.Verify(lp => lp.ProcessLiveMatchData(pastMatch), Times.Once);
         liveProcessor.Verify(lp => lp.ProcessLiveMatchData(futureMatch), Times.Never);
@@ -82,7 +87,7 @@ public class ExcitmentMatchServiceTests
     public async Task GetAllMatchesAsync_MapsEntitiesAndOrdersByKickoff()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
 
         var laterMatch = CreateMatch(10, DateTime.UtcNow.AddHours(6), status: MatchStatus.Live, excitmentScore: 0.72, liveScores: new[] { 0.65, 0.8 });
         var earlierMatch = CreateMatch(11, DateTime.UtcNow.AddHours(1), status: MatchStatus.Upcoming, excitmentScore: 0.55);
@@ -110,6 +115,7 @@ public class ExcitmentMatchServiceTests
 
         repository.Verify(r => r.GetUpcomingMatchesAsync(), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         processor.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
@@ -118,7 +124,7 @@ public class ExcitmentMatchServiceTests
     public async Task GetLiveMatchesAsync_MapsLatestLiveSnapshot()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
 
         var matchWithLive = CreateMatch(20, DateTime.UtcNow.AddMinutes(-15), status: MatchStatus.Live, excitmentScore: 0.66, liveScores: new[] { 0.4, 0.7 }, liveMinutes: new[] { 15d, 55d });
         var matchWithoutLive = CreateMatch(21, DateTime.UtcNow.AddMinutes(-30), status: MatchStatus.Live, excitmentScore: 0.45, includeLive: false);
@@ -142,6 +148,7 @@ public class ExcitmentMatchServiceTests
 
         repository.Verify(r => r.GetUnfinishedMatchesAsync(), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         processor.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
@@ -150,7 +157,7 @@ public class ExcitmentMatchServiceTests
     public async Task GetMatchByIdAsync_ReturnsNullWhenMatchMissing()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
         repository.Setup(r => r.GetMatchByIdAsync(999)).ReturnsAsync((MatchEntity?)null);
 
         // Act
@@ -160,6 +167,7 @@ public class ExcitmentMatchServiceTests
         result.Should().BeNull();
         repository.Verify(r => r.GetMatchByIdAsync(999), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         processor.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
@@ -168,7 +176,7 @@ public class ExcitmentMatchServiceTests
     public async Task GetMatchByIdAsync_ProvidesDetailedBreakdown()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
 
         var match = CreateMatch(
             id: 42,
@@ -211,6 +219,7 @@ public class ExcitmentMatchServiceTests
 
         repository.Verify(r => r.GetMatchByIdAsync(match.Id), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         processor.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
@@ -219,7 +228,7 @@ public class ExcitmentMatchServiceTests
     public async Task GetMatchByIdAsync_ReturnsPreMatchBreakdown()
     {
         // Arrange
-        var service = CreateService(out var repository, out var processor, out var liveProcessor);
+        var service = CreateService(out var repository, out var liveRepository, out var processor, out var liveProcessor);
 
         var match = CreateMatch(
             id: 77,
@@ -253,9 +262,11 @@ public class ExcitmentMatchServiceTests
 
         repository.Verify(r => r.GetMatchByIdAsync(match.Id), Times.Once);
         repository.VerifyNoOtherCalls();
+        liveRepository.VerifyNoOtherCalls();
         processor.VerifyNoOtherCalls();
         liveProcessor.VerifyNoOtherCalls();
     }
+
     private static MatchEntity CreateMatch(
         int id,
         DateTime kickoff,

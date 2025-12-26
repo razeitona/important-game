@@ -7,12 +7,17 @@ using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
 namespace important_game.infrastructure.LeagueProcessors
 {
     [ExcludeFromCodeCoverage]
-internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
+    internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegration) : ILeagueProcessor
     {
 
-        public async Task<League> GetLeagueDataAsync(int leagueId)
+        public async Task<League> GetLeagueDataAsync(string leagueId)
         {
-            var tournament = await _sofaScoreIntegration.GetTournamentAsync(leagueId);
+            if (!int.TryParse(leagueId, out var numericLeagueId))
+            {
+                return null;
+            }
+
+            var tournament = await _sofaScoreIntegration.GetTournamentAsync(numericLeagueId);
 
             if (tournament?.UniqueTournament == null) { return null; }
 
@@ -391,4 +396,6 @@ internal class SofaScoreLeagueProcessor(ISofaScoreIntegration _sofaScoreIntegrat
         }
     }
 }
+
+
 

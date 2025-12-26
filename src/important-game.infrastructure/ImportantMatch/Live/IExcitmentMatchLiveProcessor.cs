@@ -1,4 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+﻿using important_game.infrastructure.Contexts.Matches.Data.Entities;
 
 namespace important_game.infrastructure.ImportantMatch.Live
 {

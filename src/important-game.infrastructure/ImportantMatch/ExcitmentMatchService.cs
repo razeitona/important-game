@@ -1,13 +1,17 @@
-﻿using important_game.infrastructure.Extensions;
-using important_game.infrastructure.ImportantMatch.Data;
-using important_game.infrastructure.ImportantMatch.Data.Entities;
+﻿using important_game.infrastructure.Shared.Extensions;
+using important_game.infrastructure.Data.Repositories;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.ImportantMatch.Models;
 
 namespace important_game.infrastructure.ImportantMatch
 {
-    public class ExcitmentMatchService(IExctimentMatchRepository matchRepository
-        , IExcitmentMatchProcessor matchProcessor, IExcitmentMatchLiveProcessor liveProcessor) : IExcitmentMatchService
+    public class ExcitmentMatchService(
+        IMatchRepository matchRepository,
+        ILiveMatchRepository liveMatchRepository,
+        IExcitmentMatchProcessor matchProcessor,
+        IExcitmentMatchLiveProcessor liveProcessor) : IExcitmentMatchService
     {
         public async Task CalculateUpcomingMatchsExcitment()
         {
@@ -18,22 +22,19 @@ namespace important_game.infrastructure.ImportantMatch
         {
             var listOfLiveMatches = await matchRepository.GetUnfinishedMatchesAsync();
 
-            //Process all the leagues to identify the excitement match rating for each
             foreach (var match in listOfLiveMatches)
             {
                 if (match.MatchDateUTC > DateTime.UtcNow)
                     continue;
 
-                //Get all upcoming games (active) from processing competition
                 var liveMatch = await liveProcessor.ProcessLiveMatchData(match);
 
                 await matchRepository.SaveMatchAsync(match);
                 if (liveMatch == null)
                     continue;
 
-                await matchRepository.SaveLiveMatchAsync(liveMatch);
+                await liveMatchRepository.SaveLiveMatchAsync(liveMatch);
             }
-
         }
 
         public async Task<List<ExcitementMatchDto>> GetAllMatchesAsync()
@@ -72,7 +73,6 @@ namespace important_game.infrastructure.ImportantMatch
                 };
 
                 matches.Add(match);
-
             }
 
             return matches.OrderBy(c => c.MatchDate).ToList();
@@ -86,7 +86,6 @@ namespace important_game.infrastructure.ImportantMatch
 
             foreach (var rawMatch in rawMatches)
             {
-
                 var match = new ExcitementMatchLiveDto
                 {
                     Id = rawMatch.Id,
@@ -119,12 +118,10 @@ namespace important_game.infrastructure.ImportantMatch
                 }
 
                 matches.Add(match);
-
             }
 
             return matches.OrderBy(c => c.MatchDate).ToList();
         }
-
 
         public async Task<ExcitementMatchDetailDto> GetMatchByIdAsync(int id)
         {
@@ -134,8 +131,6 @@ namespace important_game.infrastructure.ImportantMatch
                 return null;
 
             var liveData = rawMatch.LiveMatches.LastOrDefault();
-
-
 
             var match = new ExcitementMatchDetailDto
             {
@@ -184,7 +179,6 @@ namespace important_game.infrastructure.ImportantMatch
             { "Big chances", "amount of big chances" },
         };
 
-
         private string DetermineExcitementLevel(double averageScore)
         {
             return averageScore switch
@@ -215,13 +209,11 @@ namespace important_game.infrastructure.ImportantMatch
 
         private Dictionary<string, (bool Show, double Value)> SetupExcitmentScoreDetail(Match rawMatch, LiveMatch? liveData)
         {
-
             if (liveData != null)
             {
                 return new Dictionary<string, (bool Show, double Value)>
                 {
                     { "Score Line", (true,liveData.ScoreLineScore) },
-                    //{ "ShotTargetScore", liveData.ShotTargetScore },
                     { "xGoals", (true,liveData.XGoalsScore) },
                     { "Fouls", (true,liveData.TotalFoulsScore) },
                     { "Cards", (true,liveData.TotalCardsScore) },
@@ -282,11 +274,9 @@ namespace important_game.infrastructure.ImportantMatch
                     HomeTeamScore = fixture.HomeTeamScore,
                     AwayTeamScore = fixture.AwayTeamScore,
                 });
-
             }
 
             return matches;
         }
-
     }
 }

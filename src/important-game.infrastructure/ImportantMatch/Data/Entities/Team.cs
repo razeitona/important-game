@@ -17,9 +17,6 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
 
         public ICollection<Match> HomeFixtures { get; set; }
         public ICollection<Match> AwayFixtures { get; set; }
-
-        //public ICollection<Rivalry> TeamOneRivalries { get; set; }
-        //public ICollection<Rivalry> TeamTwoRivalries { get; set; }
         public ICollection<Headtohead> HomeHeadToHead { get; set; }
         public ICollection<Headtohead> AwayHeadToHead { get; set; }
     }

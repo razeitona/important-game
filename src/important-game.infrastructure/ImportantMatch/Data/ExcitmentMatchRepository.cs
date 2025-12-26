@@ -28,6 +28,7 @@ namespace important_game.infrastructure.ImportantMatch.Data
                 if (existingCompetition != null)
                 {
                     existingCompetition.Name = competition.Name;
+                    existingCompetition.Code = competition.Code;
                     existingCompetition.TitleHolderTeamId = competition.TitleHolderTeamId;
                     _context.Competitions.Update(existingCompetition);
                 }
@@ -50,6 +51,10 @@ namespace important_game.infrastructure.ImportantMatch.Data
             if (existCompetition != null)
             {
                 existCompetition.TitleHolderTeamId = competition.TitleHolderTeamId;
+                if (!string.IsNullOrWhiteSpace(competition.Code))
+                {
+                    existCompetition.Code = competition.Code;
+                }
                 _context.Competitions.Update(existCompetition);
                 await _context.SaveChangesAsync();
             }
@@ -435,3 +440,4 @@ namespace important_game.infrastructure.ImportantMatch.Data
         #endregion
     }
 }
+

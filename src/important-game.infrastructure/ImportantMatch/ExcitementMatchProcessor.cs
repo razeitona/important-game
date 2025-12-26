@@ -1,15 +1,22 @@
 using System.Globalization;
 using System.Threading;
-using important_game.infrastructure.ImportantMatch.Data;
-using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.Data.Repositories;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.Telegram;
 
 namespace important_game.infrastructure.ImportantMatch
 {
-    internal class ExcitementMatchProcessor(ILeagueProcessor leagueProcessor
-        , IExctimentMatchRepository matchRepository, ITelegramBot telegramBot) : IExcitmentMatchProcessor
+    internal class ExcitementMatchProcessor(
+        ILeagueProcessor leagueProcessor,
+        IMatchRepository matchRepository,
+        ICompetitionRepository competitionRepository,
+        ITeamRepository teamRepository,
+        IRivalryRepository rivalryRepository,
+        IHeadToHeadRepository headToHeadRepository,
+        ITelegramBot telegramBot) : IExcitmentMatchProcessor
     {
         private const double CompetitionCoef = 0.15d;
         private const double FixtureCoef = 0.10d;
@@ -35,8 +42,7 @@ namespace important_game.infrastructure.ImportantMatch
 
         public async Task CalculateUpcomingMatchsExcitment()
         {
-
-            var competitions = await matchRepository.GetActiveCompetitionsAsync();
+            var competitions = await competitionRepository.GetActiveCompetitionsAsync();
 
             if (competitions == null || competitions.Count == 0)
             {
@@ -105,7 +111,8 @@ namespace important_game.infrastructure.ImportantMatch
 
         private async Task<League?> GetLeagueDataInfoAsync(Competition competition)
         {
-            var league = await leagueProcessor.GetLeagueDataAsync(competition.Id);
+            var leagueIdentifier = string.IsNullOrWhiteSpace(competition.Code) ? competition.Id.ToString() : competition.Code;
+            var league = await leagueProcessor.GetLeagueDataAsync(leagueIdentifier);
 
             if (league == null)
                 return league;
@@ -117,10 +124,11 @@ namespace important_game.infrastructure.ImportantMatch
                 {
                     Id = competition.Id,
                     Name = league.Name,
+                    Code = competition.Code,
                     TitleHolderTeamId = league.TitleHolder?.Id ?? null,
                 };
 
-                await WithRepositoryLock(() => matchRepository.SaveCompetitionAsync(updatedCompetition));
+                await WithRepositoryLock(() => competitionRepository.SaveCompetitionAsync(updatedCompetition));
             }
 
             league.Ranking = competition.LeagueRanking;
@@ -178,7 +186,7 @@ namespace important_game.infrastructure.ImportantMatch
 
                 if (!rivalryCache.TryGetValue(cacheKey, out var rivalry))
                 {
-                    rivalry = await WithRepositoryLock(() => matchRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id));
+                    rivalry = await WithRepositoryLock(() => rivalryRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id));
                     rivalryCache[cacheKey] = rivalry;
                 }
 
@@ -232,7 +240,7 @@ namespace important_game.infrastructure.ImportantMatch
             var teamsLastFixtureFormValue = (homeLastFixturesScoreValue + awayLastFixturesScoreValue) / 2d;
             var homeGoalsFormScoreValue = CalculateTeamGoalsForm(fixture.HomeTeam.LastFixtures);
             var awayGoalsFormScoreValue = CalculateTeamGoalsForm(fixture.AwayTeam.LastFixtures);
-            var teamsGoalsFormValue = homeGoalsFormScoreValue + awayGoalsFormScoreValue; // Changed from average to sum
+            var teamsGoalsFormValue = homeGoalsFormScoreValue + awayGoalsFormScoreValue;
             var leagueTableValue = CalculateLeagueTableValue(fixture.HomeTeam, fixture.AwayTeam, leagueTable);
             var h2hValue = await CalculateHeadToHeadFormAsync(fixture.HomeTeam, fixture.AwayTeam, fixture.HeadToHead);
             var titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder);
@@ -301,23 +309,20 @@ namespace important_game.infrastructure.ImportantMatch
 
         private async Task ProcessHeadToHeadMatches(int id, List<Fixture> headToHeadFixtures)
         {
-
-            List<Headtohead> headToHeadMatches = new();
-
-            foreach (var fixture in headToHeadFixtures)
+            var headToHeadMatches = headToHeadFixtures.Select(fixture => new Headtohead
             {
-                headToHeadMatches.Add(new Headtohead
-                {
-                    MatchId = id,
-                    HomeTeamId = fixture.HomeTeam.Id,
-                    AwayTeamId = fixture.AwayTeam.Id,
-                    MatchDateUTC = fixture.MatchDate.UtcDateTime,
-                    HomeTeamScore = fixture.HomeTeamScore,
-                    AwayTeamScore = fixture.AwayTeamScore
-                });
-            }
+                MatchId = id,
+                HomeTeamId = fixture.HomeTeam.Id,
+                AwayTeamId = fixture.AwayTeam.Id,
+                MatchDateUTC = fixture.MatchDate.UtcDateTime,
+                HomeTeamScore = fixture.HomeTeamScore,
+                AwayTeamScore = fixture.AwayTeamScore
+            }).ToList();
 
-            await WithRepositoryLock(() => matchRepository.SaveHeadToHeadMatchesAsync(headToHeadMatches));
+            if (headToHeadMatches.Count > 0)
+            {
+                await WithRepositoryLock(() => headToHeadRepository.SaveHeadToHeadMatchesAsync(headToHeadMatches));
+            }
         }
 
         private async Task<Team> InsertTeamInfo(TeamInfo teamInfo)
@@ -328,7 +333,7 @@ namespace important_game.infrastructure.ImportantMatch
                 Name = teamInfo.Name,
             };
 
-            return await WithRepositoryLock(() => matchRepository.SaveTeamAsync(team));
+            return await WithRepositoryLock(() => teamRepository.SaveTeamAsync(team));
         }
 
         private double CalculateTitleHolder(TeamInfo homeTeam, TeamInfo awayTeam, TeamTitleHolder titleHolder)
@@ -430,3 +435,5 @@ namespace important_game.infrastructure.ImportantMatch
         }
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Data.Entities;
+using important_game.infrastructure.ImportantMatch.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -121,13 +121,13 @@ namespace important_game.infrastructure.ImportantMatch.Data
         {
             modelBuilder.Entity<Competition>().HasData(
                 new Competition { Id = 7, Name = "Champions League", LeagueRanking = 1d, PrimaryColor = "#3c1c5a", BackgroundColor = "#ffffff", IsActive = true },
-                new Competition { Id = 17, Name = "Premier League", LeagueRanking = 0.95d, PrimaryColor = "#3c1c5a", BackgroundColor = "#3d195b", IsActive = true },
+                new Competition { Id = 17, Name = "Premier League", Code = "PL", LeagueRanking = 0.95d, PrimaryColor = "#3c1c5a", BackgroundColor = "#3d195b", IsActive = true },
                 new Competition { Id = 35, Name = "Bundesliga", LeagueRanking = 0.85d, PrimaryColor = "#ffffff", BackgroundColor = "#e2080e", IsActive = true },
                 new Competition { Id = 8, Name = "La Liga", LeagueRanking = 0.85d, PrimaryColor = "#ffffff", BackgroundColor = "#2f4a89", IsActive = true },
                 new Competition { Id = 23, Name = "Serie A", LeagueRanking = 0.82d, PrimaryColor = "#ffffff", BackgroundColor = "#09519e", IsActive = true },
                 new Competition { Id = 34, Name = "Ligue 1", LeagueRanking = 0.75d, PrimaryColor = "#3c1c5a", BackgroundColor = "#ffffff", IsActive = true },
                 new Competition { Id = 37, Name = "Eredevisie", LeagueRanking = 0.7d, PrimaryColor = "#122e62", BackgroundColor = "#122e62", IsActive = true },
-                new Competition { Id = 325, Name = "Brasileirão", LeagueRanking = 0.7d, PrimaryColor = "#141528", BackgroundColor = "#C7FF00", IsActive = true },
+                new Competition { Id = 325, Name = "Brasileir�o", LeagueRanking = 0.7d, PrimaryColor = "#141528", BackgroundColor = "#C7FF00", IsActive = true },
                 new Competition { Id = 155, Name = "Argentina", LeagueRanking = 0.65d, PrimaryColor = "#004a79", BackgroundColor = "#33c5df", IsActive = true },
                 new Competition { Id = 52, Name = "Turkey", LeagueRanking = 0.6d, PrimaryColor = "#f00515", BackgroundColor = "#f00918", IsActive = true },
                 new Competition { Id = 238, Name = "Liga Portugal", LeagueRanking = 0.6d, PrimaryColor = "#001841", BackgroundColor = "#ffc501", IsActive = true },
@@ -253,3 +253,4 @@ namespace important_game.infrastructure.ImportantMatch.Data
         }
     }
 }
+

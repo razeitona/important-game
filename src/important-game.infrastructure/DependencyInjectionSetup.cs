@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Net.Http.Headers;
+using important_game.infrastructure.FootballData;
 using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Data;
+using important_game.infrastructure.Data;
+using important_game.infrastructure.Data.Connections;
+using important_game.infrastructure.Data.Repositories;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.SofaScoreAPI.Models;
 using important_game.infrastructure.Telegram;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -30,11 +32,30 @@ namespace important_game.infrastructure
                 client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             });
 
+            services.Configure<FootballDataOptions>(configuration.GetSection("FootballData"));
+            services.AddHttpClient<IFootballDataIntegration, FootballDataIntegration>((sp, client) =>
+            {
+                var options = sp.GetRequiredService<IOptions<FootballDataOptions>>().Value;
+                client.BaseAddress = new Uri(FootballDataConstants.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                if (!string.IsNullOrWhiteSpace(options.ApiKey))
+                {
+                    if (client.DefaultRequestHeaders.Contains("X-Auth-Token"))
+                    {
+                        client.DefaultRequestHeaders.Remove("X-Auth-Token");
+                    }
+
+                    client.DefaultRequestHeaders.Add("X-Auth-Token", options.ApiKey);
+                }
+            });
+
             services.AddScoped<IExcitmentMatchProcessor, ExcitementMatchProcessor>();
             services.AddScoped<IExcitmentMatchLiveProcessor, ExcitmentMatchLiveProcessor>();
-            services.AddScoped<IExctimentMatchRepository, ExcitmentMatchRepository>();
             services.AddScoped<IExcitmentMatchService, ExcitmentMatchService>();
-            services.AddScoped<ILeagueProcessor, SofaScoreLeagueProcessor>();
+            services.AddScoped<ILeagueProcessor, FootballDataLeagueProcessor>();
 
             services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
             services.AddHttpClient<ITelegramBot, TelegramBot>((sp, client) =>
@@ -46,10 +67,24 @@ namespace important_game.infrastructure
                 }
             });
 
-            services.AddDbContext<ImportantMatchDbContext>(options =>
-                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+            // Register Dapper database infrastructure
+            // Connection factory for database access
+            services.AddScoped<IDbConnectionFactory>(sp =>
+            {
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                return new SqliteConnectionFactory(connectionString ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found"));
+            });
+
+            // Register specialized repositories following Single Responsibility Principle
+            services.AddScoped<ICompetitionRepository, CompetitionRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
+            services.AddScoped<IMatchRepository, MatchRepositoryDapper>();
+            services.AddScoped<ILiveMatchRepository, LiveMatchRepository>();
+            services.AddScoped<IRivalryRepository, RivalryRepository>();
+            services.AddScoped<IHeadToHeadRepository, HeadToHeadRepository>();
 
             return services;
         }
     }
 }
+

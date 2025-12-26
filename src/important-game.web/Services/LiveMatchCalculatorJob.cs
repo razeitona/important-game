@@ -1,20 +1,12 @@
 ﻿using important_game.infrastructure.ImportantMatch;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-public class LiveMatchCalculatorJob : BackgroundService
+namespace important_game.web.Services;
+
+public class LiveMatchCalculatorJob(IServiceProvider serviceProvider, ILogger<LiveMatchCalculatorJob> logger) : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<LiveMatchCalculatorJob> _logger;
-
-    public LiveMatchCalculatorJob(IServiceProvider serviceProvider, ILogger<LiveMatchCalculatorJob> logger)
-    {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        return;
         await RunJobAsync(stoppingToken).ConfigureAwait(false);
 
         using var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
@@ -28,7 +20,7 @@ public class LiveMatchCalculatorJob : BackgroundService
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation("Live match calculator job is stopping.");
+            logger.LogInformation("Live match calculator job is stopping.");
         }
     }
 
@@ -41,7 +33,7 @@ public class LiveMatchCalculatorJob : BackgroundService
 
         try
         {
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = serviceProvider.CreateScope();
             var matchProcessor = scope.ServiceProvider.GetRequiredService<IExcitmentMatchService>();
             await matchProcessor.CalculateUnfinishedMatchExcitment().ConfigureAwait(false);
         }
@@ -51,8 +43,7 @@ public class LiveMatchCalculatorJob : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to calculate live match excitement.");
+            logger.LogError(ex, "Failed to calculate live match excitement.");
         }
     }
 }
-

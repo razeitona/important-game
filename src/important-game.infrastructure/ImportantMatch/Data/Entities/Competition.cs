@@ -15,6 +15,8 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         [Required]
         public string Name { get; set; }
 
+        public string? Code { get; set; }
+
         [Required]
         public string PrimaryColor { get; set; }
 
@@ -37,4 +39,5 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         public ICollection<Match> Fixtures { get; set; }
     }
 }
+
 
