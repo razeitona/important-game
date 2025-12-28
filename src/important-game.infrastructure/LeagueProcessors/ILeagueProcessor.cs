@@ -17,7 +17,7 @@ namespace important_game.infrastructure.LeagueProcessors
         /// <param name="leagueId">League Identifier</param>
         /// <param name="seasonId">Season Identifier</param>
         /// <returns></returns>
-        Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(int leagueId, int seasonId);
+        Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(string leagueId, int seasonId);
 
         /// <summary>
         /// Get League current table
@@ -25,7 +25,7 @@ namespace important_game.infrastructure.LeagueProcessors
         /// <param name="leagueId"></param>
         /// <param name="seasonId"></param>
         /// <returns></returns>
-        Task<LeagueStanding> GetLeagueTableAsync(int leagueId, int seasonId);
+        Task<LeagueStanding> GetLeagueTableAsync(string leagueId, int seasonId);
 
 
         /// <summary>

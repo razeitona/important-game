@@ -12,7 +12,6 @@ namespace important_game.infrastructure.ImportantMatch.Data.Entities
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(Competition))]
         public int CompetitionId { get; set; }
 
         [Required]

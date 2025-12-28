@@ -14,6 +14,8 @@ using important_game.infrastructure.Telegram;
 using Moq;
 using HeadToHeadEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Headtohead;
 using MatchEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Match;
+using important_game.infrastructure.Contexts.Competitions.Data;
+using important_game.infrastructure.Contexts.Teams.Data;
 
 namespace important_game.infrastructure.tests.ImportantMatch;
 
@@ -45,9 +47,9 @@ public class ExcitementMatchProcessorTests
 
         var leagueProcessor = new Mock<ILeagueProcessor>();
         leagueProcessor.Setup(p => p.GetLeagueDataAsync(scenario.League.Id.ToString())).ReturnsAsync(scenario.League);
-        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(new LeagueUpcomingFixtures { scenario.Fixture });
-        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(scenario.LeagueStanding);
 
         var matchRepository = new Mock<IMatchRepository>();
@@ -156,9 +158,9 @@ public class ExcitementMatchProcessorTests
 
         var leagueProcessor = new Mock<ILeagueProcessor>();
         leagueProcessor.Setup(p => p.GetLeagueDataAsync(scenario.League.Id.ToString())).ReturnsAsync(scenario.League);
-        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(new LeagueUpcomingFixtures { scenario.Fixture });
-        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(scenario.LeagueStanding);
 
         var matchRepository = new Mock<IMatchRepository>();
@@ -208,7 +210,7 @@ public class ExcitementMatchProcessorTests
 
         var leagueProcessor = new Mock<ILeagueProcessor>();
         leagueProcessor.Setup(p => p.GetLeagueDataAsync(scenario.League.Id.ToString())).ReturnsAsync(scenario.League);
-        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync((LeagueUpcomingFixtures?)null);
 
         var matchRepository = new Mock<IMatchRepository>();
@@ -234,7 +236,7 @@ public class ExcitementMatchProcessorTests
 
         await processor.CalculateUpcomingMatchsExcitment();
 
-        leagueProcessor.Verify(p => p.GetLeagueTableAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        leagueProcessor.Verify(p => p.GetLeagueTableAsync(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
         matchRepository.Verify(r => r.SaveMatchAsync(It.IsAny<MatchEntity>()), Times.Never);
         headToHeadRepository.Verify(r => r.SaveHeadToHeadMatchesAsync(It.IsAny<List<HeadToHeadEntity>>()), Times.Never);
     }
@@ -248,9 +250,9 @@ public class ExcitementMatchProcessorTests
 
         var leagueProcessor = new Mock<ILeagueProcessor>();
         leagueProcessor.Setup(p => p.GetLeagueDataAsync(scenario.League.Id.ToString())).ReturnsAsync(scenario.League);
-        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetUpcomingMatchesAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(new LeagueUpcomingFixtures { scenario.Fixture });
-        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id, scenario.League.CurrentSeason.Id))
+        leagueProcessor.Setup(p => p.GetLeagueTableAsync(scenario.League.Id.ToString(), scenario.League.CurrentSeason.Id))
             .ReturnsAsync(scenario.LeagueStanding);
 
         var matchRepository = new Mock<IMatchRepository>();

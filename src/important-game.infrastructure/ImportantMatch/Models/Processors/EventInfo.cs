@@ -1,6 +1,4 @@
-﻿using important_game.infrastructure.SofaScoreAPI.Models;
-
-namespace important_game.infrastructure.ImportantMatch.Models.Processors
+﻿namespace important_game.infrastructure.ImportantMatch.Models.Processors
 {
     public class EventInfo : Fixture
     {

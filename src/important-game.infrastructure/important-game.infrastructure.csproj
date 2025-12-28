@@ -9,15 +9,19 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageReference Include="PuppeteerSharp" Version="20.2.5" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SofaScoreAPI\**\*.cs">
+    <Compile Update="Contexts\Providers\ExternalServices\SofaScoreAPI\**\*.cs">
       <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
     </Compile>
     <Compile Update="ImportantMatch\Data\**\*.cs">
@@ -26,6 +30,10 @@
     <Compile Update="Telegram\**\*.cs">
       <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Services\" />
   </ItemGroup>
 
 </Project>

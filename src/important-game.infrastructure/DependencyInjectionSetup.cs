@@ -1,18 +1,21 @@
-using System;
-using System.Net.Http.Headers;
-using important_game.infrastructure.FootballData;
-using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.Data;
+using important_game.infrastructure.Contexts.Competitions.Data;
+using important_game.infrastructure.Contexts.Providers.Data;
+using important_game.infrastructure.Contexts.Providers.ExternalServices;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Models;
+using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Data.Connections;
 using important_game.infrastructure.Data.Repositories;
+using important_game.infrastructure.ImportantMatch;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.LeagueProcessors;
-using important_game.infrastructure.SofaScoreAPI;
-using important_game.infrastructure.SofaScoreAPI.Models;
 using important_game.infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace important_game.infrastructure
 {
@@ -33,7 +36,7 @@ namespace important_game.infrastructure
             });
 
             services.Configure<FootballDataOptions>(configuration.GetSection("FootballData"));
-            services.AddHttpClient<IFootballDataIntegration, FootballDataIntegration>((sp, client) =>
+            services.AddHttpClient<IExternalIntegrationProvider, FootballDataProvider>((sp, client) =>
             {
                 var options = sp.GetRequiredService<IOptions<FootballDataOptions>>().Value;
                 client.BaseAddress = new Uri(FootballDataConstants.BaseUrl);
@@ -55,7 +58,7 @@ namespace important_game.infrastructure
             services.AddScoped<IExcitmentMatchProcessor, ExcitementMatchProcessor>();
             services.AddScoped<IExcitmentMatchLiveProcessor, ExcitmentMatchLiveProcessor>();
             services.AddScoped<IExcitmentMatchService, ExcitmentMatchService>();
-            services.AddScoped<ILeagueProcessor, FootballDataLeagueProcessor>();
+            services.AddScoped<ILeagueProcessor, SofaScoreLeagueProcessor>();
 
             services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
             services.AddHttpClient<ITelegramBot, TelegramBot>((sp, client) =>
@@ -82,7 +85,13 @@ namespace important_game.infrastructure
             services.AddScoped<ILiveMatchRepository, LiveMatchRepository>();
             services.AddScoped<IRivalryRepository, RivalryRepository>();
             services.AddScoped<IHeadToHeadRepository, HeadToHeadRepository>();
+            services.AddScoped<IExternalProvidersRepository, ExternalProvidersRepository>();
 
+            // Register external data synchronization service
+            services.AddScoped<IExternalCompetitionSyncService, ExternalCompetitionSyncService>();
+            services.AddScoped<IIntegrationProviderFactory, IntegrationProviderFactory>();
+            services.AddScoped<IExternalProviderSettings, ExternalProviderSettings>();
+           
             return services;
         }
     }

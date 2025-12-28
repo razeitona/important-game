@@ -1,9 +1,8 @@
 using FluentAssertions;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
 using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Data;
 using important_game.infrastructure.ImportantMatch.Live;
 using important_game.infrastructure.LeagueProcessors;
-using important_game.infrastructure.SofaScoreAPI;
 using important_game.infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

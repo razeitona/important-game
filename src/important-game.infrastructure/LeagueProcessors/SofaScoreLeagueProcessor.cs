@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Models.SofaScoreDto;
 using important_game.infrastructure.ImportantMatch.Models;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
-using important_game.infrastructure.SofaScoreAPI;
-using important_game.infrastructure.SofaScoreAPI.Models.SofaScoreDto;
 
 namespace important_game.infrastructure.LeagueProcessors
 {
@@ -17,11 +17,11 @@ namespace important_game.infrastructure.LeagueProcessors
                 return null;
             }
 
-            var tournament = await _sofaScoreIntegration.GetTournamentAsync(numericLeagueId);
+            var tournament = await _sofaScoreIntegration.GetTournamentAsync(numericLeagueId.ToString());
 
             if (tournament?.UniqueTournament == null) { return null; }
 
-            var tournamentSeasons = await _sofaScoreIntegration.GetTournamentSeasonsAsync(tournament.UniqueTournament.Id);
+            var tournamentSeasons = await _sofaScoreIntegration.GetTournamentSeasonsAsync(tournament.UniqueTournament.Id.ToString());
 
             if (tournamentSeasons?.Seasons.Count == 0) { return null; }
 
@@ -48,7 +48,7 @@ namespace important_game.infrastructure.LeagueProcessors
             return league;
         }
 
-        public async Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(int leagueId, int seasonId)
+        public async Task<LeagueUpcomingFixtures> GetUpcomingMatchesAsync(string leagueId, int seasonId)
         {
             LeagueUpcomingFixtures upcomingFixtures = new();
 
@@ -101,7 +101,7 @@ namespace important_game.infrastructure.LeagueProcessors
             return upcomingFixtures;
         }
 
-        public async Task<LeagueStanding> GetLeagueTableAsync(int leagueId, int seasonId)
+        public async Task<LeagueStanding> GetLeagueTableAsync(string leagueId, int seasonId)
         {
             var leagueTableData = await _sofaScoreIntegration.GetTournamentSeasonsTableAsync(leagueId, seasonId);
             if (leagueTableData == null || leagueTableData.Standings == null)
@@ -116,7 +116,7 @@ namespace important_game.infrastructure.LeagueProcessors
 
             var leagueStanding = new LeagueStanding()
             {
-                LeagueId = leagueId,
+                LeagueId = Int32.Parse(leagueId),
                 Standings = new List<Standing>(),
                 CurrentRound = leagueRoundsData?.CurrentRound?.Round??1,
                 TotalRounds = leagueRoundsData?.Rounds?.Count??1

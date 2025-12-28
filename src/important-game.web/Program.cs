@@ -1,5 +1,7 @@
+using Dapper;
 using important_game.infrastructure;
-using System;
+using important_game.web.Handlers;
+using SQLitePCL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +14,12 @@ builder.Services.AddSassCompiler();
 
 builder.Services.MatchImportanceInfrastructure(builder.Configuration);
 
-builder.Services.AddHostedService<MatchCalculatorJob>();
+builder.Services.AddHostedService<SyncCompetitionJob>();
+//builder.Services.AddHostedService<MatchCalculatorJob>();
 //builder.Services.AddHostedService<LiveMatchCalculatorJob>();
+
+Batteries.Init();
+SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
 
 var app = builder.Build();
 
@@ -24,7 +30,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 
 app.UseHttpsRedirection();

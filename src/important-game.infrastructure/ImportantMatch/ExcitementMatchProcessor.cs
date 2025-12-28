@@ -1,5 +1,7 @@
+using important_game.infrastructure.Contexts.Competitions.Data;
 using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Data.Repositories;
 using important_game.infrastructure.ImportantMatch.Models.Processors;
 using important_game.infrastructure.LeagueProcessors;
@@ -140,14 +142,14 @@ namespace important_game.infrastructure.ImportantMatch
             try
             {
                 //Get upcoming features
-                var sourceUpcomingMatches = await leagueProcessor.GetUpcomingMatchesAsync(league.Id, league.CurrentSeason.Id);
+                var sourceUpcomingMatches = await leagueProcessor.GetUpcomingMatchesAsync(league.Id.ToString(), league.CurrentSeason.Id);
                 if (sourceUpcomingMatches == null)
                 {
                     return;
                 }
 
                 //Get league standing
-                var leagueTable = await leagueProcessor.GetLeagueTableAsync(league.Id, league.CurrentSeason.Id);
+                var leagueTable = await leagueProcessor.GetLeagueTableAsync(league.Id.ToString(), league.CurrentSeason.Id);
 
                 await ProcessUpcomingFixturesImportantMatches(league, sourceUpcomingMatches, leagueTable, activeMatches);
 
