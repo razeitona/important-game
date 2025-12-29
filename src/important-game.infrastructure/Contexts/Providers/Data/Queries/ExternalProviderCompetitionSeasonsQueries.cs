@@ -25,6 +25,14 @@ internal static class ExternalProviderCompetitionSeasonsQueries
             FROM ExternalProviderCompetitionSeasons
             WHERE ProviderId = @ProviderId AND InternalSeasonId = @InternalSeasonId";
 
+    internal const string SelectExternalProviderCompetitionSeasonByExternalId = @"
+            SELECT 
+                ProviderId,
+                InternalSeasonId,
+                ExternalSeasonId
+            FROM ExternalProviderCompetitionSeasons
+            WHERE ProviderId = @ProviderId AND ExternalSeasonId = @ExternalSeasonId";
+
     internal const string SelectExternalProviderCompetitionSeasonsByProvider = @"
             SELECT 
                 ProviderName,

@@ -15,7 +15,6 @@ namespace important_game.infrastructure.ImportantMatch
         IMatchRepository matchRepository,
         ICompetitionRepository competitionRepository,
         ITeamRepository teamRepository,
-        IRivalryRepository rivalryRepository,
         IHeadToHeadRepository headToHeadRepository,
         ITelegramBot telegramBot) : IExcitmentMatchProcessor
     {
@@ -166,7 +165,7 @@ namespace important_game.infrastructure.ImportantMatch
         {
 
             var activeMatchesDict = activeMatches.ToDictionary(c => c.Id, c => c);
-            var rivalryCache = new Dictionary<(int, int), Rivalry?>();
+            var rivalryCache = new Dictionary<(int, int), RivalryEntity?>();
 
             var validationDate = DateTime.UtcNow.AddDays(-1);
 
@@ -183,16 +182,7 @@ namespace important_game.infrastructure.ImportantMatch
                         continue;
                 }
 
-
-                var cacheKey = CreateRivalryCacheKey(fixture.HomeTeam.Id, fixture.AwayTeam.Id);
-
-                if (!rivalryCache.TryGetValue(cacheKey, out var rivalry))
-                {
-                    rivalry = await WithRepositoryLock(() => rivalryRepository.GetRivalryByTeamIdAsync(fixture.HomeTeam.Id, fixture.AwayTeam.Id));
-                    rivalryCache[cacheKey] = rivalry;
-                }
-
-                var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable, rivalry);
+                var match = await CalculateMatchImportanceAsync(league, fixture, leagueTable);
 
                 if (match.MatchDateUTC.Date == DateTime.UtcNow.Date)
                     _ = telegramBot.SendMessageAsync(ProcessGameMessage(match));
@@ -233,7 +223,7 @@ namespace important_game.infrastructure.ImportantMatch
         }
 
         private async Task<Match> CalculateMatchImportanceAsync(League league, UpcomingFixture fixture
-            , LeagueStanding leagueTable, Rivalry? rivalry)
+            , LeagueStanding leagueTable)
         {
             var competitionRankValue = league.Ranking;
             var fixtureValue = CalculateFixtureValue(leagueTable);
@@ -246,7 +236,6 @@ namespace important_game.infrastructure.ImportantMatch
             var leagueTableValue = CalculateLeagueTableValue(fixture.HomeTeam, fixture.AwayTeam, leagueTable);
             var h2hValue = await CalculateHeadToHeadFormAsync(fixture.HomeTeam, fixture.AwayTeam, fixture.HeadToHead);
             var titleHolderValue = CalculateTitleHolder(fixture.HomeTeam, fixture.AwayTeam, league.TitleHolder);
-            var rivalryValue = rivalry?.RivarlyValue ?? 0d;
 
             var homeTeam = await InsertTeamInfo(fixture.HomeTeam);
             var awayTeam = await InsertTeamInfo(fixture.AwayTeam);
@@ -268,13 +257,12 @@ namespace important_game.infrastructure.ImportantMatch
                 CompetitionStandingScore = leagueTableValue,
                 HeadToHeadScore = h2hValue,
                 TitleHolderScore = titleHolderValue,
-                RivalryScore = rivalryValue,
                 HomeForm = PrepareTeamForm(fixture.HomeTeam),
                 AwayForm = PrepareTeamForm(fixture.AwayTeam),
                 MatchStatus = MatchStatus.Upcoming
             };
 
-            var isLateStage = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) > 0.8d 
+            var isLateStage = ((double)leagueTable.CurrentRound / (double)leagueTable.TotalRounds) > 0.8d
                 && leagueTable.TotalRounds > leagueTable.Standings.Count;
 
             double competitionCoef = isLateStage ? LateCompetitionCoef : CompetitionCoef;

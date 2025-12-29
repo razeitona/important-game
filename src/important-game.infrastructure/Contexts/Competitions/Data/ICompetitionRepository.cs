@@ -18,7 +18,7 @@ public interface ICompetitionRepository
     /// <summary>
     /// Gets a competition by its ID.
     /// </summary>
-    Task<CompetitionEntity?> GetCompetitionByIdAsync(int id);
+    Task<CompetitionEntity?> GetCompetitionByIdAsync(int competitionId);
 
     /// <summary>
     /// Gets all competitions.
@@ -57,12 +57,7 @@ public interface ICompetitionRepository
     /// <summary>
     /// Get all standings for a specific competition and season, ordered by position.
     /// </summary>
-    Task<List<CompetitionTableEntity>> GetByCompetitionAndSeasonAsync(int competitionId, int seasonId);
-
-    /// <summary>
-    /// Get standing for a specific team in a competition and season.
-    /// </summary>
-    Task<CompetitionTableEntity?> GetByTeamCompetitionAndSeasonAsync(int teamId, int competitionId, int seasonId);
+    Task<List<CompetitionTableEntity>> GetCompetitionTableAsync(int competitionId, int seasonId);
     #endregion
 
 }

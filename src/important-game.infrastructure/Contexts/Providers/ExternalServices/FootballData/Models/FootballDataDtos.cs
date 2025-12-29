@@ -8,6 +8,7 @@ public class FootballDataCompetition
     public string? Name { get; set; }
     public string? Code { get; set; }
     public string? Type { get; set; }
+    public string? Emblem { get; set; }
     public FootballDataSeason? CurrentSeason { get; set; }
     public int? NumberOfAvailableSeasons { get; set; }
 }
@@ -64,6 +65,7 @@ public class FootballDataMatchesResponse
 public class FootballDataMatch
 {
     public int Id { get; set; }
+    public FootballDataCompetition? Competition { get; set; }
     public FootballDataSeason? Season { get; set; }
     public DateTimeOffset UtcDate { get; set; }
     public string? Status { get; set; }

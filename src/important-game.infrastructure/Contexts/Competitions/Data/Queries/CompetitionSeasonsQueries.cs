@@ -22,6 +22,7 @@ namespace important_game.infrastructure.Contexts.Competitions.Data.Queries
                 SeasonId,
                 CompetitionId,
                 SeasonYear,
+                NumberOfRounds,
                 TitleHolderId,
                 IsFinished,
                 SyncStandingsDate

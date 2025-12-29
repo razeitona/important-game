@@ -1,9 +1,13 @@
 using important_game.infrastructure.Contexts.Competitions.Data;
+using important_game.infrastructure.Contexts.Matches;
+using important_game.infrastructure.Contexts.Matches.Data;
 using important_game.infrastructure.Contexts.Providers.Data;
 using important_game.infrastructure.Contexts.Providers.ExternalServices;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Models;
+using important_game.infrastructure.Contexts.ScoreCalculator;
+using important_game.infrastructure.Contexts.ScoreCalculator.Calculators;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Data.Connections;
 using important_game.infrastructure.Data.Repositories;
@@ -15,7 +19,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace important_game.infrastructure
 {
@@ -83,15 +86,28 @@ namespace important_game.infrastructure
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IMatchRepository, MatchRepositoryDapper>();
             services.AddScoped<ILiveMatchRepository, LiveMatchRepository>();
-            services.AddScoped<IRivalryRepository, RivalryRepository>();
             services.AddScoped<IHeadToHeadRepository, HeadToHeadRepository>();
             services.AddScoped<IExternalProvidersRepository, ExternalProvidersRepository>();
+            services.AddScoped<IMatchesRepository, MatchesRepository>();
 
             // Register external data synchronization service
             services.AddScoped<IExternalCompetitionSyncService, ExternalCompetitionSyncService>();
+            services.AddScoped<IExternalMatchesSyncService, ExternalMatchesSyncService>();
             services.AddScoped<IIntegrationProviderFactory, IntegrationProviderFactory>();
             services.AddScoped<IExternalProviderSettings, ExternalProviderSettings>();
-           
+
+            // Registar match calculators
+            services.AddScoped<IFixtureValueCalculator, FixtureValueCalculator>();
+            services.AddScoped<IHeadToHeadCalculator, HeadToHeadCalculator>();
+            services.AddScoped<ILeagueLateStageDetector, LeagueLateStageDetector>();
+            services.AddScoped<ILeagueTableValueCalculator, LeagueTableValueCalculator>();
+            services.AddScoped<ITeamFormCalculator, TeamFormCalculator>();
+            services.AddScoped<ITitleHolderCalculator, TitleHolderCalculator>();
+            services.AddScoped<IExcitmentMatchCalculator, ExcitmentMatchCalculator>();
+
+            // Register matches services
+            services.AddScoped<IMatchesService, MatchesService>();
+
             return services;
         }
     }

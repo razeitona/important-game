@@ -27,7 +27,7 @@ namespace important_game.infrastructure.Contexts.Competitions.Data.Queries
                 IsActive,
                 UpdatedAt
             FROM Competitions 
-            WHERE id = @Id";
+            WHERE CompetitionId = @CompetitionId";
 
         internal const string SelectAllCompetitions = @"
             SELECT 

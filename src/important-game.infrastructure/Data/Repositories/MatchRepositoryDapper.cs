@@ -1,9 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using Dapper;
 using important_game.infrastructure.Contexts.Matches.Data.Entities;
-using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.Data.Connections;
 using important_game.infrastructure.Data.Repositories.Queries;
+using System.Diagnostics.CodeAnalysis;
 
 namespace important_game.infrastructure.Data.Repositories
 {
@@ -12,6 +11,8 @@ namespace important_game.infrastructure.Data.Repositories
     /// Handles complex queries involving matches, teams, competitions, and related data.
     /// </summary>
     [ExcludeFromCodeCoverage]
+
+    [Obsolete("Class to be removed")]
     public class MatchRepositoryDapper : IMatchRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
@@ -90,17 +91,6 @@ namespace important_game.infrastructure.Data.Repositories
             }
         }
 
-        public async Task SaveMatchesAsync(List<Match> matches)
-        {
-            if (matches == null || matches.Count == 0)
-                return;
-
-            foreach (var match in matches)
-            {
-                await SaveMatchAsync(match);
-            }
-        }
-
         public async Task<Match?> GetMatchByIdAsync(int id)
         {
             using (var connection = _connectionFactory.CreateConnection())
@@ -118,15 +108,6 @@ namespace important_game.infrastructure.Data.Repositories
             }
         }
 
-        public async Task<List<Match>> GetMatchesFromCompetitionAsync(int competitionId)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                var result = await connection.QueryAsync<Match>(MatchQueries.SelectMatchesFromCompetition, new { CompetitionId = competitionId });
-                return result.ToList();
-            }
-        }
-
         public async Task<List<Match>> GetCompetitionActiveMatchesAsync(int competitionId)
         {
             using (var connection = _connectionFactory.CreateConnection())
@@ -136,38 +117,11 @@ namespace important_game.infrastructure.Data.Repositories
             }
         }
 
-        public async Task<List<Match>> GetUpcomingMatchesFromCompetitionAsync(int competitionId)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                var result = await connection.QueryAsync<Match>(MatchQueries.SelectUpcomingMatchesFromCompetition, new { CompetitionId = competitionId, UpcomingStatus = (int)MatchStatus.Upcoming });
-                return result.ToList();
-            }
-        }
-
-        public async Task<List<Match>> GetLiveMatchesFromCompetitionAsync(int competitionId)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                var result = await connection.QueryAsync<Match>(MatchQueries.SelectLiveMatchesFromCompetition, new { CompetitionId = competitionId, LiveStatus = (int)MatchStatus.Live });
-                return result.ToList();
-            }
-        }
-
         public async Task<List<Match>> GetUnfinishedMatchesAsync()
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
                 var result = await connection.QueryAsync<Match>(MatchQueries.SelectUnfinishedMatches, new { FinishedStatus = (int)MatchStatus.Finished });
-                return result.ToList();
-            }
-        }
-
-        public async Task<List<Match>> GetFinishedMatchesFromCompetitionAsync(int competitionId)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                var result = await connection.QueryAsync<Match>(MatchQueries.SelectFinishedMatchesFromCompetition, new { CompetitionId = competitionId, FinishedStatus = (int)MatchStatus.Finished });
                 return result.ToList();
             }
         }

@@ -12,7 +12,7 @@ using System.Text.Json;
 namespace important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
 
 [ExcludeFromCodeCoverage]
-public sealed class FootballDataProvider : IExternalIntegrationProvider, 
+public sealed class FootballDataProvider : IExternalIntegrationProvider,
     IExternalCompetitionProvider, IExternalMatchProvider
 {
     public int Id => 1;
@@ -25,7 +25,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
     private static readonly SemaphoreSlim RateLimitSemaphore = new(1, 1);
     private readonly JsonSerializerOptions _serializerOptions;
     private ConcurrentBag<ExternalProvidersLogsEntity> _logs = new();
-    private ExternalProvidersEntity _settings = new();
+    private ExternalProvidersEntity? _settings;
 
     public FootballDataProvider(ILogger<FootballDataProvider> logger, HttpClient client, IOptions<FootballDataOptions> options, IExternalProviderSettings providerLogger)
     {
@@ -65,9 +65,19 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
         return competitionStandings;
     }
 
-    public async Task<List<ExternalMatchDto>> GetTeamFinishedMatchesAsync(int teamId, DateTimeOffset fromDate, DateTimeOffset toDate, int numberOfItems, int skipItems, CancellationToken cancellationToken = default)
+    public async Task<List<ExternalMatchDto>> GetTeamFinishedMatchesAsync(string teamId, DateTimeOffset fromDate, DateTimeOffset toDate, int numberOfItems, CancellationToken cancellationToken = default)
     {
-        var footballDataMatches = await InternalGetTeamFinishedMatchesAsync(teamId, fromDate, toDate, numberOfItems, skipItems, cancellationToken).ConfigureAwait(false);
+        var footballDataMatches = await InternalGetTeamFinishedMatchesAsync(teamId, fromDate, toDate, numberOfItems, cancellationToken).ConfigureAwait(false);
+        if (footballDataMatches == null)
+            return [];
+
+        var matches = FootballDataMapper.MapToExternalMatch(footballDataMatches);
+        return matches;
+    }
+
+    public async Task<List<ExternalMatchDto>> GetCompetitionUpcomingMatchesAsync(string competitionId, DateTimeOffset fromDate, DateTimeOffset toDate, CancellationToken cancellationToken = default)
+    {
+        var footballDataMatches = await InternalGetTeamUpcomingMatchesAsync(competitionId, fromDate, toDate, cancellationToken).ConfigureAwait(false);
         if (footballDataMatches == null)
             return [];
 
@@ -83,18 +93,16 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
     public Task<FootballDataStandingsResponse?> InternalGetCompetitionStandingsAsync(string competitionId, CancellationToken cancellationToken = default)
         => GetAsync<FootballDataStandingsResponse>($"competitions/{competitionId}/standings", cancellationToken);
     #endregion
-    public async Task<IReadOnlyList<FootballDataMatch>> GetUpcomingMatchesAsync(string competitionId, int daysAhead = 7, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FootballDataMatch>?> InternalGetTeamUpcomingMatchesAsync(string competitionId, DateTimeOffset fromDate, DateTimeOffset toDate, CancellationToken cancellationToken = default)
     {
-        var dateFrom = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
-        var dateTo = DateTime.UtcNow.Date.AddDays(daysAhead).ToString("yyyy-MM-dd");
-        var response = await GetAsync<FootballDataMatchesResponse>($"competitions/{competitionId}/matches?status=SCHEDULED&dateFrom={dateFrom}&dateTo={dateTo}", cancellationToken).ConfigureAwait(false);
+        var response = await GetAsync<FootballDataMatchesResponse>($"competitions/{competitionId}/matches?status=SCHEDULED&dateFrom={fromDate:yyyy-MM-dd}&dateTo={toDate:yyyy-MM-dd}", cancellationToken).ConfigureAwait(false);
         var matches = response?.Matches?.ToArray();
-        return matches ?? Array.Empty<FootballDataMatch>();
+        return matches;
     }
 
-    private async Task<IReadOnlyList<FootballDataMatch>?> InternalGetTeamFinishedMatchesAsync(int teamId, DateTimeOffset fromDate, DateTimeOffset toDate, int numberOfItems, int skipItems, CancellationToken cancellationToken = default)
+    private async Task<IReadOnlyList<FootballDataMatch>?> InternalGetTeamFinishedMatchesAsync(string teamId, DateTimeOffset fromDate, DateTimeOffset toDate, int numberOfItems, CancellationToken cancellationToken = default)
     {
-        var response = await GetAsync<FootballDataMatchesResponse>($"teams/{teamId}/matches?status=FINISHED&dateFrom={fromDate:yyyy-MM-dd}&dateTo={toDate:yyyy-MM-dd}&limit={numberOfItems}&offset={skipItems}", cancellationToken).ConfigureAwait(false);
+        var response = await GetAsync<FootballDataMatchesResponse>($"teams/{teamId}/matches?status=FINISHED&dateFrom={fromDate:yyyy-MM-dd}&dateTo={toDate:yyyy-MM-dd}&limit={numberOfItems}", cancellationToken).ConfigureAwait(false);
         var matches = response?.Matches?.ToArray();
         return matches;
     }
@@ -166,6 +174,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
             await RateLimitSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
+                await Task.Delay(TimeSpan.FromSeconds(6), cancellationToken).ConfigureAwait(false);
                 var now = DateTime.UtcNow;
 
                 if (IsLimitPerMinute())
@@ -186,7 +195,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
 
     private bool IsLimitPerMinute()
     {
-        if (!_settings.MaxRequestsPerMinute.HasValue)
+        if (_settings == null || !_settings.MaxRequestsPerMinute.HasValue)
             return false;
 
         var limitPerMinute = _settings.MaxRequestsPerMinute.Value;

@@ -1,17 +1,17 @@
-using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Models;
+using important_game.infrastructure.Contexts.Matches;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Globalization;
 
 namespace important_game.web.Pages
 {
-    public class IndexModel(ILogger<IndexModel> _logger, IExcitmentMatchService _matchService, IConfiguration configuration) : PageModel
+    public class IndexModel(IMatchesService _matchService) : PageModel
     {
-        public List<ExcitementMatchDto> TrendingMatches { get; set; }
-        public List<ExcitementMatchDto> OtherMatches { get; set; }
+        public List<MatchDto> TrendingMatches { get; set; }
+        public List<MatchDto> OtherMatches { get; set; }
         public async Task OnGet()
         {
-            var allMatches = await _matchService.GetAllMatchesAsync();
+            var allMatches = await _matchService.GetAllUpcomingMatchesAsync();
 
             TrendingMatches = GetTrendingMatches(allMatches);
             OtherMatches = GetUpcomingMatches(allMatches);
@@ -20,9 +20,9 @@ namespace important_game.web.Pages
         /// <summary>
         /// Extract top 5 trending matches
         /// </summary>
-        public List<ExcitementMatchDto> GetTrendingMatches(List<ExcitementMatchDto> allMatches)
+        public List<MatchDto> GetTrendingMatches(List<MatchDto> allMatches)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             CultureInfo cultureInfo = CultureInfo.CurrentCulture;
             Calendar calendar = cultureInfo.Calendar;
             CalendarWeekRule calendarWeekRule = cultureInfo.DateTimeFormat.CalendarWeekRule;
@@ -30,14 +30,14 @@ namespace important_game.web.Pages
             int weekNumber = calendar.GetWeekOfYear(now, calendarWeekRule, DayOfWeek.Monday);
 
             var matchesOfWeek = allMatches.Where(c =>
-                c.MatchDate > now &&
-                calendar.GetWeekOfYear(c.MatchDate.Date, calendarWeekRule, DayOfWeek.Monday) == weekNumber
-                && c.ExcitementScore >= 0.6d
-            ).OrderByDescending(c => c.ExcitementScore).Take(5).ToList();
+                c.MatchDateUTC > now &&
+                calendar.GetWeekOfYear(c.MatchDateUTC.Date, calendarWeekRule, DayOfWeek.Monday) == weekNumber
+                && c.ExcitmentScore >= 0.6d
+            ).OrderByDescending(c => c.ExcitmentScore).Take(5).ToList();
 
-            var ids = matchesOfWeek.Select(c => c.Id).ToHashSet();
+            var ids = matchesOfWeek.Select(c => c.MatchId).ToHashSet();
 
-            allMatches.RemoveAll(m => ids.Contains(m.Id));
+            allMatches.RemoveAll(m => ids.Contains(m.MatchId));
 
             return matchesOfWeek;
         }
@@ -46,14 +46,10 @@ namespace important_game.web.Pages
         /// <summary>
         /// Extract all live games and top 5 upcoming games
         /// </summary>
-        public List<ExcitementMatchDto> GetUpcomingMatches(List<ExcitementMatchDto> allMatches)
+        public List<MatchDto> GetUpcomingMatches(List<MatchDto> allMatches)
         {
-            var upcomingMatches = allMatches.Where(c => c.IsLive).ToList();
-
-            upcomingMatches.AddRange(allMatches
-                .Where(c => !c.IsLive)
-                .Take(10));
-
+            var upcomingMatches = allMatches.ToList();
+            upcomingMatches.AddRange(allMatches.Take(10));
             return upcomingMatches;
         }
     }

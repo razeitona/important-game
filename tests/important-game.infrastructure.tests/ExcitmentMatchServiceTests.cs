@@ -12,6 +12,7 @@ using important_game.infrastructure.ImportantMatch.Models;
 using Moq;
 using HeadToHeadEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Headtohead;
 using MatchEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Match;
+using important_game.infrastructure.Contexts.Matches.Data;
 
 namespace important_game.infrastructure.tests.ImportantMatch;
 

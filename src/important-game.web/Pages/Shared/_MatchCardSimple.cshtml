@@ -1,23 +1,24 @@
 ﻿@using System.Globalization
-@using important_game.infrastructure.ImportantMatch.Models
-@model ExcitementMatchDto
+@using important_game.infrastructure.Contexts.Matches.Data.Entities
+@using important_game.infrastructure.Extensions
+@model MatchDto
 
 <div class="card match-card-simple"
-     style="--bgcolor: @(Model.League.BackgroundColor);"
-     data-game-day="@Model.MatchDate.ToString("MMMdd")"
-     data-game-date="@Model.MatchDate.Ticks"
-     data-game-score="@(Math.Round(Model.ExcitementScore * 100, 0))"
-     data-game-league="@Model.League.Id"
-     id="game-@(Model.HomeTeam.Slug)v@(Model.AwayTeam.Slug)">
-    <a href="/match/@(Model.Id)" class="match-card-link">
+     style="--bgcolor: @(Model.CompetitionBackgroundColor);"
+     data-game-day="@Model.MatchDateUTC.ToString("MMMdd")"
+     data-game-date="@Model.MatchDateUTC.Ticks"
+     data-game-score="@(Math.Round(Model.ExcitmentScore * 100, 0))"
+     data-game-league="@Model.CompetitionId"
+     id="game-@(SlugHelper.GenerateSlug(Model.HomeTeamName))v@(SlugHelper.GenerateSlug(Model.AwayTeamName))">
+    <a href="/match/@(Model.MatchId)" class="match-card-link">
         <div class="card-header match-header">
             <div>
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.League.Id  + "/image")" alt="@Model.League.Name" width="1.2rem" />
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.CompetitionId + "/image")" alt="@Model.CompetitionName" width="1.2rem" />
             </div>
             <div class="match-header-title">
-                @Model.League.Name
+                @Model.CompetitionName
             </div>
-            @if (Model.IsLive)
+            @if (false)
             {
                 <div class="match-card-live">
                     <span>Live</span>
@@ -27,7 +28,7 @@
             {
                 <div class="match-card-time">
                     <time>
-                        @Model.MatchDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                        @Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
             }
@@ -36,30 +37,31 @@
             <div class="match-card-content">
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeam.Id + "/image")" alt="@(Model.HomeTeam.Name)" width="60px" />
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeamId + "/image")" alt="@(Model.HomeTeamName)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
-                        <span>@Model.HomeTeam.Name</span>
+                        <span>@Model.HomeTeamName</span>
                     </div>
                 </div>
                 <div class="match-card-score">
-                    <div class="match-card-score-value" title="Excitement Score" data-es="@(Math.Round(Model.ExcitementScore, 2).ToString().Replace(",", "."))">
-                        @if (Model.IsLive)
+                    <div class="match-card-score-value" title="Excitement Score" data-es="@(Math.Round(Model.ExcitmentScore, 2).ToString().Replace(",", "."))">
+                        @if (false)
                         {
-                            @(Math.Round(Model.LiveExcitementScore * 100, 0))
-                        } else
+                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                        }
+                        else
                         {
-                            @(Math.Round(Model.ExcitementScore * 100, 0))
+                            @(Math.Round(Model.ExcitmentScore * 100, 0))
                         }
                     </div>
                     <span>Excitment score</span>
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeam.Id + "/image")" alt="@(Model.AwayTeam.Name)" width="60px" />
+                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeamId + "/image")" alt="@(Model.AwayTeamName)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
-                        <span>@Model.AwayTeam.Name</span>
+                        <span>@Model.AwayTeamName</span>
                     </div>
                 </div>
             </div>

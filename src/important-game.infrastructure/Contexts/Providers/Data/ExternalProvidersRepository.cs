@@ -167,6 +167,16 @@ public class ExternalProvidersRepository(IDbConnectionFactory connectionFactory)
         }
     }
 
+    public async Task<ExternalProviderCompetitionsEntity?> GetExternalCompetitionByExternalIdAsync(int providerId, string externalId)
+    {
+        using (var connection = _connectionFactory.CreateConnection())
+        {
+            return await connection.QueryFirstOrDefaultAsync<ExternalProviderCompetitionsEntity>(
+                ExternalProviderCompetitionsQueries.SelectExternalCompetitionByExternalId,
+                new { ProviderId = providerId, ExternalCompetitionId = externalId });
+        }
+    }
+
     public async Task<List<ExternalProviderCompetitionsEntity>> GetExternalIntegrationCompetitionsByIntegrationAsync(int providerId)
     {
         using (var connection = _connectionFactory.CreateConnection())
@@ -227,7 +237,66 @@ public class ExternalProvidersRepository(IDbConnectionFactory connectionFactory)
         }
     }
 
+    public async Task<ExternalProviderCompetitionSeasonsEntity?> GetExternalProviderCompetitionSeasonByExternalIdAsync(int providerId, string externalSeasonId)
+    {
+        using (var connection = _connectionFactory.CreateConnection())
+        {
+            return await connection.QueryFirstOrDefaultAsync<ExternalProviderCompetitionSeasonsEntity>(
+                ExternalProviderCompetitionSeasonsQueries.SelectExternalProviderCompetitionSeasonByExternalId,
+                new { ProviderId = providerId, ExternalSeasonId = externalSeasonId });
+        }
+    }
+
     #endregion
 
+    #region Matches Integration
+
+    public async Task SaveExternalProviderMatchAsync(ExternalProviderMatchesEntity entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(
+            ExternalProviderMatchesQueries.InsertExternalProviderMatch,
+            new
+            {
+                entity.ProviderId,
+                entity.InternalMatchId,
+                entity.ExternalMatchId
+            });
+    }
+
+    public async Task<ExternalProviderMatchesEntity?> GetExternalProviderMatchAsync(int providerId, int internalMatchId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        return await connection.QueryFirstOrDefaultAsync<ExternalProviderMatchesEntity>(
+            ExternalProviderMatchesQueries.SelectExternalProviderMatchByIds,
+            new
+            {
+                ProviderId = providerId,
+                InternalMatchId = internalMatchId
+            });
+    }
+
+    public async Task<List<ExternalProviderMatchesEntity>> GetExternalProviderMatchesByProviderAsync(int providerId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<ExternalProviderMatchesEntity>(
+            ExternalProviderMatchesQueries.SelectExternalProviderMatchesByProvider,
+            new { ProviderId = providerId });
+        return result.ToList();
+    }
+
+    public async Task DeleteExternalProviderMatchAsync(int providerId, int internalMatchId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(ExternalProviderMatchesQueries.DeleteExternalProviderMatch, new
+        {
+            ProviderId = providerId,
+            InternalMatchId = internalMatchId
+        });
+    }
+    #endregion
 
 }

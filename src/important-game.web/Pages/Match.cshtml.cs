@@ -1,14 +1,13 @@
-using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Data.Entities;
-using important_game.web.Models;
+using important_game.infrastructure.Contexts.Matches;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace important_game.web.Pages
 {
-    public class MatchModel(ILogger<MatchModel> _logger, IExcitmentMatchService _matchService) : PageModel
+    public class MatchModel(ILogger<MatchModel> _logger, IMatchesService _matchService) : PageModel
     {
-        public ExcitmentMatchDetailResponse MatchInfo { get; private set; }
+        public MatchDetailDto MatchInfo { get; private set; }
 
 
         public async Task OnGet([FromRoute] int id)
@@ -18,23 +17,25 @@ namespace important_game.web.Pages
             if (match == null)
                 return;
 
-            MatchInfo = new ExcitmentMatchDetailResponse
-            {
-                AwayTeam = match.AwayTeam,
-                ExcitementScore = match.ExcitementScore,
-                Headtohead = match.Headtohead,
-                HomeTeam = match.HomeTeam,
-                Id = match.Id,
-                League = match.League,
-                MatchDate = match.MatchDate,
-                ExcitmentScoreDetail = match.ExcitmentScoreDetail,
-                IsLive = match.IsLive,
-                IsRivalry = match.ExcitmentScoreDetail.Any(c => c.Key == "Rivalry" && c.Value.Value > 0d),
-                HasTitleHolder = match.HomeTeam.IsTitleHolder || match.AwayTeam.IsTitleHolder,
-                Description = match.Description,
-                LiveExcitementScore = match.LiveExcitementScore
-                //Score = match.Score,
-            };
+            MatchInfo = match;
+
+            //MatchInfo = new ExcitmentMatchDetailResponse
+            //{
+            //    AwayTeam = match.AwayTeam,
+            //    ExcitementScore = match.ExcitementScore,
+            //    Headtohead = match.Headtohead,
+            //    HomeTeam = match.HomeTeam,
+            //    Id = match.Id,
+            //    League = match.League,
+            //    MatchDate = match.MatchDate,
+            //    ExcitmentScoreDetail = match.ExcitmentScoreDetail,
+            //    IsLive = match.IsLive,
+            //    IsRivalry = match.ExcitmentScoreDetail.Any(c => c.Key == "Rivalry" && c.Value.Value > 0d),
+            //    HasTitleHolder = match.HomeTeam.IsTitleHolder || match.AwayTeam.IsTitleHolder,
+            //    Description = match.Description,
+            //    LiveExcitementScore = match.LiveExcitementScore
+            //    //Score = match.Score,
+            //};
 
         }
 

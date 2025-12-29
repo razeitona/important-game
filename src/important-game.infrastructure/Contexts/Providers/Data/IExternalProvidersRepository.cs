@@ -27,6 +27,7 @@ public interface IExternalProvidersRepository
     #region Competition Integration
     Task SaveExternalIntegrationCompetitionAsync(ExternalProviderCompetitionsEntity entity);
     Task<ExternalProviderCompetitionsEntity?> GetExternalIntegrationCompetitionAsync(int providerId, int internalCompetitionId);
+    Task<ExternalProviderCompetitionsEntity?> GetExternalCompetitionByExternalIdAsync(int providerId, string externalId);
     Task<List<ExternalProviderCompetitionsEntity>> GetExternalIntegrationCompetitionsByIntegrationAsync(int providerId);
     Task DeleteExternalIntegrationCompetitionAsync(int providerId, int internalCompetitionId);
     #endregion
@@ -34,5 +35,13 @@ public interface IExternalProvidersRepository
     #region Competition Seasons Integration
     Task SaveExternalProviderCompetitionSeasonAsync(ExternalProviderCompetitionSeasonsEntity entity);
     Task<ExternalProviderCompetitionSeasonsEntity?> GetExternalProviderCompetitionSeasonAsync(int providerId, int seasonId);
+    Task<ExternalProviderCompetitionSeasonsEntity?> GetExternalProviderCompetitionSeasonByExternalIdAsync(int providerId, string externalSeasonId);
+    #endregion
+
+    #region Matches Integration
+    Task SaveExternalProviderMatchAsync(ExternalProviderMatchesEntity entity);
+    Task<ExternalProviderMatchesEntity?> GetExternalProviderMatchAsync(int providerId, int internalMatchId);
+    Task<List<ExternalProviderMatchesEntity>> GetExternalProviderMatchesByProviderAsync(int providerId);
+    Task DeleteExternalProviderMatchAsync(int providerId, int internalMatchId);
     #endregion
 }

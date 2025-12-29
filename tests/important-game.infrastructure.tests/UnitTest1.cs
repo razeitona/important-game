@@ -16,6 +16,7 @@ using HeadToHeadEntity = important_game.infrastructure.Contexts.Matches.Data.Ent
 using MatchEntity = important_game.infrastructure.Contexts.Matches.Data.Entities.Match;
 using important_game.infrastructure.Contexts.Competitions.Data;
 using important_game.infrastructure.Contexts.Teams.Data;
+using important_game.infrastructure.Contexts.Matches.Data;
 
 namespace important_game.infrastructure.tests.ImportantMatch;
 
@@ -64,10 +65,6 @@ public class ExcitementMatchProcessorTests
         teamRepository.Setup(r => r.SaveTeamAsync(It.IsAny<Team>()))
             .ReturnsAsync((Team team) => team);
 
-        var rivalryRepository = new Mock<IRivalryRepository>();
-        rivalryRepository.Setup(r => r.GetRivalryByTeamIdAsync(scenario.HomeTeam.Id, scenario.AwayTeam.Id))
-            .ReturnsAsync(scenario.Rivalry);
-
         var headToHeadRepository = new Mock<IHeadToHeadRepository>();
 
         MatchEntity? capturedMatch = null;
@@ -85,7 +82,6 @@ public class ExcitementMatchProcessorTests
             matchRepository.Object,
             competitionRepository.Object,
             teamRepository.Object,
-            rivalryRepository.Object,
             headToHeadRepository.Object,
             Mock.Of<ITelegramBot>());
 
@@ -181,7 +177,6 @@ public class ExcitementMatchProcessorTests
             .ReturnsAsync(new List<CompetitionEntity> { scenario.Competition });
 
         var teamRepository = new Mock<ITeamRepository>();
-        var rivalryRepository = new Mock<IRivalryRepository>();
         var headToHeadRepository = new Mock<IHeadToHeadRepository>();
 
         var processor = new ExcitementMatchProcessor(
@@ -189,7 +184,6 @@ public class ExcitementMatchProcessorTests
             matchRepository.Object,
             competitionRepository.Object,
             teamRepository.Object,
-            rivalryRepository.Object,
             headToHeadRepository.Object,
             Mock.Of<ITelegramBot>());
 
@@ -199,7 +193,6 @@ public class ExcitementMatchProcessorTests
         // Assert
         matchRepository.Verify(r => r.SaveMatchAsync(It.IsAny<MatchEntity>()), Times.Never);
         headToHeadRepository.Verify(r => r.SaveHeadToHeadMatchesAsync(It.IsAny<List<HeadToHeadEntity>>()), Times.Never);
-        rivalryRepository.Verify(r => r.GetRivalryByTeamIdAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
         teamRepository.Verify(r => r.SaveTeamAsync(It.IsAny<Team>()), Times.Never);
     }
 
@@ -222,7 +215,6 @@ public class ExcitementMatchProcessorTests
             .ReturnsAsync(new List<CompetitionEntity> { scenario.Competition });
 
         var teamRepository = new Mock<ITeamRepository>();
-        var rivalryRepository = new Mock<IRivalryRepository>();
         var headToHeadRepository = new Mock<IHeadToHeadRepository>();
 
         var processor = new ExcitementMatchProcessor(
@@ -230,7 +222,6 @@ public class ExcitementMatchProcessorTests
             matchRepository.Object,
             competitionRepository.Object,
             teamRepository.Object,
-            rivalryRepository.Object,
             headToHeadRepository.Object,
             Mock.Of<ITelegramBot>());
 
@@ -267,10 +258,6 @@ public class ExcitementMatchProcessorTests
         teamRepository.Setup(r => r.SaveTeamAsync(It.IsAny<Team>()))
             .ReturnsAsync((Team t) => t);
 
-        var rivalryRepository = new Mock<IRivalryRepository>();
-        rivalryRepository.Setup(r => r.GetRivalryByTeamIdAsync(scenario.HomeTeam.Id, scenario.AwayTeam.Id))
-            .ReturnsAsync(scenario.Rivalry);
-
         var headToHeadRepository = new Mock<IHeadToHeadRepository>();
 
         MatchEntity? captured = null;
@@ -283,7 +270,6 @@ public class ExcitementMatchProcessorTests
             matchRepository.Object,
             competitionRepository.Object,
             teamRepository.Object,
-            rivalryRepository.Object,
             headToHeadRepository.Object,
             Mock.Of<ITelegramBot>());
 
@@ -394,7 +380,7 @@ public class ExcitementMatchProcessorTests
             }
         };
 
-        var rivalry = new Rivalry { RivarlyValue = 0.8 };
+        var rivalry = new RivalryEntity { RivarlyValue = 0.8 };
 
         return new Scenario(competition, league, homeTeam, awayTeam, fixture, leagueStanding, rivalry);
     }
@@ -552,7 +538,7 @@ public class ExcitementMatchProcessorTests
         TeamInfo AwayTeam,
         UpcomingFixture Fixture,
         LeagueStanding LeagueStanding,
-        Rivalry Rivalry);
+        RivalryEntity Rivalry);
 }
 
 

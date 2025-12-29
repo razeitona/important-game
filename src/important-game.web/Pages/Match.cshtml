@@ -9,7 +9,7 @@
 
     if (matchInfo != null)
     {
-        ViewData["Title"] = $"{matchInfo.HomeTeam.Name} v {matchInfo.AwayTeam.Name} - Excitement Analysis & Live Updates";
+        ViewData["Title"] = $"{matchInfo.HomeTeamName} v {matchInfo.AwayTeamName} - Excitement Analysis & Live Updates";
     }
     else
     {
@@ -26,21 +26,21 @@
 
 @section Header {
     @{
-        var teamId = matchInfo.HomeTeam.Id;
+        var teamId = matchInfo.HomeTeamId;
 
         if (matchInfo.AwayTeam.IsTitleHolder || matchInfo.AwayTeam.TablePosition < matchInfo.HomeTeam.TablePosition)
-            teamId = matchInfo.AwayTeam.Id;
+            teamId = matchInfo.AwayTeamId;
 
-        var url = "https://matchtowatch.net/match/" + matchInfo.Id;
+        var url = "https://matchtowatch.net/match/" + matchInfo.MatchId;
         var image = "https://api.sofascore.app/api/v1/team/" + teamId + "/image";
     }
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@Html.Raw(matchInfo.HomeTeam.Name) vs @Html.Raw(matchInfo.AwayTeam.Name) - Match to watch">
-    <meta name="twitter:description" content="Follow the @Html.Raw(matchInfo.League.Name) match on @matchInfo.MatchDate.ToString("dd/MM/yyyy HH:mm") UTC time. Excitement Score: @(Math.Round((matchInfo.IsLive ? matchInfo.LiveExcitementScore : matchInfo.ExcitementScore)*100,0)). Key moments and stats here!">
+    <meta name="twitter:title" content="@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName) - Match to watch">
+    <meta name="twitter:description" content="Follow the @Html.Raw(matchInfo.CompetitionName) match on @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm") UTC time. Excitement Score: @(Math.Round((/* matchInfo.IsLive  */ false ? 0d /* matchInfo.LiveExcitementScore */ : matchInfo.ExcitmentScore)*100,0)). Key moments and stats here!">
     <meta name="twitter:image" content="@image">
     <meta name="twitter:url" content="@url">
 }
-<div class="match-detail" data-live="@matchInfo.IsLive">
+<div class="match-detail" data-live="@(false)@* matchInfo.IsLive *@">
     <div class="match-detail-content-left">
         <span class="match-detail-back"><i class="bi bi-arrow-left"></i>BACK</span>
         <div class="match-detail-info match-detail-card">
@@ -49,25 +49,25 @@
                     <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id + "/image")" alt="@(matchInfo.League.Name)" />
                 </div>
                 <div class="match-detail-league-title">
-                    @matchInfo.League.Name
+                    @matchInfo.CompetitionName
                 </div>
                 <div class="match-detail-time">
                     <time>
-                        @matchInfo.MatchDate.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                        @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
             </div>
             <div class="match-detail-teams">
                 <div class="match-detail-team-info">
-                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
-                    <p>@matchInfo.HomeTeam.Name</p>
+                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeamId + "/image")" alt="@(matchInfo.HomeTeamName)" />
+                    <p>@matchInfo.HomeTeamName</p>
                 </div>
                 <div class="match-detail-team-label">
                     <span>vs</span>
                 </div>
                 <div class="match-detail-team-info">
-                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
-                    <p>@matchInfo.AwayTeam.Name</p>
+                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeamId + "/image")" alt="@(matchInfo.AwayTeamName)" />
+                    <p>@matchInfo.AwayTeamName</p>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
             <div class="match-detail-info-h2h-content">
                 @if (matchInfo.Headtohead.Count == 0)
                 {
-                    <span class="match-detail-info-h2h-empty">No matches between <i>@(matchInfo.HomeTeam.Name)</i> and <i>@(matchInfo.AwayTeam.Name)</i> the past two years </span>
+                    <span class="match-detail-info-h2h-empty">No matches between <i>@(matchInfo.HomeTeamName)</i> and <i>@(matchInfo.AwayTeamName)</i> the past two years </span>
                 }
                 else
                 {
@@ -117,7 +117,7 @@
             <h1>Recent Form</h1>
             <div class="match-detail-info-form-content">
                 <div>
-                    <span>@matchInfo.HomeTeam.Name</span>
+                    <span>@matchInfo.HomeTeamName</span>
                     <div>
                         @foreach (var form in matchInfo.HomeTeam.Form)
                         {
@@ -133,7 +133,7 @@
                     </div>
                 </div>
                 <div>
-                    <span>@matchInfo.AwayTeam.Name</span>
+                    <span>@matchInfo.AwayTeamName</span>
                     <div>
                         @foreach (var form in matchInfo.AwayTeam.Form)
                         {
@@ -210,7 +210,6 @@
                 <span>Excitement Score</span>
             </div>
             <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitementScore * 100, 0))</div>
-            @* <p>This match has high excitement potential due to its significant impact on league standings and the historical rivalry between the teams.</p> *@
             <p>@matchInfo.Description</p>
         </div>
 
@@ -222,23 +221,6 @@
 
     <script>
         $(document).ready(function () {
-            // $("time").each(function (elem) {
-            //     var utctimeval = $(this).html().trim();
-            //     var date = new Date(utctimeval);
-            //     var optionsDate = {
-            //         day: "2-digit",
-            //         month: "2-digit",
-            //         year: "numeric",
-            //     };
-            //     var optionsTime = {
-            //         hour: "numeric",
-            //         minute: "numeric",
-            //     };
-            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            // });
-
-
-
             $(".match-detail-back").on("click", function () {
                 history.back();
             });

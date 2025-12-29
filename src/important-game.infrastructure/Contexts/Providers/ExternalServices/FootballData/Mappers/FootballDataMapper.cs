@@ -4,15 +4,15 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrat
 namespace important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData.Mappers;
 public static class FootballDataMapper
 {
-    public static ExternalCompetitionDto MapToExternalCompetition(FootballDataCompetition competition)
+    public static ExternalCompetitionDto? MapToExternalCompetition(FootballDataCompetition? competition)
     {
+        if (competition == null)
+            return null;
+
         var externalCompetition = new ExternalCompetitionDto();
         externalCompetition.Id = competition.Code!;
         externalCompetition.Name = competition.Name;
-        externalCompetition.CurrentSeason = new ExternalSeasonDto();
-        externalCompetition.CurrentSeason.Id = competition.CurrentSeason!.Id.ToString();
-        externalCompetition.CurrentSeason.StartDate = competition.CurrentSeason.StartDate;
-        externalCompetition.CurrentSeason.EndDate = competition.CurrentSeason.EndDate;
+        externalCompetition.CurrentSeason = MapToExternalSeason(competition.CurrentSeason);
         return externalCompetition;
     }
 
@@ -65,11 +65,12 @@ public static class FootballDataMapper
             externalMatch.MatchDateUtc = footballMatch.UtcDate;
             externalMatch.HomeTeam = MapToExternalTeamDto(footballMatch.HomeTeam);
             externalMatch.AwayTeam = MapToExternalTeamDto(footballMatch.AwayTeam);
-            externalMatch.HomeGoals = footballMatch.Score.FullTime.Home!.Value;
-            externalMatch.AwayGoals = footballMatch.Score.FullTime.Away!.Value;
+            externalMatch.HomeGoals = footballMatch.Score?.FullTime?.Home ?? null;
+            externalMatch.AwayGoals = footballMatch.Score?.FullTime?.Away ?? null;
 
             externalMatch.RoundId = footballMatch.Matchday;
-            externalMatch.SeasonId = footballMatch.Season?.Id.ToString();
+            externalMatch.Competition = MapToExternalCompetition(footballMatch.Competition);
+            externalMatch.Season = MapToExternalSeason(footballMatch.Season);
 
             externalMatches.Add(externalMatch);
         }
@@ -85,5 +86,18 @@ public static class FootballDataMapper
         team.ShortName = footballTeam.ShortName;
         team.ThreeLetterName = footballTeam.Tla;
         return team;
+    }
+
+    private static ExternalSeasonDto? MapToExternalSeason(FootballDataSeason? dataSeason)
+    {
+        if (dataSeason == null)
+            return null;
+
+        var season = new ExternalSeasonDto();
+        season.Id = dataSeason.Id.ToString();
+        season.StartDate = dataSeason.StartDate;
+        season.EndDate = dataSeason.EndDate;
+
+        return season;
     }
 }

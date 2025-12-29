@@ -14,8 +14,9 @@ builder.Services.AddSassCompiler();
 
 builder.Services.MatchImportanceInfrastructure(builder.Configuration);
 
-builder.Services.AddHostedService<SyncCompetitionJob>();
-//builder.Services.AddHostedService<MatchCalculatorJob>();
+//builder.Services.AddHostedService<SyncCompetitionJob>();
+//builder.Services.AddHostedService<SyncMatchesJob>();
+builder.Services.AddHostedService<MatchCalculatorJob>();
 //builder.Services.AddHostedService<LiveMatchCalculatorJob>();
 
 Batteries.Init();

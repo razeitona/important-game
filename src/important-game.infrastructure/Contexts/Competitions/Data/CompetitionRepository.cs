@@ -54,11 +54,11 @@ public class CompetitionRepository : ICompetitionRepository
         }
     }
 
-    public async Task<CompetitionEntity?> GetCompetitionByIdAsync(int id)
+    public async Task<CompetitionEntity?> GetCompetitionByIdAsync(int competitionId)
     {
         using (var connection = _connectionFactory.CreateConnection())
         {
-            return await connection.QueryFirstOrDefaultAsync<CompetitionEntity>(CompetitionQueries.SelectCompetitionById, new { Id = id });
+            return await connection.QueryFirstOrDefaultAsync<CompetitionEntity>(CompetitionQueries.SelectCompetitionById, new { CompetitionId = competitionId });
         }
     }
 
@@ -195,7 +195,7 @@ public class CompetitionRepository : ICompetitionRepository
         }
     }
 
-    public async Task<List<CompetitionTableEntity>> GetByCompetitionAndSeasonAsync(int competitionId, int seasonId)
+    public async Task<List<CompetitionTableEntity>> GetCompetitionTableAsync(int competitionId, int seasonId)
     {
         using (var connection = _connectionFactory.CreateConnection())
         {
@@ -203,16 +203,6 @@ public class CompetitionRepository : ICompetitionRepository
                 CompetitionTableQueries.SelectCompetitionTableByCompetitionAndSeason,
                 new { CompetitionId = competitionId, SeasonId = seasonId });
             return result.ToList();
-        }
-    }
-
-    public async Task<CompetitionTableEntity?> GetByTeamCompetitionAndSeasonAsync(int teamId, int competitionId, int seasonId)
-    {
-        using (var connection = _connectionFactory.CreateConnection())
-        {
-            return await connection.QueryFirstOrDefaultAsync<CompetitionTableEntity>(
-                CompetitionTableQueries.SelectCompetitionTableByTeamCompetitionAndSeason,
-                new { CompetitionId = competitionId, SeasonId = seasonId, TeamId = teamId });
         }
     }
     #endregion

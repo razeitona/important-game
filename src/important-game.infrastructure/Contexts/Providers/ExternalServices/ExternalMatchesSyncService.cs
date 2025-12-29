@@ -1,6 +1,7 @@
 using FuzzySharp;
 using important_game.infrastructure.Contexts.Competitions.Data;
-using important_game.infrastructure.Contexts.Competitions.Data.Entities;
+using important_game.infrastructure.Contexts.Matches.Data;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using important_game.infrastructure.Contexts.Providers.Data;
 using important_game.infrastructure.Contexts.Providers.Data.Entities;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrations;
@@ -14,37 +15,452 @@ namespace important_game.infrastructure.Contexts.Providers.ExternalServices;
 
 public interface IExternalMatchesSyncService
 {
-    Task SyncMatchesAsync(CancellationToken cancellationToken = default);
+    Task SyncFinishedMatchesAsync(CancellationToken cancellationToken = default);
+    Task SyncUpcomingMatchesAsync(CancellationToken cancellationToken = default);
 }
 
 [ExcludeFromCodeCoverage]
 public class ExternalMatchesSyncService : IExternalMatchesSyncService
 {
-    private const string CurrentSeasonYear = "2025/2026";
-
     private readonly IIntegrationProviderFactory _integrationProvider;
-    private readonly IExternalProvidersRepository _externalIntegrationRepository;
+    private readonly IExternalProvidersRepository _externalProvidersRepository;
     private readonly ICompetitionRepository _competitionRepository;
     private readonly ITeamRepository _teamRepository;
+    private readonly IMatchesRepository _matchesRepository;
     private readonly ILogger<ExternalMatchesSyncService> _logger;
 
     public ExternalMatchesSyncService(
         IIntegrationProviderFactory integrationProvider,
-        IExternalProvidersRepository externalIntegrationRepository,
+        IExternalProvidersRepository externalProvidersRepository,
         ITeamRepository teamRepository,
         ICompetitionRepository competitionRepository,
+        IMatchesRepository matchesRepository,
         ILogger<ExternalMatchesSyncService> logger)
     {
         _integrationProvider = integrationProvider ?? throw new ArgumentNullException(nameof(integrationProvider));
         _teamRepository = teamRepository ?? throw new ArgumentNullException(nameof(teamRepository));
-        _externalIntegrationRepository = externalIntegrationRepository ?? throw new ArgumentNullException(nameof(externalIntegrationRepository));
+        _externalProvidersRepository = externalProvidersRepository ?? throw new ArgumentNullException(nameof(externalProvidersRepository));
         _competitionRepository = competitionRepository ?? throw new ArgumentNullException(nameof(competitionRepository));
+        _matchesRepository = matchesRepository ?? throw new ArgumentNullException(nameof(matchesRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task SyncMatchesAsync(CancellationToken cancellationToken = default)
+    public async Task SyncFinishedMatchesAsync(CancellationToken cancellationToken = default)
     {
-       
+        try
+        {
+            _logger.LogInformation("Starting synchronization of matches from external providers");
+
+            var provider = _integrationProvider.GetBest<IExternalMatchProvider>();
+            var teamsInCompetitions = await GetTeamsFromCompetitionTableAsync();
+
+            _logger.LogInformation("Found {TeamCount} unique teams in CompetitionTable", teamsInCompetitions.Count);
+
+            var listOfTeams = await _teamRepository.GetAllTeamsAsync();
+            var externalIntegrationTeams = await _externalProvidersRepository.GetExternalIntegrationTeamsByIntegrationAsync(provider.Id);
+            foreach (var teamId in teamsInCompetitions)
+            {
+                var externalTeam = externalIntegrationTeams.FirstOrDefault(c => c.InternalTeamId == teamId);
+                if (externalTeam == null)
+                    continue;
+                await SyncTeamFinishedMatchesAsync(provider, teamId, externalTeam.ExternalTeamId, listOfTeams, cancellationToken);
+            }
+
+            _logger.LogInformation("Successfully synchronized matches from external providers");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error synchronizing matches");
+            throw;
+        }
     }
 
+    public async Task SyncUpcomingMatchesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("Starting synchronization of matches from external providers");
+
+            var provider = _integrationProvider.GetBest<IExternalMatchProvider>();
+            var activeCompetitions = await _competitionRepository.GetActiveCompetitionsAsync();
+
+            _logger.LogInformation("Found {CompetitionCount} unique competition", activeCompetitions.Count);
+
+            var listOfTeams = await _teamRepository.GetAllTeamsAsync();
+            foreach (var competition in activeCompetitions)
+            {
+                var externalCompetition = await _externalProvidersRepository.GetExternalIntegrationCompetitionAsync(provider.Id, competition.CompetitionId);
+                if (externalCompetition == null)
+                    continue;
+                await SyncCompetitionUpcomingMatchesAsync(provider, externalCompetition.InternalCompetitionId, externalCompetition.ExternalCompetitionId, listOfTeams, cancellationToken);
+            }
+
+            _logger.LogInformation("Successfully synchronized matches from external providers");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error synchronizing matches");
+            throw;
+        }
+    }
+
+    private async Task<List<int>> GetTeamsFromCompetitionTableAsync()
+    {
+        var activeCompetitions = await _competitionRepository.GetActiveCompetitionsAsync();
+        var uniqueTeamIds = new HashSet<int>();
+
+        foreach (var competition in activeCompetitions)
+        {
+            var latestSeason = await _competitionRepository.GetLatestCompetitionSeasonAsync(competition.CompetitionId);
+            if (latestSeason == null)
+                continue;
+
+            var tableData = await _competitionRepository.GetCompetitionTableAsync(competition.CompetitionId, latestSeason.SeasonId);
+
+            foreach (var row in tableData)
+            {
+                uniqueTeamIds.Add(row.TeamId);
+            }
+        }
+
+        return uniqueTeamIds.ToList();
+    }
+
+    private async Task SyncTeamFinishedMatchesAsync(
+        IExternalMatchProvider provider,
+        int internalTeamId,
+        string externalTeamId,
+        List<TeamEntity> listOfTeams,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation("Starting synchronization of matches for team {TeamId}", internalTeamId);
+
+            DateTimeOffset dateFrom = DateTimeOffset.UtcNow.AddYears(-2);
+            DateTimeOffset dateTo = dateFrom.AddDays(100);
+            DateTimeOffset currentDate = DateTimeOffset.UtcNow;
+
+            while (true)
+            {
+                var externalMatches = await provider.GetTeamFinishedMatchesAsync(
+                    externalTeamId,
+                    dateFrom,
+                    dateTo,
+                    100,
+                    cancellationToken);
+
+                await ProcessAndSaveFinishedMatchesAsync(provider.Id, externalMatches, listOfTeams, cancellationToken);
+
+                dateFrom = dateTo.AddDays(1);
+                dateTo = dateFrom.AddDays(100);
+
+                if (currentDate < dateFrom)
+                    break;
+            }
+
+            _logger.LogInformation("Completed synchronization of matches for team {TeamId}", internalTeamId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error synchronizing matches for team {TeamId}", internalTeamId);
+        }
+    }
+
+    private async Task SyncCompetitionUpcomingMatchesAsync(
+        IExternalMatchProvider provider,
+        int internalCompetitionId,
+        string externalCompetitionId,
+        List<TeamEntity> listOfTeams,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogInformation("Starting synchronization of matches for team {CompetitionId}", internalCompetitionId);
+
+            DateTimeOffset dateFrom = DateTimeOffset.UtcNow;
+            DateTimeOffset dateTo = dateFrom.AddDays(15);
+
+            var externalMatches = await provider.GetCompetitionUpcomingMatchesAsync(
+                externalCompetitionId,
+                dateFrom,
+                dateTo,
+                cancellationToken);
+
+            await ProcessAndSaveUpcomingMatchesAsync(provider.Id, internalCompetitionId, externalMatches, listOfTeams, cancellationToken);
+
+            _logger.LogInformation("Completed synchronization of matches for team {CompetitionId}", internalCompetitionId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error synchronizing matches for team {CompetitionId}", internalCompetitionId);
+        }
+    }
+
+    private async Task ProcessAndSaveFinishedMatchesAsync(
+        int providerId,
+        List<ExternalMatchDto> externalMatches,
+        List<TeamEntity> listOfTeams,
+        CancellationToken cancellationToken)
+    {
+        var matchesToSave = new List<Match>();
+
+        var externalProviderMatches = await _externalProvidersRepository.GetExternalProviderMatchesByProviderAsync(providerId);
+
+        foreach (var externalMatch in externalMatches)
+        {
+            // Identify external Match mapping
+            var existingExternalMatch = externalProviderMatches.FirstOrDefault(c => c.ExternalMatchId == externalMatch.Id);
+            if (existingExternalMatch != null)
+                continue;
+
+            // Identify or create home team
+            var homeTeam = await FindOrCreateTeamAsync(providerId, externalMatch.HomeTeam, listOfTeams);
+            if (homeTeam == null)
+                continue;
+
+            // Identify or create away team
+            var awayTeam = await FindOrCreateTeamAsync(providerId, externalMatch.AwayTeam, listOfTeams);
+            if (awayTeam == null)
+                continue;
+
+            // Get competition for this match (based on external season)
+            var competitionId = await IdentifyCompetitionAsync(providerId, externalMatch.Competition);
+            var seasonId = await IdentifySeasonAsync(providerId, externalMatch.Season);
+
+            // Create match entity
+            var match = new MatchesEntity
+            {
+                CompetitionId = competitionId,
+                SeasonId = seasonId,
+                MatchDateUTC = externalMatch.MatchDateUtc,
+                HomeTeamId = homeTeam.Id,
+                AwayTeamId = awayTeam.Id,
+                HomeScore = externalMatch.HomeGoals,
+                AwayScore = externalMatch.AwayGoals,
+                IsFinished = true,
+                UpdatedDateUTC = DateTimeOffset.UtcNow
+            };
+
+            match = await _matchesRepository.SaveFinishedMatchAsync(match);
+
+            // Save external match mapping
+            await SaveExternalMatchMappingAsync(providerId, match.MatchId, externalMatch.Id);
+        }
+    }
+
+    private async Task ProcessAndSaveUpcomingMatchesAsync(
+        int providerId,
+        int internalCompetitionId,
+        List<ExternalMatchDto> externalMatches,
+        List<TeamEntity> listOfTeams,
+        CancellationToken cancellationToken)
+    {
+        var externalProviderMatches = await _externalProvidersRepository.GetExternalProviderMatchesByProviderAsync(providerId);
+
+        foreach (var externalMatch in externalMatches)
+        {
+            // Identify external Match mapping
+            var existingExternalMatch = externalProviderMatches.FirstOrDefault(c => c.ExternalMatchId == externalMatch.Id);
+            if (existingExternalMatch != null)
+                continue;
+
+            // Identify or create home team
+            var homeTeam = await FindOrCreateTeamAsync(providerId, externalMatch.HomeTeam, listOfTeams);
+            if (homeTeam == null)
+                continue;
+
+            // Identify or create away team
+            var awayTeam = await FindOrCreateTeamAsync(providerId, externalMatch.AwayTeam, listOfTeams);
+            if (awayTeam == null)
+                continue;
+
+            // Get competition for this match (based on external season)
+            var seasonId = await IdentifySeasonAsync(providerId, externalMatch.Season);
+
+            // Create match entity
+            var match = new MatchesEntity
+            {
+                CompetitionId = internalCompetitionId,
+                SeasonId = seasonId,
+                Round = externalMatch.RoundId,
+                MatchDateUTC = externalMatch.MatchDateUtc,
+                HomeTeamId = homeTeam.Id,
+                AwayTeamId = awayTeam.Id,
+                HomeScore = externalMatch.HomeGoals,
+                AwayScore = externalMatch.AwayGoals,
+                IsFinished = false,
+                UpdatedDateUTC = DateTimeOffset.UtcNow
+            };
+
+            match = await _matchesRepository.SaveFinishedMatchAsync(match);
+
+            // Save external match mapping
+            await SaveExternalMatchMappingAsync(providerId, match.MatchId, externalMatch.Id);
+        }
+    }
+
+    private async Task<TeamEntity?> FindOrCreateTeamAsync(
+        int providerId,
+        ExternalTeamDto externalTeam,
+        List<TeamEntity> listOfTeams)
+    {
+        // Try to find by external ID mapping
+        var internalTeam = await FindInternalTeamByExternalIdAsync(providerId, externalTeam.Id, listOfTeams);
+
+        if (internalTeam != null)
+            return internalTeam;
+
+        // Try to find by fuzzy matching
+        internalTeam = IdentifyExistingTeam(listOfTeams, externalTeam.Name, externalTeam.ShortName);
+
+        if (internalTeam != null)
+        {
+            await SaveExternalTeamMappingAsync(providerId, internalTeam.Id, externalTeam.Id);
+            return internalTeam;
+        }
+
+        // Create new team
+        internalTeam = await CreateTeamAsync(externalTeam);
+        if (internalTeam != null)
+        {
+            await SaveExternalTeamMappingAsync(providerId, internalTeam.Id, externalTeam.Id);
+            listOfTeams.Add(internalTeam);
+        }
+
+        return internalTeam;
+    }
+
+    private async Task<TeamEntity?> FindInternalTeamByExternalIdAsync(
+        int providerId,
+        int externalTeamId,
+        List<TeamEntity> listOfTeams)
+    {
+        var externalTeamInfo = await _externalProvidersRepository.GetExternalIntegrationTeamByExternalIdAsync(providerId, externalTeamId);
+        if (externalTeamInfo == null)
+            return null;
+
+        var teamFound = listOfTeams.FirstOrDefault(c => c.Id == externalTeamInfo.InternalTeamId);
+        return teamFound;
+    }
+
+    private static TeamEntity? IdentifyExistingTeam(List<TeamEntity> listOfTeams, string? name, string? shortName)
+    {
+        if (listOfTeams.Count == 0 || string.IsNullOrWhiteSpace(name))
+            return null;
+
+        var ranked = listOfTeams
+            .Select(c => new
+            {
+                Team = c,
+                Score = Math.Max(
+                    Fuzz.Ratio(c.NormalizedName ?? c.Name.Normalize(), name.Normalize()),
+                    Fuzz.Ratio(c.ShortName?.Normalize() ?? c.Name.Normalize(), shortName?.Normalize() ?? "UNKNOWN_NAME"))
+            })
+            .Where(c => c.Score > 75)
+            .OrderByDescending(x => x.Score)
+            .FirstOrDefault();
+
+        return ranked?.Team;
+    }
+
+    private async Task<TeamEntity?> CreateTeamAsync(ExternalTeamDto externalTeam)
+    {
+        try
+        {
+            var teamEntity = new TeamEntity
+            {
+                Name = externalTeam.Name ?? "Unknown Team",
+                ShortName = externalTeam.ShortName,
+                ThreeLetterName = externalTeam.ThreeLetterName,
+                NormalizedName = (externalTeam.Name ?? "Unknown Team").Normalize()
+            };
+
+            teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);
+            return teamEntity;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating team from external provider");
+            return null;
+        }
+    }
+
+    private async Task<int?> IdentifySeasonAsync(int providerId, ExternalSeasonDto? externalSeason)
+    {
+        if (externalSeason == null || string.IsNullOrWhiteSpace(externalSeason.Id))
+            return null;
+
+        try
+        {
+            var seasonMapping = await _externalProvidersRepository.GetExternalProviderCompetitionSeasonByExternalIdAsync(providerId, externalSeason.Id);
+            if (seasonMapping == null)
+                return null;
+
+            return seasonMapping.InternalSeasonId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error identifying season for external season {ExternalSeasonId}", externalSeason.Id);
+            return null;
+        }
+    }
+
+    private async Task<int?> IdentifyCompetitionAsync(int providerId, ExternalCompetitionDto? externalCompetition)
+    {
+        if (externalCompetition == null || string.IsNullOrWhiteSpace(externalCompetition.Id))
+            return null;
+
+        try
+        {
+            var competitionMapping = await _externalProvidersRepository.GetExternalCompetitionByExternalIdAsync(providerId, externalCompetition.Id);
+            if (competitionMapping == null)
+                return null;
+
+            return competitionMapping.InternalCompetitionId;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error identifying season for external season {ExternalSeasonId}", externalCompetition.Id);
+            return null;
+        }
+    }
+
+    private async Task SaveExternalTeamMappingAsync(int providerId, int internalTeamId, int externalTeamId)
+    {
+        try
+        {
+            var mapping = new ExternalProviderTeamsEntity
+            {
+                ProviderId = providerId,
+                InternalTeamId = internalTeamId,
+                ExternalTeamId = externalTeamId.ToString()
+            };
+
+            await _externalProvidersRepository.SaveExternalIntegrationTeamAsync(mapping);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error saving external team mapping");
+        }
+    }
+
+    private async Task SaveExternalMatchMappingAsync(int providerId, int internalMatchId, string externalMatchId)
+    {
+        try
+        {
+            var mapping = new ExternalProviderMatchesEntity
+            {
+                ProviderId = providerId,
+                InternalMatchId = internalMatchId,
+                ExternalMatchId = externalMatchId
+            };
+
+            await _externalProvidersRepository.SaveExternalProviderMatchAsync(mapping);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error saving external match mapping");
+        }
+    }
 }
