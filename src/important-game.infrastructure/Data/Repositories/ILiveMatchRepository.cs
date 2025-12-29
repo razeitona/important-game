@@ -12,15 +12,5 @@ namespace important_game.infrastructure.Data.Repositories
         /// Saves a live match snapshot (insert or update).
         /// </summary>
         Task SaveLiveMatchAsync(LiveMatch liveMatch);
-
-        /// <summary>
-        /// Saves multiple live match snapshots.
-        /// </summary>
-        Task SaveLiveMatchesAsync(List<LiveMatch> liveMatches);
-
-        /// <summary>
-        /// Gets a live match snapshot by ID.
-        /// </summary>
-        Task<LiveMatch?> GetLiveMatchByIdAsync(int id);
     }
 }

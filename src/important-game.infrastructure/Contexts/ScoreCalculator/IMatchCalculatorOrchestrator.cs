@@ -4,7 +4,7 @@
 /// Interface for calculating excitement scores of unfinished matches.
 /// Follows Single Responsibility Principle by focusing only on excitement score calculations.
 /// </summary>
-public interface IExcitmentMatchCalculator
+public interface IMatchCalculatorOrchestrator
 {
     /// <summary>
     /// Calculates and updates excitement scores for all unfinished matches (IsFinished = 0).

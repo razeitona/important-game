@@ -24,16 +24,9 @@
     <Compile Update="Contexts\Providers\ExternalServices\SofaScoreAPI\**\*.cs">
       <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
     </Compile>
-    <Compile Update="ImportantMatch\Data\**\*.cs">
-      <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
-    </Compile>
     <Compile Update="Telegram\**\*.cs">
       <ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Services\" />
   </ItemGroup>
 
 </Project>

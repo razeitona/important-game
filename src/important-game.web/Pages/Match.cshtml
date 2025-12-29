@@ -26,9 +26,8 @@
 
 @section Header {
     @{
-        var teamId = matchInfo.HomeTeamId;
-
-        if (matchInfo.AwayTeam.IsTitleHolder || matchInfo.AwayTeam.TablePosition < matchInfo.HomeTeam.TablePosition)
+        var teamId = matchInfo.TitleHolderId ?? matchInfo.HomeTeamId;
+        if (matchInfo.AwayTeamTablePosition < matchInfo.HomeTeamTablePosition)
             teamId = matchInfo.AwayTeamId;
 
         var url = "https://matchtowatch.net/match/" + matchInfo.MatchId;
@@ -36,7 +35,7 @@
     }
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName) - Match to watch">
-    <meta name="twitter:description" content="Follow the @Html.Raw(matchInfo.CompetitionName) match on @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm") UTC time. Excitement Score: @(Math.Round((/* matchInfo.IsLive  */ false ? 0d /* matchInfo.LiveExcitementScore */ : matchInfo.ExcitmentScore)*100,0)). Key moments and stats here!">
+    <meta name="twitter:description" content="Follow the @Html.Raw(matchInfo.CompetitionName) match on @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm") UTC time. Excitement Score: @(Math.Round((/* matchInfo.IsLive  */ false ? 0d /* matchInfo.LiveExcitementScore */ : matchInfo.ExcitmentScore) * 100, 0)). Key moments and stats here!">
     <meta name="twitter:image" content="@image">
     <meta name="twitter:url" content="@url">
 }
@@ -46,7 +45,7 @@
         <div class="match-detail-info match-detail-card">
             <div class="match-detail-league">
                 <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.League.Id + "/image")" alt="@(matchInfo.League.Name)" />
+                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.CompetitionId + "/image")" alt="@(matchInfo.CompetitionName)" />
                 </div>
                 <div class="match-detail-league-title">
                     @matchInfo.CompetitionName
@@ -75,16 +74,16 @@
         <div class="match-detail-info match-detail-card match-detail-info-h2h">
             <h1>Head to Head History</h1>
             <div class="match-detail-info-h2h-content">
-                @if (matchInfo.Headtohead.Count == 0)
+                @if (matchInfo.HeadToHead.Count == 0)
                 {
                     <span class="match-detail-info-h2h-empty">No matches between <i>@(matchInfo.HomeTeamName)</i> and <i>@(matchInfo.AwayTeamName)</i> the past two years </span>
                 }
                 else
                 {
-                    foreach (var match in matchInfo.Headtohead)
+                    foreach (var match in matchInfo.HeadToHead)
                     {
                         <div class="match-detail-info-h2h-item">
-                            <span class="h2h-date">@match.MatchDate.ToString("dd/MM/yyyy")</span>
+                            <span class="h2h-date">@match.MatchDateUTC.ToString("dd/MM/yyyy")</span>
                             <div class="h2h-match">
                                 @if (match.HomeTeamScore > match.AwayTeamScore)
                                 {
@@ -119,7 +118,7 @@
                 <div>
                     <span>@matchInfo.HomeTeamName</span>
                     <div>
-                        @foreach (var form in matchInfo.HomeTeam.Form)
+                        @foreach (var form in matchInfo.HomeTeamForm)
                         {
                             var formResult = form switch
                             {
@@ -135,7 +134,7 @@
                 <div>
                     <span>@matchInfo.AwayTeamName</span>
                     <div>
-                        @foreach (var form in matchInfo.AwayTeam.Form)
+                        @foreach (var form in matchInfo.AwayTeamForm)
                         {
                             var formResult = form switch
                             {
@@ -152,29 +151,16 @@
         </div>
     </div>
     <div class="match-detail-content-right">
-        @if (matchInfo.IsLive)
+        @if (false)
         {
             <div class="match-detail-info match-detail-card match-detail-info-live">
                 <div class="match-detail-info-live-title">
                     <p>Live</p>
                     <div class="match-detail-info-live-title-score">
                         <span>Score</span>
-                        <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.LiveExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.LiveExcitementScore * 100, 0))</div>
+                        <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitmentScore * 100, 0))</div>
                     </div>
                 </div>
-                @* <div class="match-detail-info-live-content">
-            <div class="match-detail-teams">
-            <div class="match-detail-team-info">
-            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeam.Id + "/image")" alt="@(matchInfo.HomeTeam.Name)" />
-            </div>
-            <div class="eslive-map">
-            <div id="heatmapContainer"></div>
-            </div>
-            <div class="match-detail-team-info">
-            <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeam.Id + "/image")" alt="@(matchInfo.AwayTeam.Name)" />
-            </div>
-            </div>
-            </div> *@
             </div>
         }
         <div class="match-detail-info match-detail-card match-detail-info-esdetail">
@@ -209,7 +195,7 @@
                 <i class="bi bi-broadcast-pin"></i>
                 <span>Excitement Score</span>
             </div>
-            <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitementScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitementScore * 100, 0))</div>
+            <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitmentScore * 100, 0))</div>
             <p>@matchInfo.Description</p>
         </div>
 

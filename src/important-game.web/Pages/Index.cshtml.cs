@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace important_game.web.Pages
 {
-    public class IndexModel(IMatchesService _matchService) : PageModel
+    public class IndexModel(IMatchService _matchService) : PageModel
     {
         public List<MatchDto> TrendingMatches { get; set; }
         public List<MatchDto> OtherMatches { get; set; }

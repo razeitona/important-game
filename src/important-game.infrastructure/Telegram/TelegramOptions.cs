@@ -1,8 +1,7 @@
-﻿namespace important_game.infrastructure.Telegram
+﻿namespace important_game.infrastructure.Telegram;
+
+public class TelegramOptions
 {
-    public class TelegramOptions
-    {
-        public string BotToken { get; set; } = string.Empty;
-        public string ChatId { get; set; } = string.Empty;
-    }
+    public string BotToken { get; set; } = string.Empty;
+    public string ChatId { get; set; } = string.Empty;
 }

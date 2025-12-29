@@ -1,6 +1,7 @@
 ﻿@page
 @using System.Globalization
 @using System.Text.Json
+@using important_game.infrastructure.Extensions
 @model MatchesModel
 @{
     ViewData["Title"] = "Upcoming Exciting Matches - Match to Watch";
@@ -19,11 +20,11 @@
 
 
     <div class="match-league-filter">
-        @foreach (var league in Model.Matches.Leagues)
+        @foreach (var competition in Model.Matches.Competitions)
         {
-            <div class="match-league-item" data-league="@league.Id">
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + league.Id  + "/image")" alt="@league.Name" width="20px" />
-                <span>@league.Name</span>
+            <div class="match-league-item" data-league="@competition.CompetitionId">
+                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + competition.CompetitionId + "/image")" alt="@competition.Name" width="20px" />
+                <span>@competition.Name</span>
             </div>
         }
     </div>
@@ -35,12 +36,12 @@
         }
         else
         {
-            @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDate.Date))
+            @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDateUTC.Date))
             {
                 <div class="wm-match-date">
                     <h1 class="wm-match-date-title">@dates.Key.ToString("dd/MM/yyyy")</h1>
                     <div class="matches-section-content">
-                        @foreach (var match in dates.OrderByDescending(c => c.ExcitementScore))
+                        @foreach (var match in dates.OrderByDescending(c => c.ExcitmentScore))
                         {
                             <partial name="_MatchCardSimple" for="@match" />
                         }
@@ -61,32 +62,25 @@
 
 
         $(document).ready(function () {
-            // $("time").each(function (elem) {
-            //     var utctimeval = $(this).html().trim();
-            //     var date = new Date(utctimeval);
-            //     var optionsDate = {
-            //         day: "2-digit",
-            //         month: "2-digit",
-            //         year: "numeric",
-            //     };
-            //     var optionsTime = {
-            //         hour: "numeric",
-            //         minute: "numeric",
-            //     };
-            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            // });
 
-            var list = @Html.Raw(JsonSerializer.Serialize(Model.Matches.Matches
-          .Select(c => new { id = c.Id, home = c.HomeTeam.Name, away = c.AwayTeam.Name, homeslug = c.HomeTeam.Slug, awayslug = c.AwayTeam.Slug })));
+            var list = @Html.Raw(JsonSerializer.Serialize(
+                                    Model.Matches.Matches.Select(c => 
+                                        new { 
+                                            id = c.MatchId, 
+                                            home = c.HomeTeamName, 
+                                            away = c.AwayTeamName, 
+                                            homeslug = SlugHelper.GenerateSlug(c.HomeTeamName), 
+                                            awayslug = SlugHelper.GenerateSlug(c.AwayTeamName) 
+                                        })));
 
-            const fuseOptions = {
-                threshold: 0.3,           // Adjust to control the fuzzy matching
-                minMatchCharLength: 3,     // Minimum length of the pattern to start matching
-                keys: [
-                    "home",
-                    "away"
-                ]
-            };
+        const fuseOptions = {
+        threshold: 0.3,           // Adjust to control the fuzzy matching
+        minMatchCharLength: 3,     // Minimum length of the pattern to start matching
+        keys: [
+            "home",
+            "away"
+        ]
+    };
 
             const fuse = new Fuse(list, fuseOptions);
 

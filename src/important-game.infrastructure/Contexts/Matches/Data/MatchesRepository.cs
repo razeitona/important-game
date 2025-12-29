@@ -15,10 +15,10 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
 {
     private readonly IDbConnectionFactory _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
 
-    public async Task<List<MatchesEntity>> GetUnfinishedMatchesAsync()
+    public async Task<List<UnfinishedMatchDto>> GetUnfinishedMatchesAsync()
     {
         using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryAsync<MatchesEntity>(MatchesQueries.SelectUnfinishedMatches);
+        var result = await connection.QueryAsync<UnfinishedMatchDto>(MatchesQueries.SelectUnfinishedMatches);
         return result.ToList();
     }
 
@@ -108,6 +108,33 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
             entity.UpdatedDateUTC
         });
     }
+
+    public async Task<List<MatchDto>> GetAllUpcomingMatchesAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<MatchDto>(MatchesQueries.SelectAllUpcomingMatches);
+        return result.ToList();
+    }
+
+    public async Task<MatchDetailDto?> GetMatchByIdAsync(int matchId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchById, new { MatchId = matchId });
+        return result;
+    }
+
+    #region Head To Head
+    public async Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<HeadToHeadDto>(MatchesQueries.SelectHeadToHeadMatches,
+        new { TeamOneId = teamOneId, TeamTwoId = teamTwoId });
+
+        return result.ToList();
+    }
+    #endregion
+
+    #region Rivalry
     public async Task<RivalryEntity?> GetRivalryAsync(int teamOneId, int teamTwoId)
     {
         using var connection = _connectionFactory.CreateConnection();
@@ -120,10 +147,5 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
             });
         return result;
     }
-    public async Task<List<MatchDto>> GetAllUpcomingMatchesAsync()
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryAsync<MatchDto>(MatchesQueries.SelectAllUpcomingMatches);
-        return result.ToList();
-    }
+    #endregion
 }

@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace important_game.infrastructure.Telegram;
 
-namespace important_game.infrastructure.Telegram
+public interface ITelegramBot
 {
-    public interface ITelegramBot
-    {
-        Task SendMessageAsync(string message);
-    }
+    Task SendMessageAsync(string message);
 }

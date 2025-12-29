@@ -7,7 +7,6 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices.Football
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Models;
 using important_game.infrastructure.Contexts.ScoreCalculator;
-using important_game.infrastructure.Contexts.ScoreCalculator.Calculators;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Data.Connections;
 using important_game.infrastructure.Data.Repositories;
@@ -97,16 +96,11 @@ namespace important_game.infrastructure
             services.AddScoped<IExternalProviderSettings, ExternalProviderSettings>();
 
             // Registar match calculators
-            services.AddScoped<IFixtureValueCalculator, FixtureValueCalculator>();
-            services.AddScoped<IHeadToHeadCalculator, HeadToHeadCalculator>();
-            services.AddScoped<ILeagueLateStageDetector, LeagueLateStageDetector>();
-            services.AddScoped<ILeagueTableValueCalculator, LeagueTableValueCalculator>();
-            services.AddScoped<ITeamFormCalculator, TeamFormCalculator>();
-            services.AddScoped<ITitleHolderCalculator, TitleHolderCalculator>();
-            services.AddScoped<IExcitmentMatchCalculator, ExcitmentMatchCalculator>();
+            services.AddScoped<IMatchCalculatorOrchestrator, MatchCalculatorOrchestrator>();
+            services.AddScoped<IMatchCalculator, MatchCalculator>();
 
             // Register matches services
-            services.AddScoped<IMatchesService, MatchesService>();
+            services.AddScoped<IMatchService, MatchService>();
 
             return services;
         }

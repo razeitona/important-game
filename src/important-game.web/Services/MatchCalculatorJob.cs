@@ -40,7 +40,7 @@ public class MatchCalculatorJob : BackgroundService
         try
         {
             using var scope = _serviceProvider.CreateScope();
-            var calculator = scope.ServiceProvider.GetRequiredService<IExcitmentMatchCalculator>();
+            var calculator = scope.ServiceProvider.GetRequiredService<IMatchCalculatorOrchestrator>();
             await calculator.CalculateExcitmentScoreAsync().ConfigureAwait(false);
         }
         catch (OperationCanceledException)

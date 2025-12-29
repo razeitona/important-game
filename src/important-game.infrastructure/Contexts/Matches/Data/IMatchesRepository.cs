@@ -11,7 +11,7 @@ public interface IMatchesRepository
     /// <summary>
     /// Gets all unfinished matches (IsFinished = 0).
     /// </summary>
-    Task<List<MatchesEntity>> GetUnfinishedMatchesAsync();
+    Task<List<UnfinishedMatchDto>> GetUnfinishedMatchesAsync();
 
     /// <summary>
     /// Saves a match (insert or update) with all its related data.
@@ -23,7 +23,17 @@ public interface IMatchesRepository
     /// </summary>
     Task UpdateMatchCalculatorAsync(MatchCalcsDto entity);
 
-    Task<RivalryEntity?> GetRivalryAsync(int teamOneId, int teamTwoId);
 
     Task<List<MatchDto>> GetAllUpcomingMatchesAsync();
+
+    Task<MatchDetailDto?> GetMatchByIdAsync(int matchId);
+
+
+    #region Head To Head
+    Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId);
+    #endregion
+
+    #region Rivalry
+    Task<RivalryEntity?> GetRivalryAsync(int teamOneId, int teamTwoId);
+    #endregion
 }

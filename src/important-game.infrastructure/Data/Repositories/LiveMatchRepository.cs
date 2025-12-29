@@ -64,24 +64,5 @@ namespace important_game.infrastructure.Data.Repositories
                 }
             }
         }
-
-        public async Task SaveLiveMatchesAsync(List<LiveMatch> liveMatches)
-        {
-            if (liveMatches == null || liveMatches.Count == 0)
-                return;
-
-            foreach (var liveMatch in liveMatches)
-            {
-                await SaveLiveMatchAsync(liveMatch);
-            }
-        }
-
-        public async Task<LiveMatch?> GetLiveMatchByIdAsync(int id)
-        {
-            using (var connection = _connectionFactory.CreateConnection())
-            {
-                return await connection.QueryFirstOrDefaultAsync<LiveMatch>(LiveMatchQueries.SelectLiveMatchById, new { Id = id });
-            }
-        }
     }
 }
