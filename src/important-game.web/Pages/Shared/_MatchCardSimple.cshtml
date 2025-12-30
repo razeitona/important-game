@@ -13,7 +13,7 @@
     <a href="/match/@(Model.MatchId)" class="match-card-link">
         <div class="card-header match-header">
             <div>
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + Model.CompetitionId + "/image")" alt="@Model.CompetitionName" width="1.2rem" />
+                <img src="@("images/competition/" + Model.CompetitionId + ".png")" alt="@Model.CompetitionName" width="1.2rem" />
             </div>
             <div class="match-header-title">
                 @Model.CompetitionName
@@ -37,7 +37,7 @@
             <div class="match-card-content">
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.HomeTeamId + "/image")" alt="@(Model.HomeTeamName)" width="60px" />
+                        <img src="@("images/team/" + Model.HomeTeamId + ".png")" alt="@(Model.HomeTeamName)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.HomeTeamName</span>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("https://api.sofascore.app/api/v1/team/" + Model.AwayTeamId + "/image")" alt="@(Model.AwayTeamName)" width="60px" />
+                        <img src="@("images/team/" + Model.AwayTeamId + ".png")" alt="@(Model.AwayTeamName)" width="60px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.AwayTeamName</span>

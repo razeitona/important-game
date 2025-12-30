@@ -1,11 +1,11 @@
 ﻿using important_game.infrastructure.Contexts.Providers.ExternalServices;
 
-public class SyncMatchesJob : BackgroundService
+public class SyncUpcomingMatchesJob : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<SyncMatchesJob> _logger;
+    private readonly ILogger<SyncUpcomingMatchesJob> _logger;
 
-    public SyncMatchesJob(IServiceProvider serviceProvider, ILogger<SyncMatchesJob> logger)
+    public SyncUpcomingMatchesJob(IServiceProvider serviceProvider, ILogger<SyncUpcomingMatchesJob> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -15,7 +15,7 @@ public class SyncMatchesJob : BackgroundService
     {
         await RunJobAsync(stoppingToken).ConfigureAwait(false);
 
-        using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
+        using var timer = new PeriodicTimer(TimeSpan.FromDays(7));
 
         try
         {
@@ -41,12 +41,11 @@ public class SyncMatchesJob : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var matchProcessor = scope.ServiceProvider.GetRequiredService<IExternalMatchesSyncService>();
-            //await matchProcessor.SyncFinishedMatchesAsync().ConfigureAwait(false);
             await matchProcessor.SyncUpcomingMatchesAsync().ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            throw;
+            _logger.LogError(ex, "Failed to calculate upcoming match excitement.");
         }
         catch (Exception ex)
         {

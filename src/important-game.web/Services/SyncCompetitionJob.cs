@@ -15,7 +15,7 @@ public class SyncCompetitionJob : BackgroundService
     {
         await RunJobAsync(stoppingToken).ConfigureAwait(false);
 
-        using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
+        using var timer = new PeriodicTimer(TimeSpan.FromDays(1));
 
         try
         {
@@ -43,9 +43,9 @@ public class SyncCompetitionJob : BackgroundService
             var matchProcessor = scope.ServiceProvider.GetRequiredService<IExternalCompetitionSyncService>();
             await matchProcessor.SyncCompetitionsAsync().ConfigureAwait(false);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
-            throw;
+            _logger.LogError(ex, "Failed to calculate upcoming match excitement.");
         }
         catch (Exception ex)
         {

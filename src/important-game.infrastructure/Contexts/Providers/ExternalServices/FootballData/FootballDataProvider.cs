@@ -24,7 +24,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
 
     private static readonly SemaphoreSlim RateLimitSemaphore = new(1, 1);
     private readonly JsonSerializerOptions _serializerOptions;
-    private ConcurrentBag<ExternalProvidersLogsEntity> _logs = new();
+    private static ConcurrentBag<ExternalProvidersLogsEntity> _logs = new();
     private ExternalProvidersEntity? _settings;
 
     public FootballDataProvider(ILogger<FootballDataProvider> logger, HttpClient client, IOptions<FootballDataOptions> options, IExternalProviderSettings providerLogger)
@@ -55,9 +55,9 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
         return externalCompetition;
     }
 
-    public async Task<ExternalCompetitionStandingsDto?> GetCompetitionStandingsAsync(string competitionId, CancellationToken cancellationToken = default)
+    public async Task<ExternalCompetitionStandingsDto?> GetCompetitionStandingsAsync(string competitionId, string seasonId, CancellationToken cancellationToken = default)
     {
-        var footballDataStandings = await InternalGetCompetitionStandingsAsync(competitionId, cancellationToken);
+        var footballDataStandings = await InternalGetCompetitionStandingsAsync(competitionId, seasonId, cancellationToken);
         if (footballDataStandings == null)
             return null;
 
@@ -90,9 +90,9 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
     private Task<FootballDataCompetition?> InternalGetCompetitionAsync(string competitionId, CancellationToken cancellationToken = default)
         => GetAsync<FootballDataCompetition>($"competitions/{competitionId}", cancellationToken);
 
-    public Task<FootballDataStandingsResponse?> InternalGetCompetitionStandingsAsync(string competitionId, CancellationToken cancellationToken = default)
-        => GetAsync<FootballDataStandingsResponse>($"competitions/{competitionId}/standings", cancellationToken);
-    #endregion
+    public Task<FootballDataStandingsResponse?> InternalGetCompetitionStandingsAsync(string competitionId, string seasonId, CancellationToken cancellationToken = default)
+        => GetAsync<FootballDataStandingsResponse>($"competitions/{competitionId}/standings?season={seasonId}", cancellationToken);
+
     public async Task<IReadOnlyList<FootballDataMatch>?> InternalGetTeamUpcomingMatchesAsync(string competitionId, DateTimeOffset fromDate, DateTimeOffset toDate, CancellationToken cancellationToken = default)
     {
         var response = await GetAsync<FootballDataMatchesResponse>($"competitions/{competitionId}/matches?status=SCHEDULED&dateFrom={fromDate:yyyy-MM-dd}&dateTo={toDate:yyyy-MM-dd}", cancellationToken).ConfigureAwait(false);
@@ -106,12 +106,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
         var matches = response?.Matches?.ToArray();
         return matches;
     }
-
-    public Task<FootballDataHeadToHeadResponse?> GetHeadToHeadAsync(int matchId, int limit = FootballDataConstants.DefaultRecentMatchesLimit, CancellationToken cancellationToken = default)
-        => GetAsync<FootballDataHeadToHeadResponse>($"matches/{matchId}/head2head?limit={limit}", cancellationToken);
-
-    public Task<FootballDataMatch?> GetMatchAsync(int matchId, CancellationToken cancellationToken = default)
-        => GetAsync<FootballDataMatch>($"matches/{matchId}", cancellationToken);
+    #endregion
 
     private async Task<T?> GetAsync<T>(string path, CancellationToken cancellationToken)
     {
@@ -156,7 +151,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
         {
             ProviderId = Id,
             RequestPath = path,
-            RequestDate = DateTime.UtcNow
+            RequestDate = DateTimeOffset.UtcNow
         };
 
         await _providerLogger.SaveLogAsync(log).ConfigureAwait(false);

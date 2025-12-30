@@ -20,7 +20,7 @@ internal class MatchCalculatorOrchestrator(
     IMatchCalculator matchCalculator,
     ILogger<MatchCalculatorOrchestrator> logger) : IMatchCalculatorOrchestrator
 {
-    private const int MaxConcurrentCalculations = 3;
+    private const int MaxConcurrentCalculations = 1;
 
     private readonly IMatchesRepository _matchesRepository = matchesRepository ?? throw new ArgumentNullException(nameof(matchesRepository));
     private readonly ICompetitionRepository _competitionRepository = competitionRepository ?? throw new ArgumentNullException(nameof(competitionRepository));
@@ -85,7 +85,9 @@ internal class MatchCalculatorOrchestrator(
 
             var rivarlyInformation = await TryGetTeamRivalryAsync(match.HomeTeamId, match.AwayTeamId);
             var headToHeadMatches = await _matchesRepository.GetHeadToHeadMatchesAsync(match.HomeTeamId, match.AwayTeamId);
-            var excitementScores = _matchCalculator.CalculateMatchScore(match, competitionTable, rivarlyInformation, headToHeadMatches);
+            var homeLastMatches = await _matchesRepository.GetRecentMatchesForTeamAsync(match.HomeTeamId, 5);
+            var awayLastMatches = await _matchesRepository.GetRecentMatchesForTeamAsync(match.AwayTeamId, 5);
+            var excitementScores = _matchCalculator.CalculateMatchScore(match, competitionTable, rivarlyInformation, headToHeadMatches, homeLastMatches, awayLastMatches);
 
             if (excitementScores == null)
                 return;

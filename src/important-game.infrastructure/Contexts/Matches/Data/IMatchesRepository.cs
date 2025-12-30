@@ -16,17 +16,17 @@ public interface IMatchesRepository
     /// <summary>
     /// Saves a match (insert or update) with all its related data.
     /// </summary>
-    Task<MatchesEntity> SaveFinishedMatchAsync(MatchesEntity entity);
+    Task<MatchesEntity> SaveMatchAsync(MatchesEntity entity);
 
     /// <summary>
     /// Update Match entity with new calculated excitement score
     /// </summary>
     Task UpdateMatchCalculatorAsync(MatchCalcsDto entity);
-
-
     Task<List<MatchDto>> GetAllUpcomingMatchesAsync();
-
     Task<MatchDetailDto?> GetMatchByIdAsync(int matchId);
+    Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId);
+    Task<List<MatchesEntity>> GetRecentMatchesForTeamAsync(int teamId, int numberOfMatches);
+
 
 
     #region Head To Head

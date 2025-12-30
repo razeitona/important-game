@@ -70,5 +70,10 @@ namespace important_game.infrastructure.Contexts.Competitions.Data.Queries
             UPDATE CompetitionSeasons 
             SET SyncStandingsDate = @SyncStandingsDate
             WHERE SeasonId = @SeasonId";
+
+        internal const string UpdateCompetitionSeasonMatchesDate = @"
+            UPDATE CompetitionSeasons 
+            SET SyncMatchesDate = @SyncMatchesDate
+            WHERE SeasonId = @SeasonId";
     }
 }

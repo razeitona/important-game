@@ -68,7 +68,7 @@ public static class FootballDataMapper
             externalMatch.HomeGoals = footballMatch.Score?.FullTime?.Home ?? null;
             externalMatch.AwayGoals = footballMatch.Score?.FullTime?.Away ?? null;
 
-            externalMatch.RoundId = footballMatch.Matchday;
+            externalMatch.Round = footballMatch.Matchday;
             externalMatch.Competition = MapToExternalCompetition(footballMatch.Competition);
             externalMatch.Season = MapToExternalSeason(footballMatch.Season);
 

@@ -20,8 +20,6 @@ public interface IExternalCompetitionSyncService
 [ExcludeFromCodeCoverage]
 public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
 {
-    private const string CurrentSeasonYear = "2025/2026";
-
     private readonly IIntegrationProviderFactory _integrationProvider;
     private readonly IExternalProvidersRepository _externalIntegrationRepository;
     private readonly ICompetitionRepository _competitionRepository;
@@ -63,13 +61,15 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         {
             _logger.LogInformation("Starting synchronization of competition {CompetitionId} from external source {ExternalCompetitionId}", competitionId, externalCompetitionId);
 
-            var competitionInfo = await externalProvider.GetCompetitionAsync(externalCompetitionId, cancellationToken);
-
+            // Extract competition from external provider
+            var externalCompetition = await externalProvider.GetCompetitionAsync(externalCompetitionId, cancellationToken);
+            if (externalCompetition == null)
+                return;
             await SaveExternalProviderCompetitionMappingAsync(externalProvider.Id, competitionId, externalCompetitionId);
 
-            var currentSeason = await SaveCompetitionSeasonAsync(competitionId);
-
-            await SaveExternalProviderSeasonMappingAsync(externalProvider.Id, currentSeason.SeasonId, competitionInfo.CurrentSeason!.Id);
+            // Identify and save current competition current season
+            var currentSeason = await SaveCompetitionSeasonAsync(competitionId, externalCompetition);
+            await SaveExternalProviderSeasonMappingAsync(externalProvider.Id, currentSeason.SeasonId, externalCompetition.CurrentSeason!.Id);
 
             if (currentSeason.SyncStandingsDate.HasValue && currentSeason.SyncStandingsDate.Value.AddHours(12) > DateTime.UtcNow)
             {
@@ -77,7 +77,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
                 return;
             }
 
-            await SyncCompetitionStandingsAsync(competitionId, externalCompetitionId, currentSeason.SeasonId, externalProvider, cancellationToken);
+            await SyncCompetitionStandingsAsync(competitionId, externalCompetition, currentSeason.SeasonId, externalProvider, cancellationToken);
 
             _logger.LogInformation("Successfully synchronized competition {CompetitionId}", competitionId);
         }
@@ -88,16 +88,19 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         }
     }
 
-    private async Task SyncCompetitionStandingsAsync(int competitionId, string externalCompetitionId, int seasonId, IExternalCompetitionProvider externalProvider, CancellationToken cancellationToken = default)
+    private async Task SyncCompetitionStandingsAsync(int competitionId, ExternalCompetitionDto externalCompetition, int seasonId, IExternalCompetitionProvider externalProvider, CancellationToken cancellationToken = default)
     {
         try
         {
-            _logger.LogInformation("Starting synchronization of competition {CompetitionId} standings from external source {ExternalCompetitionId}", competitionId, externalCompetitionId);
+            if (externalCompetition == null)
+                return;
 
-            var standings = await externalProvider.GetCompetitionStandingsAsync(externalCompetitionId, cancellationToken);
+            _logger.LogInformation("Starting synchronization of competition {CompetitionId} standings from external source {ExternalCompetitionId}", competitionId, externalCompetition.Id);
+
+            var standings = await externalProvider.GetCompetitionStandingsAsync(externalCompetition.Id!, $"{externalCompetition.CurrentSeason!.StartDate:yyyy}", cancellationToken);
             if (standings == null)
             {
-                _logger.LogWarning("Failed to retrieve standings for competition {ExternalCompetitionId}", externalCompetitionId);
+                _logger.LogWarning("Failed to retrieve standings for competition {ExternalCompetitionId}", externalCompetition.Id);
                 return;
             }
 
@@ -147,9 +150,12 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         await _externalIntegrationRepository.SaveExternalProviderCompetitionSeasonAsync(mapping);
     }
 
-    private async Task<CompetitionSeasonsEntity> SaveCompetitionSeasonAsync(int competitionId)
+    private async Task<CompetitionSeasonsEntity> SaveCompetitionSeasonAsync(int competitionId, ExternalCompetitionDto externalCompetition)
     {
-        var existingSeason = await _competitionRepository.GetCompetitionSeasonByCompetitionAndYearAsync(competitionId, CurrentSeasonYear);
+        var currentSeason = externalCompetition.CurrentSeason!;
+        var seasonYear = $"{currentSeason.StartDate:yyyy}/{currentSeason.EndDate:yyyy}";
+
+        var existingSeason = await _competitionRepository.GetCompetitionSeasonByCompetitionAndYearAsync(competitionId, seasonYear);
 
         if (existingSeason != null)
         {
@@ -159,7 +165,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         var newSeason = new CompetitionSeasonsEntity
         {
             CompetitionId = competitionId,
-            SeasonYear = CurrentSeasonYear,
+            SeasonYear = seasonYear,
             TitleHolderId = default
         };
 
@@ -186,7 +192,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
             // Identify or create team
             var teamFound = await FindInternalTeamAsyync(listOfTeams, providerId, row.Team.Id);
             teamFound ??= IdentifyExistingTeam(listOfTeams, row.Team.Name!, row.Team.ShortName);
-            teamFound ??= await CreateTeamAsync(row.Team);
+            teamFound ??= await CreateTeamAsync(row.Team, listOfTeams);
             await SaveExternalTeamMappingAsync(providerId, teamFound.Id, row.Team.Id);
 
             tableRows.Add(new CompetitionTableEntity
@@ -242,7 +248,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         return teamFound;
     }
 
-    private async Task<TeamEntity> CreateTeamAsync(ExternalTeamDto team)
+    private async Task<TeamEntity> CreateTeamAsync(ExternalTeamDto team, List<TeamEntity> listOfTeams)
     {
         var teamEntity = new TeamEntity
         {
@@ -253,6 +259,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         };
 
         teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);
+        listOfTeams.Add(teamEntity);
         return teamEntity;
     }
 

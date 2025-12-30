@@ -3,7 +3,7 @@ internal static class MatchesQueries
 {
     internal const string CheckMatchExists = @"
         SELECT 
-            COUNT(*) 
+            MatchId
         FROM 
             Matches
         WHERE 
@@ -11,7 +11,7 @@ internal static class MatchesQueries
             AND AwayTeamId = @AwayTeamId
             AND MatchDateUTC = @MatchDateUTC;";
 
-    internal const string InsertFinishedMatch = @"
+    internal const string InsertMatch = @"
         INSERT INTO Matches (
             CompetitionId, SeasonId, Round, MatchDateUTC, HomeTeamId, AwayTeamId, 
             HomeScore, AwayScore, IsFinished, UpdatedDateUTC
@@ -21,10 +21,11 @@ internal static class MatchesQueries
         );
         SELECT last_insert_rowid();";
 
-    internal const string UpdateFinishedMatch = @"
+    internal const string UpdateMatch = @"
             UPDATE Matches 
             SET CompetitionId = @CompetitionId,
                 SeasonId = @SeasonId,
+                Round = @Round, 
                 MatchDateUTC = @MatchDateUTC,
                 HomeTeamId = @HomeTeamId,
                 AwayTeamId = @AwayTeamId,
@@ -38,7 +39,9 @@ internal static class MatchesQueries
             UPDATE Matches 
             SET 
                 HomeForm = @HomeForm,
+                HomeTeamPosition = @HomeTeamPosition,
                 AwayForm = @AwayForm,
+                AwayTeamPosition = @AwayTeamPosition,
                 ExcitmentScore = @ExcitmentScore,
                 CompetitionScore = @CompetitionScore,
                 FixtureScore = @FixtureScore,
@@ -148,6 +151,28 @@ internal static class MatchesQueries
            ON act.CompetitionId = c.CompetitionId
 	       AND act.TeamId = at.Id
         WHERE m.MatchId = @MatchId";
+
+    internal const string SelectTeamLatestMatchDate = @"
+        SELECT 
+	        dateTime(MatchDateUTC) 
+        FROM Matches 
+        WHERE 
+            (HomeTeamId = @TeamId OR AwayTeamId = @TeamId)
+            AND IsFinished = 1
+        ORDER BY datetime(MatchDateUTC) DESC
+        LIMIT 1";
+
+    internal const string SelectRecentMatchesForTeam = @"
+        SELECT 
+	        *
+        FROM Matches 
+        WHERE 
+            (HomeTeamId = @TeamId OR AwayTeamId = @TeamId)
+            AND IsFinished = 1
+        ORDER BY datetime(MatchDateUTC) DESC
+        LIMIT @NumberOfMatches";
+
+
 
     internal const string SelectHeadToHeadMatches = @"
         SELECT 

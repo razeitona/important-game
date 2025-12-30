@@ -23,7 +23,7 @@
         @foreach (var competition in Model.Matches.Competitions)
         {
             <div class="match-league-item" data-league="@competition.CompetitionId">
-                <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + competition.CompetitionId + "/image")" alt="@competition.Name" width="20px" />
+                <img src="@("images/competition/" + competition.CompetitionId + ".png")" alt="@competition.Name" width="20px" />
                 <span>@competition.Name</span>
             </div>
         }

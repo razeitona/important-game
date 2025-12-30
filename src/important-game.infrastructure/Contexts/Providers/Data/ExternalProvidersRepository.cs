@@ -39,7 +39,7 @@ public class ExternalProvidersRepository(IDbConnectionFactory connectionFactory)
         using var connection = _connectionFactory.CreateConnection();
         await connection.ExecuteAsync(
             ExternalProvidersQueries.InsertExternalProviderLog,
-            new { entity.ProviderId, entity.RequestPath, entity.RequestDate });
+            new { entity.ProviderId, entity.RequestPath, RequestDate = entity.RequestDate.ToString("yyyy-MM-dd HH:mm:ss") });
     }
     #endregion
 
