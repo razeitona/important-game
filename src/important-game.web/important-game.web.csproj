@@ -12,6 +12,29 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\css\site.scss" />
+    <Content Remove="wwwroot\images\competition\17.png" />
+    <Content Remove="wwwroot\images\competition\8.png" />
+    <Content Remove="wwwroot\images\team\17.png" />
+    <Content Remove="wwwroot\images\team\2672.png" />
+    <Content Remove="wwwroot\images\team\2817.png" />
+    <Content Remove="wwwroot\images\team\2819.png" />
+    <Content Remove="wwwroot\images\team\2825.png" />
+    <Content Remove="wwwroot\images\team\2826.png" />
+    <Content Remove="wwwroot\images\team\2829.png" />
+    <Content Remove="wwwroot\images\team\2846.png" />
+    <Content Remove="wwwroot\images\team\2849.png" />
+    <Content Remove="wwwroot\images\team\3.png" />
+    <Content Remove="wwwroot\images\team\3001.png" />
+    <Content Remove="wwwroot\images\team\3002.png" />
+    <Content Remove="wwwroot\images\team\3006.png" />
+    <Content Remove="wwwroot\images\team\34.png" />
+    <Content Remove="wwwroot\images\team\35.png" />
+    <Content Remove="wwwroot\images\team\38.png" />
+    <Content Remove="wwwroot\images\team\40.png" />
+    <Content Remove="wwwroot\images\team\41.png" />
+    <Content Remove="wwwroot\images\team\42.png" />
+    <Content Remove="wwwroot\images\team\44.png" />
+    <Content Remove="wwwroot\images\team\60.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +95,78 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Styles\_about.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\images\competition\17.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\competition\8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\17.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2672.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2817.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2819.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2825.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2826.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2829.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2846.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\2849.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\3001.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\3002.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\3006.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\34.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\35.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\38.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\40.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\41.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\42.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\44.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\images\team\60.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

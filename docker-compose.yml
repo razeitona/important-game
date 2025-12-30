@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  webapp:
+  web:
     build:
       context: .
       dockerfile: ./src/important-game.web/Dockerfile
-    container_name: dotnet-webapp
+    container_name: important-game-web
     restart: unless-stopped
     ports:
       - "80:80"
@@ -13,25 +13,39 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Data Source=/app/data/matchwatch.db
-    user: "root:root"
     volumes:
-      # Mount a host directory to the container's /app/data directory
-      - type: bind
-        source: ./data
-        target: /app/data
-        # Add explicit permissions
-        bind:
-          create_host_path: true
+      - ./data:/app/data
     networks:
-      - webapp-network
-    # Add healthcheck
+      - important-game-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
-    # Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: ./src/important-game.app/Dockerfile
+    container_name: important-game-app
+    restart: unless-stopped
+    environment:
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/matchwatch.db
+    volumes:
+      - ./data:/app/data
+    networks:
+      - important-game-network
     deploy:
       resources:
         limits:
@@ -42,8 +56,8 @@ services:
           memory: 512M
 
 volumes:
-  webapp:
+  shared-data:
 
 networks:
-  webapp-network:
+  important-game-network:
     driver: bridge

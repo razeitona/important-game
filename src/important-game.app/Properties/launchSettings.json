@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "important-game.app": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

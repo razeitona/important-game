@@ -14,10 +14,10 @@ builder.Services.AddSassCompiler();
 
 builder.Services.MatchImportanceInfrastructure(builder.Configuration);
 
-builder.Services.AddHostedService<SyncCompetitionJob>();
-builder.Services.AddHostedService<SyncFinishedMatchesJob>();
-builder.Services.AddHostedService<SyncUpcomingMatchesJob>();
-builder.Services.AddHostedService<MatchCalculatorJob>();
+//builder.Services.AddHostedService<SyncCompetitionJob>();
+//builder.Services.AddHostedService<SyncFinishedMatchesJob>();
+//builder.Services.AddHostedService<SyncUpcomingMatchesJob>();
+//builder.Services.AddHostedService<MatchCalculatorJob>();
 
 Batteries.Init();
 SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
