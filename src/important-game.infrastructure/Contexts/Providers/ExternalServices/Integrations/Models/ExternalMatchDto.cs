@@ -8,7 +8,7 @@ public class ExternalMatchDto
     public ExternalTeamDto AwayTeam { get; set; } = new();
     public int? HomeGoals { get; set; }
     public int? AwayGoals { get; set; }
-    public int? RoundId { get; set; }
+    public int? Round { get; set; }
     public ExternalCompetitionDto? Competition { get; set; }
     public ExternalSeasonDto? Season { get; set; }
 }

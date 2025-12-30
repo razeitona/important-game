@@ -49,12 +49,8 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     {
         try
         {
-            _logger.LogInformation("Starting synchronization of matches from external providers");
-
             var provider = _integrationProvider.GetBest<IExternalMatchProvider>();
             var teamsInCompetitions = await GetTeamsFromCompetitionTableAsync();
-
-            _logger.LogInformation("Found {TeamCount} unique teams in CompetitionTable", teamsInCompetitions.Count);
 
             var listOfTeams = await _teamRepository.GetAllTeamsAsync();
             var externalIntegrationTeams = await _externalProvidersRepository.GetExternalIntegrationTeamsByIntegrationAsync(provider.Id);
@@ -63,10 +59,9 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 var externalTeam = externalIntegrationTeams.FirstOrDefault(c => c.InternalTeamId == teamId);
                 if (externalTeam == null)
                     continue;
+
                 await SyncTeamFinishedMatchesAsync(provider, teamId, externalTeam.ExternalTeamId, listOfTeams, cancellationToken);
             }
-
-            _logger.LogInformation("Successfully synchronized matches from external providers");
         }
         catch (Exception ex)
         {
@@ -79,23 +74,30 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     {
         try
         {
-            _logger.LogInformation("Starting synchronization of matches from external providers");
-
             var provider = _integrationProvider.GetBest<IExternalMatchProvider>();
             var activeCompetitions = await _competitionRepository.GetActiveCompetitionsAsync();
-
-            _logger.LogInformation("Found {CompetitionCount} unique competition", activeCompetitions.Count);
 
             var listOfTeams = await _teamRepository.GetAllTeamsAsync();
             foreach (var competition in activeCompetitions)
             {
+                var currentSeason = await _competitionRepository.GetLatestCompetitionSeasonAsync(competition.CompetitionId);
+                if (currentSeason == null)
+                    continue;
+
+                if (currentSeason.SyncMatchesDate.HasValue && currentSeason.SyncMatchesDate.Value.AddHours(12) > DateTime.UtcNow)
+                {
+                    return;
+                }
+
                 var externalCompetition = await _externalProvidersRepository.GetExternalIntegrationCompetitionAsync(provider.Id, competition.CompetitionId);
                 if (externalCompetition == null)
                     continue;
+
                 await SyncCompetitionUpcomingMatchesAsync(provider, externalCompetition.InternalCompetitionId, externalCompetition.ExternalCompetitionId, listOfTeams, cancellationToken);
+
+                await _competitionRepository.UpdateCompetitionSeasonMatchesDateAsync(currentSeason.SeasonId, DateTime.UtcNow);
             }
 
-            _logger.LogInformation("Successfully synchronized matches from external providers");
         }
         catch (Exception ex)
         {
@@ -135,9 +137,14 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     {
         try
         {
-            _logger.LogInformation("Starting synchronization of matches for team {TeamId}", internalTeamId);
+            var lastFinishedMatch = await _matchesRepository.GetTeamLastFinishedMatchDateAsync(internalTeamId);
 
             DateTimeOffset dateFrom = DateTimeOffset.UtcNow.AddYears(-2);
+            if (lastFinishedMatch.HasValue)
+            {
+                dateFrom = lastFinishedMatch.Value.AddDays(1);
+            }
+
             DateTimeOffset dateTo = dateFrom.AddDays(100);
             DateTimeOffset currentDate = DateTimeOffset.UtcNow;
 
@@ -150,7 +157,8 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                     100,
                     cancellationToken);
 
-                await ProcessAndSaveFinishedMatchesAsync(provider.Id, externalMatches, listOfTeams, cancellationToken);
+                if (externalMatches.Count > 0)
+                    await ProcessAndSaveFinishedMatchesAsync(provider.Id, externalMatches, listOfTeams);
 
                 dateFrom = dateTo.AddDays(1);
                 dateTo = dateFrom.AddDays(100);
@@ -158,12 +166,11 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 if (currentDate < dateFrom)
                     break;
             }
-
-            _logger.LogInformation("Completed synchronization of matches for team {TeamId}", internalTeamId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error synchronizing matches for team {TeamId}", internalTeamId);
+            throw;
         }
     }
 
@@ -176,8 +183,6 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     {
         try
         {
-            _logger.LogInformation("Starting synchronization of matches for team {CompetitionId}", internalCompetitionId);
-
             DateTimeOffset dateFrom = DateTimeOffset.UtcNow;
             DateTimeOffset dateTo = dateFrom.AddDays(15);
 
@@ -187,9 +192,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 dateTo,
                 cancellationToken);
 
-            await ProcessAndSaveUpcomingMatchesAsync(provider.Id, internalCompetitionId, externalMatches, listOfTeams, cancellationToken);
-
-            _logger.LogInformation("Completed synchronization of matches for team {CompetitionId}", internalCompetitionId);
+            await ProcessAndSaveUpcomingMatchesAsync(provider.Id, internalCompetitionId, externalMatches, listOfTeams);
         }
         catch (Exception ex)
         {
@@ -200,20 +203,12 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     private async Task ProcessAndSaveFinishedMatchesAsync(
         int providerId,
         List<ExternalMatchDto> externalMatches,
-        List<TeamEntity> listOfTeams,
-        CancellationToken cancellationToken)
+        List<TeamEntity> listOfTeams)
     {
-        var matchesToSave = new List<Match>();
-
         var externalProviderMatches = await _externalProvidersRepository.GetExternalProviderMatchesByProviderAsync(providerId);
 
         foreach (var externalMatch in externalMatches)
         {
-            // Identify external Match mapping
-            var existingExternalMatch = externalProviderMatches.FirstOrDefault(c => c.ExternalMatchId == externalMatch.Id);
-            if (existingExternalMatch != null)
-                continue;
-
             // Identify or create home team
             var homeTeam = await FindOrCreateTeamAsync(providerId, externalMatch.HomeTeam, listOfTeams);
             if (homeTeam == null)
@@ -233,6 +228,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
             {
                 CompetitionId = competitionId,
                 SeasonId = seasonId,
+                Round = externalMatch.Round,
                 MatchDateUTC = externalMatch.MatchDateUtc,
                 HomeTeamId = homeTeam.Id,
                 AwayTeamId = awayTeam.Id,
@@ -242,7 +238,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 UpdatedDateUTC = DateTimeOffset.UtcNow
             };
 
-            match = await _matchesRepository.SaveFinishedMatchAsync(match);
+            match = await _matchesRepository.SaveMatchAsync(match);
 
             // Save external match mapping
             await SaveExternalMatchMappingAsync(providerId, match.MatchId, externalMatch.Id);
@@ -253,18 +249,10 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
         int providerId,
         int internalCompetitionId,
         List<ExternalMatchDto> externalMatches,
-        List<TeamEntity> listOfTeams,
-        CancellationToken cancellationToken)
+        List<TeamEntity> listOfTeams)
     {
-        var externalProviderMatches = await _externalProvidersRepository.GetExternalProviderMatchesByProviderAsync(providerId);
-
         foreach (var externalMatch in externalMatches)
         {
-            // Identify external Match mapping
-            var existingExternalMatch = externalProviderMatches.FirstOrDefault(c => c.ExternalMatchId == externalMatch.Id);
-            if (existingExternalMatch != null)
-                continue;
-
             // Identify or create home team
             var homeTeam = await FindOrCreateTeamAsync(providerId, externalMatch.HomeTeam, listOfTeams);
             if (homeTeam == null)
@@ -283,7 +271,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
             {
                 CompetitionId = internalCompetitionId,
                 SeasonId = seasonId,
-                Round = externalMatch.RoundId,
+                Round = externalMatch.Round,
                 MatchDateUTC = externalMatch.MatchDateUtc,
                 HomeTeamId = homeTeam.Id,
                 AwayTeamId = awayTeam.Id,
@@ -293,7 +281,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 UpdatedDateUTC = DateTimeOffset.UtcNow
             };
 
-            match = await _matchesRepository.SaveFinishedMatchAsync(match);
+            match = await _matchesRepository.SaveMatchAsync(match);
 
             // Save external match mapping
             await SaveExternalMatchMappingAsync(providerId, match.MatchId, externalMatch.Id);
@@ -331,10 +319,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
         return internalTeam;
     }
 
-    private async Task<TeamEntity?> FindInternalTeamByExternalIdAsync(
-        int providerId,
-        int externalTeamId,
-        List<TeamEntity> listOfTeams)
+    private async Task<TeamEntity?> FindInternalTeamByExternalIdAsync(int providerId, int externalTeamId, List<TeamEntity> listOfTeams)
     {
         var externalTeamInfo = await _externalProvidersRepository.GetExternalIntegrationTeamByExternalIdAsync(providerId, externalTeamId);
         if (externalTeamInfo == null)

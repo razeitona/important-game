@@ -22,22 +22,23 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         return result.ToList();
     }
 
-    public async Task<MatchesEntity> SaveFinishedMatchAsync(MatchesEntity entity)
+    public async Task<MatchesEntity> SaveMatchAsync(MatchesEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         using var connection = _connectionFactory.CreateConnection();
-        var exists = await connection.ExecuteScalarAsync<int>(MatchesQueries.CheckMatchExists,
-            new { entity.HomeTeamId, entity.AwayTeamId, entity.MatchDateUTC }) > 0;
+        var matchId = await connection.ExecuteScalarAsync<int>(MatchesQueries.CheckMatchExists,
+            new { entity.HomeTeamId, entity.AwayTeamId, MatchDateUTC = entity.MatchDateUTC.ToString("yyyy-MM-dd HH:mm:ss") });
 
-        if (exists)
+        if (matchId > 0)
         {
-            await connection.ExecuteAsync(MatchesQueries.UpdateFinishedMatch, new
+            await connection.ExecuteAsync(MatchesQueries.UpdateMatch, new
             {
-                entity.MatchId,
+                MatchId = matchId,
                 entity.CompetitionId,
                 entity.SeasonId,
-                entity.MatchDateUTC,
+                entity.Round,
+                MatchDateUTC = entity.MatchDateUTC.ToString("yyyy-MM-dd HH:mm:ss"),
                 entity.HomeTeamId,
                 entity.AwayTeamId,
                 entity.HomeScore,
@@ -52,19 +53,19 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
                 entity.HeadToHeadScore,
                 entity.RivalryScore,
                 entity.TitleHolderScore,
-                entity.UpdatedDateUTC
+                UpdatedDateUTC = entity.UpdatedDateUTC.ToString("yyyy-MM-dd HH:mm:ss")
             });
-
+            entity.MatchId = matchId;
             return entity;
         }
         else
         {
-            var insertedId = await connection.ExecuteScalarAsync<int>(MatchesQueries.InsertFinishedMatch, new
+            var insertedId = await connection.ExecuteScalarAsync<int>(MatchesQueries.InsertMatch, new
             {
                 entity.CompetitionId,
                 entity.SeasonId,
                 entity.Round,
-                entity.MatchDateUTC,
+                MatchDateUTC = entity.MatchDateUTC.ToString("yyyy-MM-dd HH:mm:ss"),
                 entity.HomeTeamId,
                 entity.AwayTeamId,
                 entity.HomeScore,
@@ -79,7 +80,7 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
                 entity.HeadToHeadScore,
                 entity.RivalryScore,
                 entity.TitleHolderScore,
-                entity.UpdatedDateUTC
+                UpdatedDateUTC = entity.UpdatedDateUTC.ToString("yyyy-MM-dd HH:mm:ss")
             });
             entity.MatchId = insertedId;
             return entity;
@@ -95,7 +96,9 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         {
             entity.MatchId,
             entity.HomeForm,
+            entity.HomeTeamPosition,
             entity.AwayForm,
+            entity.AwayTeamPosition,
             entity.ExcitmentScore,
             entity.CompetitionScore,
             entity.FixtureScore,
@@ -105,7 +108,7 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
             entity.HeadToHeadScore,
             entity.RivalryScore,
             entity.TitleHolderScore,
-            entity.UpdatedDateUTC
+            UpdatedDateUTC = entity.UpdatedDateUTC.ToString("yyyy-MM-dd HH:mm:ss")
         });
     }
 
@@ -121,6 +124,21 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchById, new { MatchId = matchId });
         return result;
+    }
+
+    public async Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<DateTimeOffset?>(MatchesQueries.SelectTeamLatestMatchDate, new { TeamId = teamId });
+        return result;
+    }
+
+    public async Task<List<MatchesEntity>> GetRecentMatchesForTeamAsync(int teamId, int numberOfMatches)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<MatchesEntity>(MatchesQueries.SelectRecentMatchesForTeam,
+            new { TeamId = teamId, NumberOfMatches = numberOfMatches });
+        return result.ToList();
     }
 
     #region Head To Head

@@ -1,11 +1,11 @@
-﻿using important_game.infrastructure.Contexts.ScoreCalculator;
+﻿using important_game.infrastructure.Contexts.Providers.ExternalServices;
 
-public class MatchCalculatorJob : BackgroundService
+public class SyncFinishedMatchesJob : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<MatchCalculatorJob> _logger;
+    private readonly ILogger<SyncFinishedMatchesJob> _logger;
 
-    public MatchCalculatorJob(IServiceProvider serviceProvider, ILogger<MatchCalculatorJob> logger)
+    public SyncFinishedMatchesJob(IServiceProvider serviceProvider, ILogger<SyncFinishedMatchesJob> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -15,7 +15,7 @@ public class MatchCalculatorJob : BackgroundService
     {
         await RunJobAsync(stoppingToken).ConfigureAwait(false);
 
-        using var timer = new PeriodicTimer(TimeSpan.FromHours(1));
+        using var timer = new PeriodicTimer(TimeSpan.FromDays(1));
 
         try
         {
@@ -40,8 +40,8 @@ public class MatchCalculatorJob : BackgroundService
         try
         {
             using var scope = _serviceProvider.CreateScope();
-            var calculator = scope.ServiceProvider.GetRequiredService<IMatchCalculatorOrchestrator>();
-            await calculator.CalculateExcitmentScoreAsync().ConfigureAwait(false);
+            var matchProcessor = scope.ServiceProvider.GetRequiredService<IExternalMatchesSyncService>();
+            await matchProcessor.SyncFinishedMatchesAsync().ConfigureAwait(false);
         }
         catch (OperationCanceledException ex)
         {

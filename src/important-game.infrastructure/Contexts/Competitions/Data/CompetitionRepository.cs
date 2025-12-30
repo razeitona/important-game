@@ -169,7 +169,16 @@ public class CompetitionRepository : ICompetitionRepository
         using var connection = _connectionFactory.CreateConnection();
         await connection.ExecuteAsync(
             CompetitionSeasonsQueries.UpdateCompetitionSeasonStandingDate,
-            new { SeasonId = seasonId, SyncStandingsDate = updateDate });
+            new { SeasonId = seasonId, SyncStandingsDate = updateDate.ToString("yyyy-MM-dd HH:mm:ss") });
+
+    }
+
+    public async Task UpdateCompetitionSeasonMatchesDateAsync(int seasonId, DateTimeOffset updateDate)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(
+            CompetitionSeasonsQueries.UpdateCompetitionSeasonMatchesDate,
+            new { SeasonId = seasonId, SyncMatchesDate = updateDate.ToString("yyyy-MM-dd HH:mm:ss") });
 
     }
     #endregion

@@ -11,7 +11,7 @@ internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRe
     public async Task<List<MatchDto>> GetAllUpcomingMatchesAsync(CancellationToken cancellationToken = default)
     {
         var upcomingMatches = await matchesRepository.GetAllUpcomingMatchesAsync();
-        return upcomingMatches ?? [];
+        return upcomingMatches?.OrderBy(c => c.MatchDateUTC).ToList() ?? [];
     }
 
     public async Task<MatchesViewModel> GetAllMatchesAsync(CancellationToken cancellationToken = default)
@@ -22,7 +22,7 @@ internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRe
             return new();
 
         var matchViewModel = new MatchesViewModel();
-        matchViewModel.Matches = upcomingMatches;
+        matchViewModel.Matches = upcomingMatches.OrderBy(c => c.MatchDateUTC).ToList();
 
         var groupCompetitions = upcomingMatches.GroupBy(c => c.CompetitionId);
         foreach (var group in groupCompetitions)

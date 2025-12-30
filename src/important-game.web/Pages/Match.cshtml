@@ -31,7 +31,7 @@
             teamId = matchInfo.AwayTeamId;
 
         var url = "https://matchtowatch.net/match/" + matchInfo.MatchId;
-        var image = "https://api.sofascore.app/api/v1/team/" + teamId + "/image";
+        var image = "/images/" + teamId;
     }
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName) - Match to watch">
@@ -45,7 +45,7 @@
         <div class="match-detail-info match-detail-card">
             <div class="match-detail-league">
                 <div>
-                    <img src="@("https://api.sofascore.app/api/v1/unique-tournament/" + matchInfo.CompetitionId + "/image")" alt="@(matchInfo.CompetitionName)" />
+                    <img src="@("/images/competition/" + matchInfo.CompetitionId + ".png")" alt="@(matchInfo.CompetitionName)" />
                 </div>
                 <div class="match-detail-league-title">
                     @matchInfo.CompetitionName
@@ -58,14 +58,14 @@
             </div>
             <div class="match-detail-teams">
                 <div class="match-detail-team-info">
-                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.HomeTeamId + "/image")" alt="@(matchInfo.HomeTeamName)" />
+                    <img src="@("/images/team/" + matchInfo.HomeTeamId + ".png")" alt="@(matchInfo.HomeTeamName)" />
                     <p>@matchInfo.HomeTeamName</p>
                 </div>
                 <div class="match-detail-team-label">
                     <span>vs</span>
                 </div>
                 <div class="match-detail-team-info">
-                    <img src="@("https://api.sofascore.app/api/v1/team/" + matchInfo.AwayTeamId + "/image")" alt="@(matchInfo.AwayTeamName)" />
+                    <img src="@("/images/team/" + matchInfo.AwayTeamId + ".png")" alt="@(matchInfo.AwayTeamName)" />
                     <p>@matchInfo.AwayTeamName</p>
                 </div>
             </div>

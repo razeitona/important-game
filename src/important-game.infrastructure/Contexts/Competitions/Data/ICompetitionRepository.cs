@@ -39,6 +39,7 @@ public interface ICompetitionRepository
     Task<CompetitionSeasonsEntity?> GetLatestCompetitionSeasonAsync(int competitionId);
     Task DeleteCompetitionSeasonAsync(int seasonId);
     Task UpdateCompetitionSeasonStandingDateAsync(int seasonId, DateTimeOffset updateDate);
+    Task UpdateCompetitionSeasonMatchesDateAsync(int seasonId, DateTimeOffset updateDate);
 
     #endregion
 

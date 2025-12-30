@@ -1,13 +1,22 @@
 ﻿using important_game.infrastructure.Contexts.Competitions.Data.Entities;
 using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.ScoreCalculator.Mappers;
+using important_game.infrastructure.Contexts.ScoreCalculator.Models;
 using important_game.infrastructure.Contexts.ScoreCalculator.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace important_game.infrastructure.Contexts.ScoreCalculator;
+
+public interface IMatchCalculator
+{
+    MatchCalcsDto? CalculateMatchScore(UnfinishedMatchDto match, List<CompetitionTableEntity> competitionTable, RivalryEntity? rivarlyInformation
+        , List<HeadToHeadDto> headToHeadMatches, List<MatchesEntity> homeMatches, List<MatchesEntity> awayMatches);
+}
+
 public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
 {
     public MatchCalcsDto? CalculateMatchScore(UnfinishedMatchDto match, List<CompetitionTableEntity> competitionTable,
-        RivalryEntity? rivarlyInformation, List<HeadToHeadDto> headToHeadMatches)
+        RivalryEntity? rivarlyInformation, List<HeadToHeadDto> headToHeadMatches, List<MatchesEntity> homeMatches, List<MatchesEntity> awayMatches)
     {
 
         var homeTeamTable = competitionTable.FirstOrDefault(c => c.TeamId == match.HomeTeamId);
@@ -19,51 +28,54 @@ public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
             return default;
         }
 
+        var homeTeamMatchesStats = TeamMatchStatMapper.MapToTeamMatchStatDto(match.HomeTeamId, homeMatches, headToHeadMatches);
+        var awayTeamMatchesStats = TeamMatchStatMapper.MapToTeamMatchStatDto(match.AwayTeamId, awayMatches, headToHeadMatches);
+
         var matchResult = new MatchCalcsDto();
         matchResult.MatchId = match.MatchId;
-
         matchResult.CompetitionScore = match.LeagueRanking;
-        matchResult.FixtureScore = CalculateFixtureValue(match.Round, match.NumberOfRounds);
-
-        var homeTeamFormScore = CalculateTeamFormScore(homeTeamTable.Wins, homeTeamTable.Draws, homeTeamTable.Matches);
-        var awayTeamFormScore = CalculateTeamFormScore(awayTeamTable.Wins, awayTeamTable.Draws, awayTeamTable.Matches);
-        matchResult.FormScore = (homeTeamFormScore + awayTeamFormScore) / 2d;
-
-        var homeTeamGoalScore = CalculateTeamGoalsScore(homeTeamTable.GoalsFor, homeTeamTable.Matches);
-        var awayTeamGoalScore = CalculateTeamGoalsScore(awayTeamTable.GoalsFor, awayTeamTable.Matches);
-        matchResult.GoalsScore = homeTeamGoalScore + awayTeamGoalScore;
-
         matchResult.CompetitionStandingScore = CalculateLeagueTableValue(homeTeamTable, awayTeamTable, match.NumberOfRounds);
-        matchResult.HeadToHeadScore = CalculateHeadToHeadScore(headToHeadMatches, match.HomeTeamId, match.AwayTeamId);
-        matchResult.TitleHolderScore = CalculateTitleHolderScore(match.HomeTeamId, match.AwayTeamId, match.TitleHolderId);
+        matchResult.FixtureScore = CalculateFixtureValue(match.Round, match.NumberOfRounds);
+        matchResult.FormScore = CalculateFormScore(homeTeamMatchesStats, awayTeamMatchesStats);
+        matchResult.GoalsScore = CalculateGoalScore(homeTeamMatchesStats, awayTeamMatchesStats);
+        matchResult.HeadToHeadScore = CalculateHeadToHeadScore(homeTeamMatchesStats, awayTeamMatchesStats);
         matchResult.RivalryScore = rivarlyInformation?.RivarlyValue ?? 0d;
+        matchResult.TitleHolderScore = CalculateTitleHolderScore(match.HomeTeamId, match.AwayTeamId, match.TitleHolderId);
 
         var isLateStage = IsLateStage(homeTeamTable.Position, match.NumberOfRounds, competitionTable.Count);
+        matchResult.ExcitmentScore = CalculateExcitmentScore(matchResult, isLateStage);
 
-        matchResult.ExcitmentScore =
-            matchResult.CompetitionScore * CalculatorCoeficients.CompetitionCoef +
-            matchResult.FixtureScore * CalculatorCoeficients.FixtureCoef +
-            matchResult.FormScore * CalculatorCoeficients.TeamFormCoef +
-            matchResult.GoalsScore * CalculatorCoeficients.TeamGoalsCoef +
-            matchResult.CompetitionStandingScore * CalculatorCoeficients.TableRankCoef +
-            matchResult.HeadToHeadScore * CalculatorCoeficients.HeadToHeadCoef +
-            matchResult.TitleHolderScore * CalculatorCoeficients.TitleHolderCoef +
-            matchResult.RivalryScore * CalculatorCoeficients.RivalryCoef;
+        matchResult.HomeForm = string.Join(",", homeTeamMatchesStats.Form.Select(c => (int)c).ToArray());
+        matchResult.AwayForm = string.Join(",", awayTeamMatchesStats.Form.Select(c => (int)c).ToArray());
+        matchResult.HomeTeamPosition = homeTeamTable.Position;
+        matchResult.AwayTeamPosition = awayTeamTable.Position;
 
         return matchResult;
-
-
     }
 
-    private double CalculateFixtureValue(int? currentRound, int? totalRounds)
+    private static double CalculateGoalScore(TeamMatchesStatsDto homeStats, TeamMatchesStatsDto awayStats)
+    {
+        var homeTeamGoalScore = homeStats.Matches == 0 ? 0d : (double)homeStats.GoalsFor / ((double)homeStats.Matches * 2.0d);
+        var awayTeamGoalScore = awayStats.Matches == 0 ? 0d : (double)awayStats.GoalsFor / ((double)awayStats.Matches * 2.0d);
+        return Math.Min(Math.Round((homeTeamGoalScore + awayTeamGoalScore)/2.0d, 3),1.0d);
+    }
+
+    private static double CalculateFixtureValue(int? currentRound, int? totalRounds)
     {
         if (!currentRound.HasValue || !totalRounds.HasValue || totalRounds == 0)
             return 0d;
 
-        return (double)currentRound / (double)totalRounds;
+        return Math.Round((double)currentRound / (double)totalRounds, 3);
     }
 
-    private double CalculateLeagueTableValue(CompetitionTableEntity homeTeamTable, CompetitionTableEntity awayTeamTable, int totalRounds)
+    private static double CalculateFormScore(TeamMatchesStatsDto homeStats, TeamMatchesStatsDto awayStats)
+    {
+        var homeTeamFormScore = homeStats.Matches == 0 ? 0d : ((double)(homeStats.Wins * 3d) + (double)homeStats.Draws) / 15d;
+        var awayTeamFormScore = awayStats.Matches == 0 ? 0d : ((double)(awayStats.Wins * 3d) + (double)awayStats.Draws) / 15d;
+        return Math.Round((homeTeamFormScore + awayTeamFormScore) / 2d, 3);
+    }
+
+    private static double CalculateLeagueTableValue(CompetitionTableEntity homeTeamTable, CompetitionTableEntity awayTeamTable, int totalRounds)
     {
         if (totalRounds == 0)
             return 0d;
@@ -93,82 +105,54 @@ public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
         var maxPointDifference = (totalRounds - Math.Max(homeTeamMatches, awayTeamMatches)) * 3d;
 
         if (maxPointDifference <= 0)
-            return positionValue * topBottomMatchupValue;
+            return Math.Round(positionValue * topBottomMatchupValue, 3);
 
         var pointImpactValue = 1d / (1d + (pointDifference / (maxPointDifference - 1d)));
 
-        return positionValue * topBottomMatchupValue * pointImpactValue;
+        return Math.Round(positionValue * topBottomMatchupValue * pointImpactValue, 3);
     }
 
-    public double CalculateTitleHolderScore(int homeTeamId, int awayTeamId, int? titleHolderId)
+    public static double CalculateTitleHolderScore(int homeTeamId, int awayTeamId, int? titleHolderId)
     {
         if (!titleHolderId.HasValue)
             return 0d;
 
-        return homeTeamId == titleHolderId.Value || awayTeamId == titleHolderId.Value ? 1d : 0d;
+        return Math.Round(homeTeamId == titleHolderId.Value || awayTeamId == titleHolderId.Value ? 1d : 0d, 3);
     }
 
-    public double CalculateTeamFormScore(int wins, int draws, int matches)
+    private static double CalculateHeadToHeadScore(TeamMatchesStatsDto homeStats, TeamMatchesStatsDto awayStats)
     {
-        if (matches == 0)
-            return 0d;
-
-        // Maximum points in last 5 games is 15 (5 wins)
-        return ((double)(wins * 3) + (double)draws) / 15d;
-    }
-
-    public double CalculateTeamGoalsScore(int goalsFor, int matches)
-    {
-        if (matches == 0)
-            return 0d;
-
-        return (double)goalsFor / (double)matches * 2.0;
-    }
-
-    private double? CalculateHeadToHeadScore(List<HeadToHeadDto> headToHeadMatches, int homeTeamId, int awayTeamId)
-    {
-        if (headToHeadMatches == null || headToHeadMatches.Count == 0)
-            return 0.5d;
-
-        var matches = headToHeadMatches.Where(c => c.MatchDateUTC > DateTimeOffset.UtcNow.AddYears(-2)).OrderByDescending(h => h.MatchDateUTC).Take(5);
-        int homeTeamWins = 0, awayTeamWins = 0, draws = 0;
-
-        foreach (var match in matches)
-        {
-            if (match.HomeTeamId == homeTeamId)
-            {
-                if (match.HomeTeamScore > match.AwayTeamScore)
-                    homeTeamWins++;
-                else if (match.HomeTeamScore < match.AwayTeamScore)
-                    awayTeamWins++;
-                else
-                    draws++;
-            }
-            else if (match.AwayTeamId == homeTeamId)
-            {
-                if (match.AwayTeamScore > match.HomeTeamScore)
-                    homeTeamWins++;
-                else if (match.AwayTeamScore < match.HomeTeamScore)
-                    awayTeamWins++;
-                else
-                    draws++;
-            }
-        }
-
-        if (homeTeamWins == 0 && awayTeamWins == 0 && draws == 0)
+        if (homeStats.HeadToHeadMatches == 0)
             return 0.5d;
 
         // Maximum value from 5 games: 3+3+3 (3 wins each + 2 draws) = 15
-        var value = ((homeTeamWins + awayTeamWins) * 3d + draws) / 15d;
-        return value > 1d ? 1d : value;
+        var value = ((homeStats.HeadToHeadWins + awayStats.HeadToHeadWins) * 3d + homeStats.HeadToHeadDraws) / 15d;
+        return Math.Round(value > 1d ? 1d : value, 3);
     }
 
-    public bool IsLateStage(int currentRound, int? totalRounds, int totalStandings)
+    public static bool IsLateStage(int currentRound, int? totalRounds, int totalStandings)
     {
         if (!totalRounds.HasValue || totalRounds == 0)
             return false;
 
         var stagePercentage = (double)currentRound / (double)totalRounds;
         return stagePercentage > 0.8d && totalRounds > totalStandings;
+    }
+
+    private static double CalculateExcitmentScore(MatchCalcsDto matchResult, bool isLateStage)
+    {
+        double competitionScore = matchResult.CompetitionScore * CalculatorCoeficients.CompetitionCoef(isLateStage);
+        double fixtureScore = matchResult.FixtureScore * CalculatorCoeficients.FixtureCoef(isLateStage);
+        double formScore = matchResult.FormScore * CalculatorCoeficients.TeamFormCoef(isLateStage);
+        double goalsScore = matchResult.GoalsScore * CalculatorCoeficients.TeamGoalsCoef(isLateStage);
+        double standingsScore = matchResult.CompetitionStandingScore * CalculatorCoeficients.TableRankCoef(isLateStage);
+        double headToheadScore = matchResult.HeadToHeadScore * CalculatorCoeficients.HeadToHeadCoef(isLateStage);
+        double titleScore = matchResult.TitleHolderScore * CalculatorCoeficients.TitleHolderCoef(isLateStage);
+        double rivalryScore = matchResult.RivalryScore * CalculatorCoeficients.RivalryCoef(isLateStage);
+
+        var finalScore = competitionScore + fixtureScore + formScore + goalsScore +
+                         standingsScore + headToheadScore + titleScore + rivalryScore;
+        return Math.Round(finalScore, 3);
+
     }
 }

@@ -14,13 +14,14 @@ builder.Services.AddSassCompiler();
 
 builder.Services.MatchImportanceInfrastructure(builder.Configuration);
 
-//builder.Services.AddHostedService<SyncCompetitionJob>();
-//builder.Services.AddHostedService<SyncMatchesJob>();
+builder.Services.AddHostedService<SyncCompetitionJob>();
+builder.Services.AddHostedService<SyncFinishedMatchesJob>();
+builder.Services.AddHostedService<SyncUpcomingMatchesJob>();
 builder.Services.AddHostedService<MatchCalculatorJob>();
-//builder.Services.AddHostedService<LiveMatchCalculatorJob>();
 
 Batteries.Init();
 SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
+SqlMapper.AddTypeHandler(new NullableDateTimeOffsetHandler());
 
 var app = builder.Build();
 
@@ -28,10 +29,8 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
