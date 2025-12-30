@@ -42,19 +42,19 @@ public static class DependencyInjectionSetup
             }
         });
 
-        services.AddScoped<IExcitmentMatchProcessor, ExcitementMatchProcessor>();
-        services.AddScoped<IExcitmentMatchLiveProcessor, ExcitmentMatchLiveProcessor>();
-        services.AddScoped<IExcitmentMatchService, ExcitmentMatchService>();
+        //services.AddScoped<IExcitmentMatchProcessor, ExcitementMatchProcessor>();
+        //services.AddScoped<IExcitmentMatchLiveProcessor, ExcitmentMatchLiveProcessor>();
+        //services.AddScoped<IExcitmentMatchService, ExcitmentMatchService>();
 
-        services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
-        services.AddHttpClient<ITelegramBot, TelegramBot>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<TelegramOptions>>().Value;
-            if (!string.IsNullOrWhiteSpace(options.BotToken))
-            {
-                client.BaseAddress = new Uri($"https://api.telegram.org/bot{options.BotToken}/");
-            }
-        });
+        //services.Configure<TelegramOptions>(configuration.GetSection("Telegram"));
+        //services.AddHttpClient<ITelegramBot, TelegramBot>((sp, client) =>
+        //{
+        //    var options = sp.GetRequiredService<IOptions<TelegramOptions>>().Value;
+        //    if (!string.IsNullOrWhiteSpace(options.BotToken))
+        //    {
+        //        client.BaseAddress = new Uri($"https://api.telegram.org/bot{options.BotToken}/");
+        //    }
+        //});
 
         // Register Dapper database infrastructure
         // Connection factory for database access

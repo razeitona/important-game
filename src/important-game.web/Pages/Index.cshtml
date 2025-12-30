@@ -5,14 +5,34 @@
     ViewData["Title"] = "Match to Watch - Discover today’s most exciting football matches";
 }
 
+<div class="ad-container ad-leaderboard">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="horizontal"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
 @if (Model.TrendingMatches.Count > 0)
 {
-    <div class="matches-section">
+    <div class="matches-section" id="trending-matches-section">
         <div class="matches-section-title">
             <h1>Match of the week</h1>
             <a href="/matches">See all</a>
         </div>
-        <div class="matches-section-content">
+
+        @* Skeleton loading state (hidden by default) *@
+        <div class="matches-section-content skeleton-content" style="display: none;">
+            @for (int i = 0; i < 3; i++)
+            {
+                <partial name="_SkeletonMatchCardSimple" />
+            }
+        </div>
+
+        @* Actual content *@
+        <div class="matches-section-content actual-content">
             @foreach (var match in Model.TrendingMatches)
             {
                 <partial name="_MatchCardSimple" for="@match" />
@@ -21,16 +41,35 @@
     </div>
 }
 
-<div class="d-flex justify-content-end">
-    <a href="https://t.me/matchtowatch" class="mt-telegram">Join Telegram <i class="bi bi-telegram"></i></a>
+<div class="ad-container ad-between-sections">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-format="fluid"
+         data-ad-layout-key="-fb+5w+4e-db+86"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
+@* <div class="d-flex justify-content-end">
+    <a href="https://t.me/matchtowatch" class="mt-telegram">Join Telegram <i class="bi bi-telegram"></i></a>
+</div> *@
 
-<div class="matches-section">
+<div class="matches-section" id="upcoming-matches-section">
     <div class="matches-section-title">
         <h1>Upcoming matches</h1>
         <a href="/matches">See all</a>
     </div>
-    <div class="matches-section-content">
+
+    @* Skeleton loading state (hidden by default) *@
+    <div class="matches-section-content skeleton-content" style="display: none;">
+        @for (int i = 0; i < 5; i++)
+        {
+            <partial name="_SkeletonMatchCardSimple" />
+        }
+    </div>
+
+    @* Actual content *@
+    <div class="matches-section-content actual-content">
         @if (Model.OtherMatches.Count == 0)
         {
             <label>No excitment match to watch this week. We are looking for one.</label>
@@ -46,26 +85,5 @@
 </div>
 
 @section Scripts {
-
-    <script>
-
-        $(document).ready(function () {
-            // $("time").each(function (elem) {
-            //     var utctimeval = $(this).html().trim();
-            //     var date = new Date(utctimeval);
-            //     var optionsDate = {
-            //         day: "2-digit",
-            //         month: "2-digit",
-            //         year: "2-digit",
-            //     };
-            //     var optionsTime = {
-            //         hour: "numeric",
-            //         minute: "numeric",
-            //     };
-            //     $(this).html(date.toLocaleString("pt", optionsDate) + " " + date.toLocaleString("pt", optionsTime));
-            // });
-
-        });
-
-    </script>
+    @* Timezone conversion is now handled by site.js *@
 }

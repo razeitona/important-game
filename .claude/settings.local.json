@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(dir:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(timeout 10 bash:*)",
+      "Bash(ls -la \"d:\\\\Ricardo\\\\repos\\\\important-game\\\\src\\\\important-game.web\\\\Pages\"\" | grep -E \".cshtml \")"
     ]
   }
 }

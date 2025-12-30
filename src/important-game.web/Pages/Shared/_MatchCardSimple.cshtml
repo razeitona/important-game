@@ -10,7 +10,39 @@
      data-game-score="@(Math.Round(Model.ExcitmentScore * 100, 0))"
      data-game-league="@Model.CompetitionId"
      id="game-@(SlugHelper.GenerateSlug(Model.HomeTeamName))v@(SlugHelper.GenerateSlug(Model.AwayTeamName))">
-    <a href="/match/@(Model.MatchId)" class="match-card-link">
+
+    @* Share Button Trigger *@
+    <button class="match-card-share-trigger"
+            data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"
+            data-match-score="@(Math.Round(Model.ExcitmentScore * 100, 0))"
+            data-match-url="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))"
+            title="Share this match">
+        <i class="bi bi-share-fill"></i>
+    </button>
+
+    @* Share Overlay *@
+    <div class="share-overlay">
+        <button class="share-overlay-close">
+            <i class="bi bi-x"></i>
+        </button>
+        <div class="share-overlay-title">Share this match</div>
+        <div class="share-overlay-buttons">
+            <button class="share-btn share-whatsapp" data-share-type="whatsapp" title="Share on WhatsApp">
+                <i class="bi bi-whatsapp"></i>
+            </button>
+            <button class="share-btn share-twitter" data-share-type="twitter" title="Share on Twitter/X">
+                <i class="bi bi-twitter-x"></i>
+            </button>
+            <button class="share-btn share-facebook" data-share-type="facebook" title="Share on Facebook">
+                <i class="bi bi-facebook"></i>
+            </button>
+            <button class="share-btn share-copy" data-share-type="copy" title="Copy Link">
+                <i class="bi bi-link-45deg"></i>
+            </button>
+        </div>
+    </div>
+
+    <a href="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))" class="match-card-link">
         <div class="card-header match-header">
             <div>
                 <img src="@("images/competition/" + Model.CompetitionId + ".png")" alt="@Model.CompetitionName" width="1.2rem" />
@@ -27,7 +59,7 @@
             else
             {
                 <div class="match-card-time">
-                    <time>
+                    <time data-utc-time="@Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
                         @Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
@@ -37,7 +69,7 @@
             <div class="match-card-content">
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("images/team/" + Model.HomeTeamId + ".png")" alt="@(Model.HomeTeamName)" width="60px" />
+                        <img src="@("images/team/" + Model.HomeTeamId + ".png")" alt="@(Model.HomeTeamName)" width="80px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.HomeTeamName</span>
@@ -51,14 +83,14 @@
                         }
                         else
                         {
-                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                            <i class="bi bi-fire es-fire-icon"></i> @(Math.Round(Model.ExcitmentScore * 100, 0))
                         }
                     </div>
                     <span>Excitment score</span>
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("images/team/" + Model.AwayTeamId + ".png")" alt="@(Model.AwayTeamName)" width="60px" />
+                        <img src="@("images/team/" + Model.AwayTeamId + ".png")" alt="@(Model.AwayTeamName)" width="80px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.AwayTeamName</span>

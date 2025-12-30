@@ -1,0 +1,32 @@
+// Ads Styles
+.ad-container {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+    min-height: 90px; // Evitar layout shift
+
+    &.ad-leaderboard {
+        max-width: 728px;
+        margin: 1.5rem auto;
+    }
+
+    &.ad-sidebar {
+        max-width: 300px;
+        position: sticky;
+        top: 100px; // Sticky ad
+    }
+
+    &.ad-between-sections {
+        border-top: 1px solid #2a2d35;
+        border-bottom: 1px solid #2a2d35;
+        padding: 1rem 0;
+        background: rgba(255,255,255,0.02);
+    }
+}
+
+// Mobile
+@media (max-width: 768px) {
+    .ad-sidebar {
+        display: none; // Ocultar sidebar ads no mobile
+    }
+}

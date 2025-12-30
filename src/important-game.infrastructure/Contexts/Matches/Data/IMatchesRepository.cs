@@ -24,6 +24,7 @@ public interface IMatchesRepository
     Task UpdateMatchCalculatorAsync(MatchCalcsDto entity);
     Task<List<MatchDto>> GetAllUpcomingMatchesAsync();
     Task<MatchDetailDto?> GetMatchByIdAsync(int matchId);
+    Task<MatchDetailDto?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug);
     Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId);
     Task<List<MatchesEntity>> GetRecentMatchesForTeamAsync(int teamId, int numberOfMatches);
 

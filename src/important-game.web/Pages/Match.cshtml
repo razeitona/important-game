@@ -1,4 +1,4 @@
-﻿@page "/match/{id:int}"
+﻿@page "/match/{slug}"
 @using System.Globalization
 @using important_game.infrastructure.Extensions
 @using important_game.infrastructure.ImportantMatch
@@ -30,7 +30,9 @@
         if (matchInfo.AwayTeamTablePosition < matchInfo.HomeTeamTablePosition)
             teamId = matchInfo.AwayTeamId;
 
-        var url = "https://matchtowatch.net/match/" + matchInfo.MatchId;
+        var homeSlug = SlugHelper.GenerateSlug(matchInfo.HomeTeamName);
+        var awaySlug = SlugHelper.GenerateSlug(matchInfo.AwayTeamName);
+        var url = $"https://matchtowatch.net/match/{homeSlug}-vs-{awaySlug}";
         var image = "/images/" + teamId;
     }
     <meta name="twitter:card" content="summary_large_image">
@@ -51,7 +53,7 @@
                     @matchInfo.CompetitionName
                 </div>
                 <div class="match-detail-time">
-                    <time>
+                    <time data-utc-time="@matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
                         @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
                     </time>
                 </div>
@@ -69,6 +71,37 @@
                     <p>@matchInfo.AwayTeamName</p>
                 </div>
             </div>
+
+            @* SHARE BUTTONS *@
+            <div class="share-buttons">
+                <span class="share-label">Share:</span>
+                <button class="share-btn share-whatsapp"
+                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
+                        data-share-type="whatsapp"
+                        title="Share on WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                </button>
+                <button class="share-btn share-twitter"
+                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
+                        data-share-type="twitter"
+                        title="Share on Twitter/X">
+                    <i class="bi bi-twitter-x"></i>
+                </button>
+                <button class="share-btn share-facebook"
+                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
+                        data-share-type="facebook"
+                        title="Share on Facebook">
+                    <i class="bi bi-facebook"></i>
+                </button>
+                <button class="share-btn share-copy"
+                        data-share-type="copy"
+                        title="Copy Link">
+                    <i class="bi bi-link-45deg"></i>
+                </button>
+            </div>
         </div>
         @* HEAD TO HEAD *@
         <div class="match-detail-info match-detail-card match-detail-info-h2h">
@@ -83,7 +116,11 @@
                     foreach (var match in matchInfo.HeadToHead)
                     {
                         <div class="match-detail-info-h2h-item">
-                            <span class="h2h-date">@match.MatchDateUTC.ToString("dd/MM/yyyy")</span>
+                            <span class="h2h-date">
+                                <time data-utc-time="@match.MatchDateUTC.ToString("dd/MM/yyyy") 00:00">
+                                    @match.MatchDateUTC.ToString("dd/MM/yyyy")
+                                </time>
+                            </span>
                             <div class="h2h-match">
                                 @if (match.HomeTeamScore > match.AwayTeamScore)
                                 {
@@ -151,6 +188,15 @@
         </div>
     </div>
     <div class="match-detail-content-right">
+        <div class="ad-container ad-sidebar">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXX"
+                 data-ad-slot="XXXXXXXXXX"
+                 data-ad-format="rectangle"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
         @if (false)
         {
             <div class="match-detail-info match-detail-card match-detail-info-live">

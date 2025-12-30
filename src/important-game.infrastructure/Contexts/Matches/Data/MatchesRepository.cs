@@ -126,6 +126,13 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         return result;
     }
 
+    public async Task<MatchDetailDto?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchByTeamSlugs, new { HomeSlug = homeSlug, AwaySlug = awaySlug });
+        return result;
+    }
+
     public async Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId)
     {
         using var connection = _connectionFactory.CreateConnection();

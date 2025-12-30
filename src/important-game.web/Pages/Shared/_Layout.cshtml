@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="utf-8" />
     <meta name="title" content="Match to Watch - Discover today’s most exciting football matches">
     <meta name="description" content="Explore excitement scores, live updates, and predictions for top football, basketball, and more. Your go-to for thrilling sports action.">
@@ -12,20 +13,24 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/esfont.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NGV2ZXXS');</script>
+    <!-- End Google Tag Manager -->
 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1934500034472565" crossorigin="anonymous"></script>
     @await RenderSectionAsync("Header", required: false)
-
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0WMDDFZYCB"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
 
-    gtag('config', 'G-0WMDDFZYCB');
-</script>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGV2ZXXS"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm watch-header navbar-light bg-light">
             <div class="container">
@@ -58,7 +63,22 @@
             @RenderBody()
         </main>
     </div>
-    <input type="hidden" id="clientTime" name="clientTime" />
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-timezone">
+                    <label for="timezoneSelector" class="timezone-label">Timezone:</label>
+                    <select id="timezoneSelector" class="timezone-selector">
+                        <option value="UTC">UTC</option>
+                        <option value="GMT">GMT</option>
+                        <option value="CET">CET</option>
+                        <option value="PST">PST</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

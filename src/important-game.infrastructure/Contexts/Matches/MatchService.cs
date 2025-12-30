@@ -74,4 +74,34 @@ internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRe
 
         return matchDetail;
     }
+
+    public async Task<MatchDetailViewModel?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug, CancellationToken cancellationToken = default)
+    {
+        var matchDetailDto = await matchesRepository.GetMatchByTeamSlugsAsync(homeSlug, awaySlug);
+        if (matchDetailDto == null)
+            return default;
+
+        var matchDetail = MatchMapper.MapToMatchDetail(matchDetailDto);
+
+        // Setup title holder information
+        if (matchDetailDto.SeasonId != null)
+        {
+            var seasonInfo = await competitionRepository.GetCompetitionSeasonByIdAsync(matchDetailDto.SeasonId.Value);
+            if (seasonInfo != null && seasonInfo.TitleHolderId.HasValue)
+            {
+                matchDetail.TitleHolderId = seasonInfo.TitleHolderId;
+                matchDetail.HasTitleHolder = seasonInfo.TitleHolderId.Value == matchDetail.HomeTeamId || seasonInfo.TitleHolderId.Value == matchDetail.AwayTeamId;
+            }
+        }
+
+        // Setup head to head information
+        var headToHeadMatches = await matchesRepository.GetHeadToHeadMatchesAsync(matchDetail.HomeTeamId, matchDetail.AwayTeamId);
+        matchDetail.HeadToHead = headToHeadMatches;
+
+        // Setup rivalry information
+        var rivalryInformation = await matchesRepository.GetRivalryAsync(matchDetail.HomeTeamId, matchDetail.AwayTeamId);
+        matchDetail.IsRivalry = rivalryInformation != null;
+
+        return matchDetail;
+    }
 }

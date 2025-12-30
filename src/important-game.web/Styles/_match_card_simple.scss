@@ -12,6 +12,10 @@
     border-bottom: 5px solid #ffffff;
     border-left: 5px solid #ffffff;
 
+    // Visual Improvements: Subtle shadows
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+
     .match-card-link {
         text-decoration: none;
         color: inherit;
@@ -23,6 +27,9 @@
 
     &:hover {
         border: 5px solid var(--bgcolor);
+        // Visual Improvements: Enhanced hover effect
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
     }
 
     .match-header {
@@ -71,9 +78,15 @@
                 gap: 10px;
                 width: 35%;
 
+                // Visual Improvements: Larger team logos with hover effect
                 img {
-                    width: 60px;
-                    max-width: 60px;
+                    width: 80px;
+                    max-width: 80px;
+                    transition: transform 0.2s ease;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
                 }
 
                 .match-card-team-name {
@@ -97,6 +110,17 @@
                     font-size: 1.8rem;
                     border-radius: 10px;
                     cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    justify-content: center;
+                    padding: 4px 8px;
+
+                    // Visual Improvements: Fire icon styling
+                    .es-fire-icon {
+                        font-size: 1.5rem;
+                        color: inherit;
+                    }
                 }
                 /* Ring background based on percentage */
                 [data-es] {

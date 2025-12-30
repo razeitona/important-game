@@ -13,6 +13,10 @@
         <input type="text" class="form-control" placeholder="Search match or team..." id="search-match">
         <ul id="mw-search-result"></ul>
     </div>
+    <button id="clearFiltersBtn" class="btn-clear-filters" style="display: none;">
+        <i class="bi bi-x-circle"></i>
+        <span>Clear Filters</span>
+    </button>
 </div>
 
 
@@ -29,26 +33,47 @@
         }
     </div>
 
-    <div class="matches-section">
-        @if (Model.Matches.Matches.Count == 0)
-        {
-            <label>No excitment match to watch this week. We are looking for one.</label>
-        }
-        else
-        {
-            @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDateUTC.Date))
+    <div class="matches-section" id="all-matches-section">
+        @* Skeleton loading state (hidden by default, shown during filter/search) *@
+        <div class="skeleton-match-list skeleton-content" style="display: none;">
+            @for (int d = 0; d < 3; d++)
             {
-                <div class="wm-match-date">
-                    <h1 class="wm-match-date-title">@dates.Key.ToString("dd/MM/yyyy")</h1>
-                    <div class="matches-section-content">
-                        @foreach (var match in dates.OrderByDescending(c => c.ExcitmentScore))
-                        {
-                            <partial name="_MatchCardSimple" for="@match" />
-                        }
-                    </div>
+                <div class="skeleton skeleton-date-header"></div>
+                <div class="skeleton-matches-grid">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <partial name="_SkeletonMatchCardSimple" />
+                    }
                 </div>
             }
-        }
+        </div>
+
+        @* Actual content *@
+        <div class="actual-content">
+            @if (Model.Matches.Matches.Count == 0)
+            {
+                <label>No excitment match to watch this week. We are looking for one.</label>
+            }
+            else
+            {
+                @foreach (var dates in Model.Matches.Matches.GroupBy(c => c.MatchDateUTC.Date))
+                {
+                    <div class="wm-match-date">
+                        <h1 class="wm-match-date-title">
+                            <time data-utc-time="@dates.Key.ToString("dd/MM/yyyy") 00:00">
+                                @dates.Key.ToString("dd/MM/yyyy")
+                            </time>
+                        </h1>
+                        <div class="matches-section-content">
+                            @foreach (var match in dates.OrderByDescending(c => c.ExcitmentScore))
+                            {
+                                <partial name="_MatchCardSimple" for="@match" />
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>
 
@@ -64,14 +89,73 @@
         $(document).ready(function () {
 
             var list = @Html.Raw(JsonSerializer.Serialize(
-                                    Model.Matches.Matches.Select(c => 
-                                        new { 
-                                            id = c.MatchId, 
-                                            home = c.HomeTeamName, 
-                                            away = c.AwayTeamName, 
-                                            homeslug = SlugHelper.GenerateSlug(c.HomeTeamName), 
-                                            awayslug = SlugHelper.GenerateSlug(c.AwayTeamName) 
+                                    Model.Matches.Matches.Select(c =>
+                                        new {
+                                            id = c.MatchId,
+                                            home = c.HomeTeamName,
+                                            away = c.AwayTeamName,
+                                            homeslug = SlugHelper.GenerateSlug(c.HomeTeamName),
+                                            awayslug = SlugHelper.GenerateSlug(c.AwayTeamName)
                                         })));
+
+            // Initialize filter state
+            var filterLeagues = [];
+
+            // URL Parameters Filter Persistence
+            const urlParams = new URLSearchParams(window.location.search);
+
+            function updateURLParams() {
+                const url = new URL(window.location);
+
+                // Update leagues parameter
+                if (filterLeagues.length > 0) {
+                    url.searchParams.set('leagues', filterLeagues.join(','));
+                } else {
+                    url.searchParams.delete('leagues');
+                }
+
+                // Update search parameter
+                const searchValue = searchInput ? searchInput.value : '';
+                if (searchValue && searchValue.length >= 3) {
+                    url.searchParams.set('search', searchValue);
+                } else {
+                    url.searchParams.delete('search');
+                }
+
+                // Update URL without reload
+                window.history.pushState({}, '', url);
+            }
+
+            function loadFiltersFromURL() {
+                // Load league filters
+                const leaguesParam = urlParams.get('leagues');
+                if (leaguesParam) {
+                    const savedLeagues = leaguesParam.split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+                    filterLeagues = savedLeagues;
+
+                    // Apply visual state to league buttons
+                    savedLeagues.forEach(leagueId => {
+                        $(`.match-league-item[data-league="${leagueId}"]`).addClass('league-active');
+                    });
+                }
+
+                // Load search filter
+                const searchParam = urlParams.get('search');
+                if (searchParam && searchInput) {
+                    searchInput.value = searchParam;
+                    // Trigger search
+                    const results = fuse.search(searchParam);
+                    updateSearchResults(results, searchParam);
+                }
+
+                // Apply filters to matches
+                if (filterLeagues.length > 0) {
+                    updateGameHideStatus();
+                }
+
+                // Update clear button visibility
+                updateClearButtonVisibility();
+            }
 
         const fuseOptions = {
         threshold: 0.3,           // Adjust to control the fuzzy matching
@@ -84,40 +168,179 @@
 
             const fuse = new Fuse(list, fuseOptions);
 
-            // $("#search-match").on("input", function () {
-            //     console.log("asdasd");
-            // });
-            document.getElementById('search-match').addEventListener('input', function () {
+            // Clear Filters functionality
+            const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+            const searchInput = document.getElementById('search-match');
 
+            function updateClearButtonVisibility() {
+                const hasActiveFilters = filterLeagues.length > 0 || (searchInput && searchInput.value.length > 0);
+
+                if (hasActiveFilters) {
+                    clearFiltersBtn.style.display = 'flex';
+                    clearFiltersBtn.classList.add('show');
+                } else {
+                    clearFiltersBtn.style.display = 'none';
+                    clearFiltersBtn.classList.remove('show');
+                }
+            }
+
+            clearFiltersBtn.addEventListener('click', function() {
+                // Clear search input
+                if (searchInput) {
+                    searchInput.value = '';
+                    document.getElementById('mw-search-result').innerHTML = '';
+                }
+
+                // Clear all league filters
+                filterLeagues = [];
+                $('.match-league-item').removeClass('league-active');
+
+                // Show all matches
+                updateGameHideStatus();
+
+                // Clear URL parameters
+                updateURLParams();
+
+                // Hide clear button
+                updateClearButtonVisibility();
+
+                // Optional: Show notification
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('All filters cleared');
+                }
+            });
+
+            // Search functionality with improved UX
+            let selectedIndex = -1;
+            const resultsList = document.getElementById('mw-search-result');
+
+            function highlightMatch(text, query) {
+                if (!query) return text;
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<strong>$1</strong>');
+            }
+
+            function updateSearchResults(results, query) {
+                resultsList.innerHTML = '';
+                selectedIndex = -1;
+
+                if (results.length === 0) {
+                    const noResults = document.createElement('li');
+                    noResults.className = 'search-no-results';
+                    noResults.innerHTML = `<i class="bi bi-search"></i> No matches found for "${query}"`;
+                    resultsList.appendChild(noResults);
+                    return;
+                }
+
+                results.forEach((result, index) => {
+                    const game = result.item;
+                    const li = document.createElement('li');
+                    li.setAttribute('data-id', game.id);
+                    li.setAttribute('data-index', index);
+                    li.innerHTML = highlightMatch(`${game.home} v ${game.away}`, query);
+
+                    // Add click event to navigate to the item
+                    li.addEventListener('click', () => {
+                        navigateToMatch(game);
+                    });
+
+                    resultsList.appendChild(li);
+                });
+            }
+
+            function navigateToMatch(game) {
+                window.location.href = `#game-${game.homeslug}v${game.awayslug}`;
+                resultsList.innerHTML = '';
+                searchInput.value = '';
+                updateClearButtonVisibility();
+            }
+
+            function selectResult(index) {
+                const items = resultsList.querySelectorAll('li:not(.search-no-results)');
+
+                // Remove previous selection
+                items.forEach(item => item.classList.remove('selected'));
+
+                // Add selection to new item
+                if (index >= 0 && index < items.length) {
+                    selectedIndex = index;
+                    items[index].classList.add('selected');
+                    items[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            }
+
+            // Input event - search as user types
+            searchInput.addEventListener('input', function () {
                 const query = this.value;
 
+                // Update clear button visibility
+                updateClearButtonVisibility();
+
+                // Update URL parameters
+                updateURLParams();
+
                 if (query.length < 3) {
-                    document.getElementById('mw-search-result').innerHTML = '';
+                    resultsList.innerHTML = '';
+                    selectedIndex = -1;
                     return;
                 }
 
                 // Perform search
                 const results = fuse.search(query);
-                console.log(results);
+                updateSearchResults(results, query);
+            });
 
-                // Render results
-                const resultsList = document.getElementById('mw-search-result');
-                resultsList.innerHTML = '';
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', function(e) {
+                const items = resultsList.querySelectorAll('li:not(.search-no-results)');
 
-                results.forEach(result => {
-                    const game = result.item;
-                    const li = document.createElement('li');
-                    li.textContent = `${game.home} v ${game.away}`;
-                    li.setAttribute('data-id', game.id);  // Set the id as a data attribute
+                if (items.length === 0) return;
 
-                    // Add click event to navigate to the item
-                    li.addEventListener('click', () => {
-                        window.location.href = `#game-${game.homeslug}v${game.awayslug}`;  // Update URL pattern to match your routes
+                switch(e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        selectResult(selectedIndex + 1 >= items.length ? 0 : selectedIndex + 1);
+                        break;
+
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        selectResult(selectedIndex - 1 < 0 ? items.length - 1 : selectedIndex - 1);
+                        break;
+
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedIndex >= 0 && selectedIndex < items.length) {
+                            const selectedItem = items[selectedIndex];
+                            const gameId = selectedItem.getAttribute('data-id');
+                            const game = list.find(g => g.id == gameId);
+                            if (game) {
+                                navigateToMatch(game);
+                            }
+                        } else if (items.length > 0) {
+                            // If no selection, select first result
+                            const gameId = items[0].getAttribute('data-id');
+                            const game = list.find(g => g.id == gameId);
+                            if (game) {
+                                navigateToMatch(game);
+                            }
+                        }
+                        break;
+
+                    case 'Escape':
+                        e.preventDefault();
                         resultsList.innerHTML = '';
-                    });
+                        searchInput.blur();
+                        selectedIndex = -1;
+                        break;
+                }
+            });
 
-                    resultsList.appendChild(li);
-                });
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+                    resultsList.innerHTML = '';
+                    selectedIndex = -1;
+                }
             });
 
             $(".match-league-item").each(function (elem) {
@@ -127,8 +350,6 @@
                     return;
                 }
             });
-
-            var filterLeagues = [];
 
             $(".match-league-item").on("click", function () {
                 var selectedLeague = $(this).data("league");
@@ -143,6 +364,11 @@
                 }
                 updateGameHideStatus();
 
+                // Update URL parameters
+                updateURLParams();
+
+                // Update clear button visibility
+                updateClearButtonVisibility();
             });
 
             function updateGameHideStatus() {
@@ -170,6 +396,9 @@
                     $(this).parent().children("div.matches-section-content").addClass("hide");
                 }
             });
+
+            // Load filters from URL on page load
+            loadFiltersFromURL();
 
         });
 

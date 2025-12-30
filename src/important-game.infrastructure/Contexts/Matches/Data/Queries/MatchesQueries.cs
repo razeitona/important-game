@@ -112,7 +112,7 @@ internal static class MatchesQueries
         ORDER BY m.MatchDateUTC ASC";
 
     internal const string SelectMatchById = @"
-       SELECT 
+       SELECT
            m.MatchId,
            m.CompetitionId,
            m.SeasonId,
@@ -151,6 +151,51 @@ internal static class MatchesQueries
            ON act.CompetitionId = c.CompetitionId
 	       AND act.TeamId = at.Id
         WHERE m.MatchId = @MatchId";
+
+    internal const string SelectMatchByTeamSlugs = @"
+       SELECT
+           m.MatchId,
+           m.CompetitionId,
+           m.SeasonId,
+           c.Name as 'CompetitionName',
+           c.PrimaryColor as 'CompetitionPrimaryColor',
+           c.BackgroundColor as 'CompetitionBackgroundColor',
+           m.MatchDateUTC,
+           ht.Id as 'HomeTeamId',
+           ht.Name as 'HomeTeamName',
+           hct.Position as 'HomeTeamTablePosition',
+	       m.HomeForm as 'HomeTeamForm',
+           at.Id as 'AwayTeamId',
+	       at.Name as 'AwayTeamName',
+           act.Position as 'AwayTeamTablePosition',
+	       m.AwayForm as 'AwayTeamForm',
+           m.ExcitmentScore,
+	       m.CompetitionScore,
+	       m.CompetitionStandingScore,
+	       m.FixtureScore,
+	       m.FormScore,
+	       m.GoalsScore,
+	       m.HeadToHeadScore,
+	       m.RivalryScore,
+	       m.TitleHolderScore
+       FROM Matches m
+       INNER JOIN Teams ht
+           ON m.HomeTeamId = ht.Id
+       INNER JOIN Teams at
+           ON m.AwayTeamId = at.Id
+       INNER JOIN Competitions c
+           ON c.CompetitionId = m.CompetitionId
+       LEFT JOIN CompetitionTable hct
+           ON hct.CompetitionId = c.CompetitionId
+	       AND hct.TeamId = ht.Id
+       LEFT JOIN CompetitionTable act
+           ON act.CompetitionId = c.CompetitionId
+	       AND act.TeamId = at.Id
+        WHERE LOWER(REPLACE(REPLACE(REPLACE(REPLACE(ht.Name, ' ', '-'), '.', ''), '''', ''), '&', 'and')) = LOWER(@HomeSlug)
+          AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(at.Name, ' ', '-'), '.', ''), '''', ''), '&', 'and')) = LOWER(@AwaySlug)
+          AND m.IsFinished = 0
+        ORDER BY m.MatchDateUTC ASC
+        LIMIT 1";
 
     internal const string SelectTeamLatestMatchDate = @"
         SELECT 

@@ -1,0 +1,307 @@
+// Skeleton Loading States with Shimmer Animation
+
+// Shimmer animation keyframes
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+// Base skeleton element
+.skeleton {
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: shimmer;
+    animation-timing-function: linear;
+    background: linear-gradient(
+        to right,
+        #2a2d35 0%,
+        #3a3d45 20%,
+        #2a2d35 40%,
+        #2a2d35 100%
+    );
+    background-size: 800px 104px;
+    position: relative;
+    overflow: hidden;
+}
+
+// Skeleton text lines
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+
+    &.short {
+        width: 60%;
+    }
+
+    &.medium {
+        width: 80%;
+    }
+
+    &.long {
+        width: 100%;
+    }
+}
+
+// Skeleton image/avatar
+.skeleton-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
+
+    &.large {
+        width: 80px;
+        height: 80px;
+    }
+
+    &.circle {
+        border-radius: 50%;
+    }
+}
+
+// Skeleton Match Card Simple
+.skeleton-match-card-simple {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    margin-top: 10px;
+    flex-grow: 1;
+    background-color: #ffffff;
+    overflow: hidden;
+
+    .skeleton-header {
+        display: flex;
+        padding: 0.4rem 0.8rem;
+        align-items: center;
+        gap: 8px;
+        background-color: #f5f5f5;
+
+        .skeleton-image {
+            width: 20px;
+            height: 20px;
+        }
+
+        .skeleton-text {
+            flex-grow: 1;
+            height: 12px;
+            background: #e0e0e0;
+        }
+    }
+
+    .skeleton-body {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        background-color: #ffffff;
+
+        .skeleton-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            .skeleton-team {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                width: 35%;
+
+                .skeleton-image {
+                    width: 80px;
+                    height: 80px;
+                    background: #e0e0e0;
+                }
+
+                .skeleton-text {
+                    width: 100%;
+                    height: 10px;
+                    background: #e0e0e0;
+                }
+            }
+
+            .skeleton-score {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+
+                .skeleton-score-circle {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 10px;
+                    background: #e0e0e0;
+                }
+
+                .skeleton-text {
+                    width: 80px;
+                    height: 8px;
+                    background: #e0e0e0;
+                }
+            }
+        }
+    }
+}
+
+// Skeleton Match Detail Card
+.skeleton-match-detail-card {
+    background: #22293b;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 10px;
+
+    .skeleton-title {
+        height: 18px;
+        width: 60%;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+
+    .skeleton-league {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+
+        .skeleton-image {
+            width: 24px;
+            height: 24px;
+        }
+
+        .skeleton-text {
+            flex-grow: 1;
+            height: 14px;
+        }
+    }
+
+    .skeleton-teams {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+
+        .skeleton-team-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+
+            .skeleton-image.large {
+                width: 80px;
+                height: 80px;
+            }
+
+            .skeleton-text {
+                width: 100px;
+                height: 12px;
+            }
+        }
+    }
+
+    .skeleton-content-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .skeleton-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .skeleton-text {
+                height: 10px;
+
+                &:first-child {
+                    width: 40%;
+                }
+
+                &:last-child {
+                    width: 30%;
+                }
+            }
+        }
+    }
+}
+
+// Skeleton for Match List (Matches page)
+.skeleton-match-list {
+    .skeleton-date-header {
+        height: 40px;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        width: 200px;
+    }
+
+    .skeleton-matches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 2fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+}
+
+// Loading spinner (fallback/complementary)
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #2a2d35;
+        border-top: 4px solid #258cfb;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .spinner-text {
+        margin-top: 1rem;
+        color: #ffffff;
+        font-size: 0.9rem;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+// Hide content when loading
+.loading-state {
+    .actual-content {
+        display: none;
+    }
+}
+
+// Show content when loaded
+.loaded-state {
+    .skeleton-content {
+        display: none;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .skeleton-matches-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .skeleton-match-card-simple {
+        .skeleton-body {
+            .skeleton-content {
+                .skeleton-team {
+                    width: 40%;
+                }
+            }
+        }
+    }
+}

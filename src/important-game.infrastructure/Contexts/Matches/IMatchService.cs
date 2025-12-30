@@ -7,4 +7,5 @@ public interface IMatchService
     Task<List<MatchDto>> GetAllUpcomingMatchesAsync(CancellationToken cancellationToken = default);
     Task<MatchesViewModel> GetAllMatchesAsync(CancellationToken cancellationToken = default);
     Task<MatchDetailViewModel?> GetMatchByIdAsync(int matchId, CancellationToken cancellationToken = default);
+    Task<MatchDetailViewModel?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug, CancellationToken cancellationToken = default);
 }
