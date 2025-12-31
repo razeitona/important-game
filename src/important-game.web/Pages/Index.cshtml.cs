@@ -44,13 +44,16 @@ namespace important_game.web.Pages
 
 
         /// <summary>
-        /// Extract all live games and top 5 upcoming games
+        /// Extract remaining upcoming games after trending matches are removed
         /// </summary>
         public List<MatchDto> GetUpcomingMatches(List<MatchDto> allMatches)
         {
-            var upcomingMatches = allMatches.ToList();
-            upcomingMatches.AddRange(allMatches.Take(10));
-            return upcomingMatches;
+            // allMatches already has trending matches removed (see line 40)
+            // Just return the remaining matches sorted by excitement score
+            return allMatches
+                .OrderByDescending(c => c.ExcitmentScore)
+                .Take(10)
+                .ToList();
         }
     }
 }

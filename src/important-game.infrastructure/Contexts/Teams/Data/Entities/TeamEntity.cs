@@ -10,5 +10,6 @@ public class TeamEntity
     public string? ShortName { get; set; }
     public string? ThreeLetterName { get; set; }
     public string NormalizedName { get; set; }
+    public string SlugName { get; set; }
 }
 

@@ -13,6 +13,11 @@ public interface ITeamRepository
     /// Gets all teams.
     /// </summary>
     Task<List<TeamEntity>> GetAllTeamsAsync();
+    
+    /// <summary>
+    /// Update team
+    /// </summary>
+    Task UpdateTeamAsync(TeamEntity entity);
 
     /// <summary>
     /// Saves a team (insert or update).

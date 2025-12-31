@@ -7,6 +7,7 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrat
 using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrations.Models;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Teams.Data.Entities;
+using important_game.infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
@@ -191,9 +192,10 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
 
             // Identify or create team
             var teamFound = await FindInternalTeamAsyync(listOfTeams, providerId, row.Team.Id);
-            teamFound ??= IdentifyExistingTeam(listOfTeams, row.Team.Name!, row.Team.ShortName);
+            EnrichExistingTeam(teamFound, listOfTeams, row.Team.Name!, row.Team.ShortName, row.Team.ThreeLetterName);
             teamFound ??= await CreateTeamAsync(row.Team, listOfTeams);
             await SaveExternalTeamMappingAsync(providerId, teamFound.Id, row.Team.Id);
+            await _teamRepository.UpdateTeamAsync(teamFound);
 
             tableRows.Add(new CompetitionTableEntity
             {
@@ -214,10 +216,20 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         await SaveCompetitionTableAsync(competitionId, seasonId, tableRows);
     }
 
-    private static TeamEntity? IdentifyExistingTeam(List<TeamEntity> listOfTeams, string name, string? shortName)
+    private static void EnrichExistingTeam(TeamEntity? teamFound, List<TeamEntity> listOfTeams, string name, string? shortName, string? threeLetterName)
     {
         if (listOfTeams.Count == 0)
-            return null;
+            return;
+
+        if (teamFound != null)
+        {
+            teamFound.Name = name;
+            teamFound.ShortName = shortName ?? name;
+            teamFound.ThreeLetterName = threeLetterName;
+            teamFound.NormalizedName = name.Normalize();
+            teamFound.SlugName = SlugHelper.GenerateSlug(name);
+            return;
+        }
 
         var ranked = listOfTeams.Select(c => new
         {
@@ -231,8 +243,15 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         .Take(5);
 
         var selectedTeam = ranked.FirstOrDefault();
-
-        return selectedTeam?.Team ?? null;
+        if (teamFound == null && selectedTeam?.Team != null)
+        {
+            teamFound = selectedTeam.Team;
+            teamFound.Name = name;
+            teamFound.ShortName = shortName ?? name;
+            teamFound.ThreeLetterName = threeLetterName;
+            teamFound.NormalizedName = name.Normalize();
+            teamFound.SlugName = SlugHelper.GenerateSlug(name);
+        }
     }
 
     private async Task<TeamEntity?> FindInternalTeamAsyync(List<TeamEntity> listOfTeams, int providerId, int externalTeamId)
@@ -255,7 +274,8 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
             Name = team.Name!,
             ShortName = team.ShortName,
             ThreeLetterName = team.ThreeLetterName,
-            NormalizedName = team.Name!.Normalize()
+            NormalizedName = team.Name!.Normalize(),
+            SlugName = SlugHelper.GenerateSlug(team.ShortName ?? team.Name)
         };
 
         teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);

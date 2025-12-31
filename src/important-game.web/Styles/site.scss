@@ -1,4 +1,8 @@
-﻿$background-color: #21242c;
+﻿// Import Design System first (CSS variables)
+@import "_design_system.scss";
+
+// Legacy SCSS variables (keep for backward compatibility)
+$background-color: #21242c;
 $text-color: #525360;
 $fire-color: linear-gradient(to top, #ff0000, #ff6a00);
 
@@ -58,3 +62,6 @@ body {
 @import "_ads.scss";
 @import "_skeleton.scss";
 @import "_share_buttons.scss";
+@import "_match_like.scss";
+@import "_calendar.scss";
+@import "_login_modal.scss";

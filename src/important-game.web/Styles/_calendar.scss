@@ -1,0 +1,752 @@
+// Calendar View Styles
+
+.calendar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+    color: #FFFAFA;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        transform: translateY(-2px);
+    }
+}
+
+.calendar-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.calendar-nav-btn {
+    background: linear-gradient(135deg, #258cfb 0%, #1a73e8 100%);
+    border: none;
+    font-size: 1.3rem;
+    color: white;
+    cursor: pointer;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(37, 140, 251, 0.3);
+
+    &:hover {
+        background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 140, 251, 0.4);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(37, 140, 251, 0.3);
+    }
+}
+
+// Calendar Grid
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+    background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-weight: 700;
+    color: #60a5fa;
+    padding: 12px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    max-height: 140px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+    cursor: default;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+
+    &.calendar-day-empty {
+        background-color: transparent;
+        border-color: transparent;
+        cursor: default;
+    }
+
+    &.calendar-day-today {
+        border-color: #60a5fa;
+        border-width: 2px;
+        background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.08));
+        box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+
+        .calendar-day-number {
+            color: #93c5fd;
+            font-weight: 800;
+        }
+    }
+
+    &.has-matches {
+        cursor: pointer;
+        border-color: rgba(255, 255, 255, 0.15);
+
+        &:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        // Sistema 4-tier: 0-24 Red, 25-49 Orange, 50-74 Green, 75-100 Blue
+        &.es-low {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.15), rgba(239, 68, 68, 0.08));
+        }
+
+        &.es-medium {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.08));
+        }
+
+        &.es-good {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.08));
+        }
+
+        &.es-high {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.08));
+        }
+    }
+}
+
+.calendar-day-number {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 3px;
+    text-align: left;
+    letter-spacing: -0.02em;
+}
+
+// Average ES Badge (top right) - Dark Theme
+.calendar-day-avg-es {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+
+    .fire-icon {
+        font-size: 0.6rem;
+    }
+
+    // Sistema 4-tier
+    &.es-low {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.35), rgba(239, 68, 68, 0.25));
+        color: #fca5a5;
+        border: 1px solid rgba(220, 38, 38, 0.5);
+
+        .fire-icon {
+            color: #ef4444;
+        }
+    }
+
+    &.es-medium {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(251, 191, 36, 0.25));
+        color: #fde047;
+        border: 1px solid rgba(245, 158, 11, 0.5);
+
+        .fire-icon {
+            color: #fbbf24;
+        }
+    }
+
+    &.es-good {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(52, 211, 153, 0.25));
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.5);
+
+        .fire-icon {
+            color: #34d399;
+        }
+    }
+
+    &.es-high {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(96, 165, 250, 0.25));
+        color: #bfdbfe;
+        border: 1px solid rgba(59, 130, 246, 0.5);
+
+        .fire-icon {
+            color: #60a5fa;
+        }
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+}
+
+// Mini Match Cards Container
+.calendar-day-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    margin-top: 2px;
+}
+
+// Mini Match Card - Dark Theme
+.mini-match-card {
+    padding: 3px 5px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    // Sistema 4-tier
+    &.es-low {
+        background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), rgba(239, 68, 68, 0.15));
+        border-color: rgba(220, 38, 38, 0.4);
+
+        .mini-team-name,
+        .mini-match-vs {
+            color: #fca5a5;
+        }
+
+        .mini-match-es {
+            color: #fecaca;
+            font-weight: 700;
+            background: rgba(220, 38, 38, 0.3);
+        }
+    }
+
+    &.es-medium {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.15));
+        border-color: rgba(245, 158, 11, 0.4);
+
+        .mini-team-name,
+        .mini-match-vs {
+            color: #fde047;
+        }
+
+        .mini-match-es {
+            color: #fef08a;
+            font-weight: 700;
+            background: rgba(245, 158, 11, 0.3);
+        }
+    }
+
+    &.es-good {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(52, 211, 153, 0.15));
+        border-color: rgba(16, 185, 129, 0.4);
+
+        .mini-team-name,
+        .mini-match-vs {
+            color: #6ee7b7;
+        }
+
+        .mini-match-es {
+            color: #a7f3d0;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.3);
+        }
+    }
+
+    &.es-high {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(96, 165, 250, 0.15));
+        border-color: rgba(59, 130, 246, 0.4);
+
+        .mini-team-name,
+        .mini-match-vs {
+            color: #bfdbfe;
+        }
+
+        .mini-match-es {
+            color: #dbeafe;
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.3);
+        }
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.mini-match-teams {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.mini-team-name {
+    font-weight: 500;
+    font-size: 0.55rem;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.mini-match-vs {
+    font-size: 0.55rem;
+    font-weight: 400;
+    opacity: 0.6;
+    flex-shrink: 0;
+    padding: 0 2px;
+}
+
+.mini-match-es {
+    font-size: 0.6rem;
+    flex-shrink: 0;
+    margin-left: 4px;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+// View All Link - Dark Theme
+.calendar-view-all {
+    padding: 4px 8px;
+    text-align: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #93c5fd;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin-top: 2px;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
+    letter-spacing: -0.01em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));
+        border-color: rgba(96, 165, 250, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        color: #bfdbfe;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.calendar-day-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: auto;
+}
+
+.es-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-full);
+    display: inline-block;
+
+    &.es-dot-low {
+        background-color: var(--color-es-low);
+    }
+
+    &.es-dot-medium {
+        background-color: var(--color-es-medium);
+    }
+
+    &.es-dot-good {
+        background-color: var(--color-es-good);
+    }
+
+    &.es-dot-high {
+        background-color: var(--color-es-high);
+    }
+}
+
+.match-count-badge {
+    background-color: var(--color-primary);
+    color: white;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    min-width: 20px;
+    text-align: center;
+}
+
+// Calendar Modal - Dark Theme
+.calendar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-index-modal);
+    display: none;
+
+    &.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.calendar-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.calendar-modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);
+    border-radius: 16px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.calendar-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.calendar-modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+}
+
+.calendar-modal-close {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1.75rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+
+    &:hover {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #fca5a5;
+        transform: rotate(90deg);
+    }
+}
+
+.calendar-modal-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+    flex: 1;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+.calendar-modal-matches-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+// Modal uses match-card-simple class - no custom styles needed
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .calendar-modal-matches-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 24px 16px 32px;
+    }
+
+    .calendar-title {
+        font-size: 1.25rem;
+    }
+
+    .calendar-day-header {
+        font-size: 0.65rem;
+        padding: var(--spacing-xs);
+    }
+
+    .calendar-day {
+        padding: 6px;
+        max-height: 120px;
+    }
+
+    .calendar-day-number {
+        font-size: 0.8125rem;
+        margin-bottom: 4px;
+    }
+
+    .mini-match-card {
+        padding: 3px 5px;
+        font-size: 0.6rem;
+        min-height: 20px;
+    }
+
+    .mini-team-name {
+        font-size: 0.6rem;
+    }
+
+    .mini-match-vs {
+        font-size: 0.5rem;
+    }
+
+    .mini-match-es {
+        font-size: 0.6rem;
+        padding: 1px 3px;
+    }
+
+    .calendar-view-all {
+        font-size: 0.6rem;
+        padding: 3px 6px;
+    }
+
+    .calendar-day-avg-es {
+        font-size: 0.6rem;
+        padding: 2px 5px;
+        top: 4px;
+        right: 4px;
+        gap: 2px;
+
+        .fire-icon {
+            font-size: 0.7rem;
+        }
+    }
+
+    .es-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .match-count-badge {
+        font-size: 0.625rem;
+        padding: 1px 4px;
+        min-width: 16px;
+    }
+
+    .calendar-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .calendar-modal-matches-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Empty state message for mobile
+.calendar-empty-message {
+    display: none;
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: #6b7280;
+    font-size: var(--font-size-md);
+    background-color: #f9fafb;
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-md);
+}
+
+// Mobile List View (instead of grid)
+@media (max-width: 480px) {
+    .calendar-header {
+        padding: var(--spacing-sm);
+    }
+
+    // Hide day headers in mobile
+    .calendar-day-header {
+        display: none;
+    }
+
+    // Change grid to list layout
+    .calendar-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+
+        // Show empty message if no matches
+        &:not(:has(.calendar-day.has-matches)) ~ .calendar-empty-message {
+            display: block;
+        }
+    }
+
+    // Hide empty days
+    .calendar-day-empty {
+        display: none;
+    }
+
+    // Transform calendar days to list items
+    .calendar-day {
+        aspect-ratio: auto;
+        max-height: none;
+        min-height: auto;
+        padding: var(--spacing-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+
+        &.has-matches {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        &:not(.has-matches) {
+            display: none; // Hide days without matches in mobile
+        }
+    }
+
+    .calendar-day-number {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: 0;
+        position: relative;
+        padding-right: 50px; // Space for average ES
+    }
+
+    .calendar-day-avg-es {
+        top: 0;
+        right: 0;
+        font-size: 0.75rem;
+        padding: 4px 8px;
+
+        .fire-icon {
+            font-size: 0.875rem;
+        }
+    }
+
+    .calendar-day-matches {
+        gap: var(--spacing-sm);
+    }
+
+    .mini-match-card {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.875rem;
+        min-height: auto;
+        border-radius: var(--radius-md);
+    }
+
+    .mini-team-name {
+        font-size: 0.875rem;
+    }
+
+    .mini-match-vs {
+        font-size: 0.75rem;
+        margin: 0 4px;
+    }
+
+    .mini-match-es {
+        font-size: 0.875rem;
+        font-weight: var(--font-weight-bold);
+    }
+
+    .calendar-view-all {
+        font-size: 0.875rem;
+        padding: var(--spacing-sm) var(--spacing-md);
+        margin-top: 0;
+    }
+
+    .calendar-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .calendar-modal-matches-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-modal-match-card {
+        min-width: 100%;
+        max-width: 100%;
+    }
+}

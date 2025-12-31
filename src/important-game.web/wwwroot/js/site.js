@@ -404,14 +404,14 @@
         }
 
         function shareWhatsApp(title, score, url) {
-            const text = `🔥 ${title} - Excitement Score: ${score}%\nCheck out this match on Match to Watch!`;
+            const text = `${title} - Excitement Score: ${score}%\nCheck out this match on Match to Watch!`;
             const fullUrl = window.location.origin + url;
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + fullUrl)}`;
             window.open(whatsappUrl, '_blank');
         }
 
         function shareTwitter(title, score, url) {
-            const text = `🔥 ${title} - Excitement Score: ${score}%`;
+            const text = `${title} - Excitement Score: ${score}%`;
             const fullUrl = window.location.origin + url;
             const hashtags = 'MatchToWatch,Football,Soccer';
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}&hashtags=${hashtags}`;
@@ -529,6 +529,511 @@
                 e.stopPropagation();
             }
         });
+    })();
+
+    // Swipe Gestures for Match Detail Page
+    (function initSwipeGestures() {
+        // Only run on match detail page
+        const matchDetail = document.querySelector('.match-detail');
+        if (!matchDetail) return;
+
+        let startX = 0;
+        let startY = 0;
+        let startTime = 0;
+        const minSwipeDistance = 50;  // Minimum distance for swipe (pixels)
+        const maxSwipeTime = 300;     // Maximum time for swipe (milliseconds)
+        const maxVerticalDistance = 100; // Max vertical movement to still count as horizontal swipe
+
+        function handleTouchStart(e) {
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            startTime = Date.now();
+        }
+
+        function handleTouchEnd(e) {
+            const touch = e.changedTouches[0];
+            const endX = touch.clientX;
+            const endY = touch.clientY;
+            const endTime = Date.now();
+
+            const diffX = startX - endX;
+            const diffY = Math.abs(startY - endY);
+            const diffTime = endTime - startTime;
+
+            // Check if it's a valid horizontal swipe
+            if (Math.abs(diffX) > minSwipeDistance &&
+                diffY < maxVerticalDistance &&
+                diffTime < maxSwipeTime) {
+
+                if (diffX > 0) {
+                    // Swiped left - go to next match
+                    navigateToNextMatch();
+                } else {
+                    // Swiped right - go to previous match
+                    navigateToPreviousMatch();
+                }
+            }
+        }
+
+        function navigateToNextMatch() {
+            // Get next match URL from session storage or navigate back to matches
+            const nextMatchUrl = sessionStorage.getItem('nextMatchUrl');
+            if (nextMatchUrl) {
+                window.location.href = nextMatchUrl;
+            } else {
+                // Fallback: show notification
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('No next match available');
+                }
+            }
+        }
+
+        function navigateToPreviousMatch() {
+            // Get previous match URL from session storage or navigate back
+            const prevMatchUrl = sessionStorage.getItem('prevMatchUrl');
+            if (prevMatchUrl) {
+                window.location.href = prevMatchUrl;
+            } else {
+                // Fallback: go back to matches page
+                window.location.href = '/matches';
+            }
+        }
+
+        // Add touch event listeners
+        matchDetail.addEventListener('touchstart', handleTouchStart, { passive: true });
+        matchDetail.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        // Keyboard shortcuts for desktop
+        document.addEventListener('keydown', function(e) {
+            // Left arrow key = previous match
+            if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                const activeElement = document.activeElement;
+                // Don't trigger if user is typing in an input
+                if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    navigateToPreviousMatch();
+                }
+            }
+            // Right arrow key = next match
+            else if (e.key === 'ArrowRight' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                const activeElement = document.activeElement;
+                if (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    navigateToNextMatch();
+                }
+            }
+        });
+
+        // Visual feedback for swipe
+        let swipeIndicator = null;
+        function showSwipeIndicator(direction) {
+            if (!swipeIndicator) {
+                swipeIndicator = document.createElement('div');
+                swipeIndicator.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    ${direction === 'left' ? 'right: 20px;' : 'left: 20px;'}
+                    transform: translateY(-50%);
+                    background: var(--color-primary, #258cfb);
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: var(--radius-md, 8px);
+                    font-size: 1.5rem;
+                    z-index: 9999;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.2s ease;
+                `;
+                swipeIndicator.innerHTML = direction === 'left' ? '<i class="bi bi-arrow-right"></i>' : '<i class="bi bi-arrow-left"></i>';
+                document.body.appendChild(swipeIndicator);
+            }
+
+            swipeIndicator.style.opacity = '1';
+            setTimeout(() => {
+                if (swipeIndicator) {
+                    swipeIndicator.style.opacity = '0';
+                }
+            }, 300);
+        }
+    })();
+
+    // Calendar View Functionality
+    (function initCalendar() {
+        // Only run on calendar page
+        if (!document.querySelector('.calendar-container')) return;
+
+        const modal = document.getElementById('calendarModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const calendarDays = document.querySelectorAll('.calendar-day.has-matches');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+        // Month navigation
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', function () {
+                const year = parseInt(this.dataset.year);
+                const month = parseInt(this.dataset.month);
+                navigateToMonth(year, month, -1);
+            });
+        }
+
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', function () {
+                const year = parseInt(this.dataset.year);
+                const month = parseInt(this.dataset.month);
+                navigateToMonth(year, month, 1);
+            });
+        }
+
+        function navigateToMonth(year, month, direction) {
+            let newMonth = month + direction;
+            let newYear = year;
+
+            if (newMonth < 1) {
+                newMonth = 12;
+                newYear--;
+            } else if (newMonth > 12) {
+                newMonth = 1;
+                newYear++;
+            }
+
+            window.location.href = `/calendar?year=${newYear}&month=${newMonth}`;
+        }
+
+        // Swipe gestures for month navigation
+        let startX = 0;
+        let startY = 0;
+        const calendarGrid = document.querySelector('.calendar-grid');
+
+        if (calendarGrid) {
+            calendarGrid.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+
+            calendarGrid.addEventListener('touchend', function(e) {
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = startX - endX;
+                const diffY = Math.abs(startY - endY);
+
+                if (Math.abs(diffX) > 50 && diffY < 100) {
+                    const year = parseInt(prevMonthBtn.dataset.year);
+                    const month = parseInt(prevMonthBtn.dataset.month);
+
+                    if (diffX > 0) {
+                        navigateToMonth(year, month, 1); // Swipe left = next month
+                    } else {
+                        navigateToMonth(year, month, -1); // Swipe right = prev month
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // Event delegation for calendar day interactions
+        document.addEventListener('click', function(e) {
+            // Handle "Ver todos" link click
+            const viewAllLink = e.target.closest('.calendar-view-all');
+            if (viewAllLink) {
+                e.stopPropagation();
+                const dayNumber = parseInt(viewAllLink.dataset.day);
+                const year = parseInt(viewAllLink.dataset.year);
+                const month = parseInt(viewAllLink.dataset.month);
+                showMatchesForDay(dayNumber, year, month);
+                return;
+            }
+
+            // Handle mini match card click
+            const miniMatchCard = e.target.closest('.mini-match-card');
+            if (miniMatchCard) {
+                e.stopPropagation();
+                const matchId = miniMatchCard.dataset.matchId;
+                if (matchId && window.calendarMatches) {
+                    // Find the match in calendar data
+                    for (const day in window.calendarMatches) {
+                        const match = window.calendarMatches[day].find(m => m.matchId == matchId);
+                        if (match) {
+                            const matchUrl = `/match/${match.homeSlug}-vs-${match.awaySlug}`;
+                            window.location.href = matchUrl;
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Handle calendar day click (only if not clicking on specific elements)
+            const calendarDay = e.target.closest('.calendar-day.has-matches');
+            if (calendarDay && !e.target.closest('.mini-match-card') && !e.target.closest('.calendar-view-all')) {
+                const dayNumber = parseInt(calendarDay.dataset.day);
+                const year = parseInt(calendarDay.dataset.year);
+                const month = parseInt(calendarDay.dataset.month);
+                showMatchesForDay(dayNumber, year, month);
+            }
+        });
+
+        function showMatchesForDay(day, year, month) {
+            if (!window.calendarMatches || !window.calendarMatches[day]) {
+                return;
+            }
+
+            const matches = window.calendarMatches[day];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+
+            modalTitle.textContent = `Matches on ${monthNames[month - 1]} ${day}, ${year}`;
+
+            // Build matches HTML
+            let matchesHTML = '<div class="calendar-modal-matches-grid">';
+
+            matches.forEach(match => {
+                const esScore = Math.round(match.excitmentScore * 100);
+                const esDecimal = match.excitmentScore.toFixed(2).replace(',', '.');
+                const matchUrl = `/match/${match.homeSlug}-vs-${match.awaySlug}`;
+
+                matchesHTML += `
+                    <div class="card match-card-simple"
+                         style="--bgcolor: ${match.competitionBgColor};"
+                         data-game-score="${esScore}"
+                         data-game-league="${match.competitionId}">
+                        <a href="${matchUrl}" class="match-card-link">
+                            <div class="card-header match-header">
+                                <div>
+                                    <img src="/images/competition/${match.competitionId}.png" alt="${match.competitionName}" width="1.2rem" />
+                                </div>
+                                <div class="match-header-title">${match.competitionName}</div>
+                                <div class="match-card-time">
+                                    <time>${match.matchDate}</time>
+                                </div>
+                            </div>
+                            <div class="card-body match-card-body">
+                                <div class="match-card-content">
+                                    <div class="match-card-team">
+                                        <div class="match-card-team-logo">
+                                            <img src="/images/team/${match.homeTeamId}.png" alt="${match.homeTeamName}" width="80px" />
+                                        </div>
+                                        <div class="match-card-team-name">
+                                            <span>${match.homeTeamName}</span>
+                                        </div>
+                                    </div>
+                                    <div class="match-card-score">
+                                        <div class="match-card-score-value" data-es="${esDecimal}" title="Excitement Score">
+                                            <i class="bi bi-fire es-fire-icon"></i> ${esScore}
+                                        </div>
+                                        <span>Excitment score</span>
+                                    </div>
+                                    <div class="match-card-team">
+                                        <div class="match-card-team-logo">
+                                            <img src="/images/team/${match.awayTeamId}.png" alt="${match.awayTeamName}" width="80px" />
+                                        </div>
+                                        <div class="match-card-team-name">
+                                            <span>${match.awayTeamName}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            });
+
+            matchesHTML += '</div>';
+            modalBody.innerHTML = matchesHTML;
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+
+        // Close modal handlers
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+
+        if (modal) {
+            modal.querySelector('.calendar-modal-overlay').addEventListener('click', closeModal);
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            const activeElement = document.activeElement;
+            if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            } else if (e.key === 'ArrowLeft') {
+                const year = parseInt(prevMonthBtn.dataset.year);
+                const month = parseInt(prevMonthBtn.dataset.month);
+                navigateToMonth(year, month, -1);
+            } else if (e.key === 'ArrowRight') {
+                const year = parseInt(prevMonthBtn.dataset.year);
+                const month = parseInt(prevMonthBtn.dataset.month);
+                navigateToMonth(year, month, 1);
+            }
+        });
+    })();
+
+    // Login Modal Handler
+    (function initLoginModal() {
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const modalOverlay = loginModal?.querySelector('.login-modal-overlay');
+
+        if (!loginBtn || !loginModal) return;
+
+        // Open modal
+        loginBtn.addEventListener('click', function () {
+            loginModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        });
+
+        // Close modal functions
+        function closeModal() {
+            loginModal.classList.remove('active');
+            document.body.style.overflow = ''; // Re-enable scroll
+        }
+
+        if (closeLoginModal) {
+            closeLoginModal.addEventListener('click', closeModal);
+        }
+
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', closeModal);
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && loginModal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Google Sign In
+        if (googleSignInBtn) {
+            googleSignInBtn.addEventListener('click', function () {
+                // Get current page URL to return after login
+                const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/login?returnUrl=${returnUrl}`;
+            });
+        }
+    })();
+
+    // Match Like/Unlike Handler
+    (function initMatchLikes() {
+        const likeButtons = document.querySelectorAll('.match-card-like-btn, .match-detail-like-btn');
+
+        if (likeButtons.length === 0) return;
+
+        // Initialize like states for all matches on page load
+        async function initializeLikeStates() {
+            for (const btn of likeButtons) {
+                const matchId = parseInt(btn.dataset.matchId);
+                if (!matchId) continue;
+
+                try {
+                    const response = await fetch(`/api/matchlike?matchId=${matchId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateLikeButton(btn, data.liked, data.voteCount);
+                    }
+                } catch (error) {
+                    console.error('Error initializing like state:', error);
+                }
+            }
+        }
+
+        // Update button visual state
+        function updateLikeButton(button, isLiked, voteCount) {
+            button.dataset.liked = isLiked;
+            const icon = button.querySelector('i');
+            const countSpan = button.querySelector('.like-count');
+
+            if (isLiked) {
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill');
+                button.classList.add('liked');
+            } else {
+                icon.classList.remove('bi-heart-fill');
+                icon.classList.add('bi-heart');
+                button.classList.remove('liked');
+            }
+
+            if (countSpan) {
+                countSpan.textContent = voteCount || 0;
+                countSpan.style.display = voteCount > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Handle like/unlike toggle
+        async function toggleLike(button) {
+            const matchId = parseInt(button.dataset.matchId);
+            const isCurrentlyLiked = button.dataset.liked === 'true';
+
+            // Optimistic UI update
+            const newState = !isCurrentlyLiked;
+            button.disabled = true;
+
+            try {
+                const method = newState ? 'POST' : 'DELETE';
+                const response = await fetch('/api/matchlike', {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ matchId: matchId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateLikeButton(button, data.liked, data.voteCount);
+
+                    // Show feedback animation
+                    button.classList.add('like-animate');
+                    setTimeout(() => button.classList.remove('like-animate'), 300);
+                } else if (response.status === 401) {
+                    // User not authenticated - show login modal
+                    const loginModal = document.getElementById('loginModal');
+                    if (loginModal) {
+                        loginModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                } else {
+                    throw new Error('Failed to toggle like');
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                // Show error notification if available
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('Failed to like match. Please try again.');
+                }
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // Attach event listeners
+        likeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleLike(this);
+            });
+        });
+
+        // Initialize states on page load
+        initializeLikeStates();
     })();
 
 })();

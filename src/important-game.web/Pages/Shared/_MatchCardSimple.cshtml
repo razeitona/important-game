@@ -11,6 +11,18 @@
      data-game-league="@Model.CompetitionId"
      id="game-@(SlugHelper.GenerateSlug(Model.HomeTeamName))v@(SlugHelper.GenerateSlug(Model.AwayTeamName))">
 
+    @* Like Button (authenticated users only) *@
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <button class="match-card-like-btn"
+                data-match-id="@Model.MatchId"
+                data-liked="false"
+                title="Like this match">
+            <i class="bi bi-heart"></i>
+            <span class="like-count">0</span>
+        </button>
+    }
+
     @* Share Button Trigger *@
     <button class="match-card-share-trigger"
             data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"

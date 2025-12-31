@@ -108,8 +108,10 @@ internal static class MatchesQueries
             ON m.AwayTeamId = at.Id
         INNER JOIN COmpetitions c
 	        ON c.CompetitionId = m.CompetitionId
-        WHERE m.IsFinished = 0
-        ORDER BY m.MatchDateUTC ASC";
+        WHERE 
+            m.IsFinished = 0
+            AND datetime(m.MatchDateUTC) >= datetime('now')
+        ORDER BY datetime(m.MatchDateUTC) ASC";
 
     internal const string SelectMatchById = @"
        SELECT
@@ -191,8 +193,8 @@ internal static class MatchesQueries
        LEFT JOIN CompetitionTable act
            ON act.CompetitionId = c.CompetitionId
 	       AND act.TeamId = at.Id
-        WHERE LOWER(REPLACE(REPLACE(REPLACE(REPLACE(ht.Name, ' ', '-'), '.', ''), '''', ''), '&', 'and')) = LOWER(@HomeSlug)
-          AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(at.Name, ' ', '-'), '.', ''), '''', ''), '&', 'and')) = LOWER(@AwaySlug)
+        WHERE ht.SlugName = @HomeSlug
+          AND at.SlugName = @AwaySlug
           AND m.IsFinished = 0
         ORDER BY m.MatchDateUTC ASC
         LIMIT 1";

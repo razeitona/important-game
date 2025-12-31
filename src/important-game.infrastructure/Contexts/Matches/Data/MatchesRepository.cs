@@ -129,7 +129,7 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
     public async Task<MatchDetailDto?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug)
     {
         using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchByTeamSlugs, new { HomeSlug = homeSlug, AwaySlug = awaySlug });
+        var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchByTeamSlugs, new { HomeSlug = homeSlug.ToLowerInvariant(), AwaySlug = awaySlug.ToLowerInvariant() });
         return result;
     }
 

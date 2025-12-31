@@ -8,6 +8,7 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrat
 using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrations.Models;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Teams.Data.Entities;
+using important_game.infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
@@ -351,6 +352,9 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
 
     private async Task<TeamEntity?> CreateTeamAsync(ExternalTeamDto externalTeam)
     {
+        if (externalTeam == null)
+            return null;
+
         try
         {
             var teamEntity = new TeamEntity
@@ -358,7 +362,8 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 Name = externalTeam.Name ?? "Unknown Team",
                 ShortName = externalTeam.ShortName,
                 ThreeLetterName = externalTeam.ThreeLetterName,
-                NormalizedName = (externalTeam.Name ?? "Unknown Team").Normalize()
+                NormalizedName = (externalTeam.Name ?? "Unknown Team").Normalize(),
+                SlugName = SlugHelper.GenerateSlug(externalTeam.ShortName ?? externalTeam.Name)
             };
 
             teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);

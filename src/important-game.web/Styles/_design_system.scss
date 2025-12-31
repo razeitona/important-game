@@ -1,0 +1,185 @@
+// Design System - CSS Variables
+// Centralized design tokens for consistency across the application
+
+:root {
+    // ========================================
+    // COLORS
+    // ========================================
+
+    // Primary Colors
+    --color-primary: #258cfb;
+    --color-primary-hover: #1a73e8;
+    --color-primary-light: rgba(37, 140, 251, 0.1);
+
+    // Status Colors
+    --color-success: #00C851;
+    --color-success-hover: #00A043;
+
+    --color-warning: #ffbb33;
+    --color-warning-hover: #ff9800;
+
+    --color-danger: #ff4444;
+    --color-danger-hover: #cc0000;
+
+    --color-info: #33b5e5;
+    --color-info-hover: #0099CC;
+
+    // Background Colors
+    --color-background: #21242c;
+    --color-background-light: #2a2d35;
+    --color-background-lighter: #3a3d45;
+
+    // Text Colors
+    --color-text: #525360;
+    --color-text-light: #71777d;
+    --color-text-dark: #333333;
+    --color-text-white: #ffffff;
+
+    // Border Colors
+    --color-border: #e0e0e0;
+    --color-border-light: #f0f0f0;
+    --color-border-dark: #2a2d35;
+
+    // Excitement Score Colors
+    --color-es-low: #ff4444;        // ES < 25% (Red)
+    --color-es-medium: #7D4D00;     // ES < 50% (Yellow/Brown)
+    --color-es-good: #00C851;       // ES < 70% (Green)
+    --color-es-high: #33b5e5;       // ES >= 70% (Blue)
+
+    // Social Media Colors
+    --color-whatsapp: #25D366;
+    --color-whatsapp-hover: #20BA5A;
+    --color-twitter: #1DA1F2;
+    --color-twitter-hover: #1A8CD8;
+    --color-facebook: #1877F2;
+    --color-facebook-hover: #1564D0;
+
+    // ========================================
+    // SPACING
+    // ========================================
+
+    --spacing-xs: 0.25rem;      // 4px
+    --spacing-sm: 0.5rem;       // 8px
+    --spacing-md: 1rem;         // 16px
+    --spacing-lg: 1.5rem;       // 24px
+    --spacing-xl: 2rem;         // 32px
+    --spacing-2xl: 3rem;        // 48px
+    --spacing-3xl: 4rem;        // 64px
+
+    // ========================================
+    // BORDER RADIUS
+    // ========================================
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-full: 9999px;      // For circular elements
+
+    // ========================================
+    // TYPOGRAPHY
+    // ========================================
+
+    // Font Families
+    --font-primary: 'Inter', sans-serif;
+    --font-heading: 'Inter', sans-serif;
+
+    // Font Sizes
+    --font-size-xs: 0.75rem;    // 12px
+    --font-size-sm: 0.875rem;   // 14px
+    --font-size-md: 1rem;       // 16px
+    --font-size-lg: 1.125rem;   // 18px
+    --font-size-xl: 1.25rem;    // 20px
+    --font-size-2xl: 1.5rem;    // 24px
+    --font-size-3xl: 2rem;      // 32px
+
+    // Font Weights
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    // Line Heights
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    // ========================================
+    // SHADOWS
+    // ========================================
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
+
+    // ========================================
+    // TRANSITIONS
+    // ========================================
+
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.2s ease;
+    --transition-slow: 0.3s ease;
+
+    // ========================================
+    // Z-INDEX
+    // ========================================
+
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+}
+
+// ========================================
+// UTILITY CLASSES
+// ========================================
+
+// Typography utilities
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+// Spacing utilities
+.m-xs { margin: var(--spacing-xs); }
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.m-lg { margin: var(--spacing-lg); }
+.m-xl { margin: var(--spacing-xl); }
+
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+// Border radius utilities
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+// Color utilities
+.text-primary { color: var(--color-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+.text-white { color: var(--color-text-white); }
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-danger { background-color: var(--color-danger); }

@@ -1,0 +1,158 @@
+@page
+@using System.Globalization
+@using important_game.infrastructure.Extensions
+@model CalendarModel
+@{
+    ViewData["Title"] = $"Calendar - {Model.MonthName} - Match to Watch";
+}
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <button class="calendar-nav-btn" id="prevMonthBtn" data-year="@Model.Year" data-month="@Model.Month">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <h1 class="calendar-title">@Model.MonthName</h1>
+        <button class="calendar-nav-btn" id="nextMonthBtn" data-year="@Model.Year" data-month="@Model.Month">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+
+    <div class="calendar-grid">
+        @* Day headers *@
+        <div class="calendar-day-header">Sun</div>
+        <div class="calendar-day-header">Mon</div>
+        <div class="calendar-day-header">Tue</div>
+        <div class="calendar-day-header">Wed</div>
+        <div class="calendar-day-header">Thu</div>
+        <div class="calendar-day-header">Fri</div>
+        <div class="calendar-day-header">Sat</div>
+
+        @* Empty cells before first day of month *@
+        @for (int i = 0; i < Model.FirstDayOfWeek; i++)
+        {
+            <div class="calendar-day calendar-day-empty"></div>
+        }
+
+        @* Days of the month *@
+        @for (int day = 1; day <= Model.DaysInMonth; day++)
+        {
+            var matchCount = Model.GetMatchCount(day);
+            var hasMatches = matchCount > 0;
+            var top3Matches = Model.GetTop3Matches(day);
+            var averageES = Model.GetAverageExcitementScore(day);
+
+            var isToday = day == DateTime.UtcNow.Day &&
+                          Model.Month == DateTime.UtcNow.Month &&
+                          Model.Year == DateTime.UtcNow.Year;
+
+            <div class="calendar-day @(hasMatches ? "has-matches" : "") @(hasMatches ? Model.GetESColorClass(averageES) : "") @(isToday ? "calendar-day-today" : "")"
+                 data-day="@day"
+                 data-year="@Model.Year"
+                 data-month="@Model.Month"
+                 data-match-count="@matchCount">
+                <div class="calendar-day-number">@day</div>
+
+                @if (hasMatches)
+                {
+                    @* Average ES label (top right) *@
+                    <div class="calendar-day-avg-es @Model.GetESColorClass(averageES)"
+                         title="Average ES: @((averageES * 100).ToString("F0", CultureInfo.InvariantCulture))">
+                        <i class="bi bi-fire fire-icon"></i>
+                        <span>@((averageES * 100).ToString("F0", CultureInfo.InvariantCulture))</span>
+                    </div>
+
+                    @* Top 3 mini match cards *@
+                    <div class="calendar-day-matches">
+                        @foreach (var match in top3Matches)
+                        {
+                            var esClass = Model.GetESColorClass(match.ExcitmentScore);
+                            <div class="mini-match-card @esClass"
+                                 data-match-id="@match.MatchId"
+                                 title="@match.HomeTeamName vs @match.AwayTeamName - ES: @((match.ExcitmentScore * 100).ToString("F0", CultureInfo.InvariantCulture))">
+                                <div class="mini-match-teams">
+                                    <span class="mini-team-name">@match.HomeTeamName</span>
+                                    <span class="mini-match-vs">vs</span>
+                                    <span class="mini-team-name">@match.AwayTeamName</span>
+                                </div>
+                                <div class="mini-match-es">
+                                    @((match.ExcitmentScore * 100).ToString("F0", CultureInfo.InvariantCulture))
+                                </div>
+                            </div>
+                        }
+
+                        @* "X Matches" link if more than 3 matches *@
+                        @if (matchCount > 3)
+                        {
+                            <div class="calendar-view-all"
+                                 data-day="@day"
+                                 data-year="@Model.Year"
+                                 data-month="@Model.Month">
+                                @matchCount Matches
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @* Fill remaining cells to complete the grid *@
+        @{
+            var totalCells = Model.FirstDayOfWeek + Model.DaysInMonth;
+            var remainingCells = (7 - (totalCells % 7)) % 7;
+        }
+        @for (int i = 0; i < remainingCells; i++)
+        {
+            <div class="calendar-day calendar-day-empty"></div>
+        }
+    </div>
+
+    @* Empty state message for mobile *@
+    <div class="calendar-empty-message">
+        No exciting matches yet this month
+    </div>
+</div>
+
+@* Modal for showing matches on selected day *@
+<div class="calendar-modal" id="calendarModal">
+    <div class="calendar-modal-overlay"></div>
+    <div class="calendar-modal-content">
+        <div class="calendar-modal-header">
+            <h2 class="calendar-modal-title" id="modalTitle">Matches</h2>
+            <button class="calendar-modal-close" id="closeModalBtn">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="calendar-modal-body" id="modalBody">
+            @* Match cards will be inserted here by JavaScript *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Store matches data for modal
+        window.calendarMatches = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.MatchesByDay.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Select(m => new {
+                    matchId = m.MatchId,
+                    homeTeamId = m.HomeTeamId,
+                    homeTeamName = m.HomeTeamName,
+                    awayTeamId = m.AwayTeamId,
+                    awayTeamName = m.AwayTeamName,
+                    competitionId = m.CompetitionId,
+                    competitionName = m.CompetitionName,
+                    competitionBgColor = m.CompetitionBackgroundColor,
+                    matchDate = m.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+                    matchDateUTC = m.MatchDateUTC,
+                    excitmentScore = m.ExcitmentScore,
+                    homeSlug = SlugHelper.GenerateSlug(m.HomeTeamName),
+                    awaySlug = SlugHelper.GenerateSlug(m.AwayTeamName)
+                }).ToList()
+            )
+        ));
+
+        window.calendarYear = @Model.Year;
+        window.calendarMonth = @Model.Month;
+    </script>
+}

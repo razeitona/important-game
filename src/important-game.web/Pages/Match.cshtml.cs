@@ -14,7 +14,7 @@ public class MatchModel(ILogger<MatchModel> _logger, IMatchService _matchService
     public async Task OnGet([FromRoute] string slug)
     {
         // Try to parse as integer for backward compatibility with old URLs
-        if (int.TryParse(slug, out int matchId))
+            if (int.TryParse(slug, out int matchId))
         {
             var match = await _matchService.GetMatchByIdAsync(matchId);
 

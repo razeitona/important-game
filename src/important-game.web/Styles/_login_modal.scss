@@ -1,0 +1,209 @@
+// Login Modal Styles
+
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+        display: flex;
+    }
+}
+
+.login-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+}
+
+.login-modal-content {
+    position: relative;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    max-width: 450px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.login-modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #525360;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+    z-index: 2;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #21242c;
+        transform: rotate(90deg);
+    }
+}
+
+.login-modal-header {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg);
+    border-bottom: 1px solid #e0e0e0;
+
+    .login-modal-logo {
+        width: 60px;
+        height: 60px;
+        margin-bottom: var(--spacing-md);
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        font-weight: var(--font-weight-bold);
+        color: #21242c;
+        margin: 0 0 var(--spacing-sm);
+    }
+
+    p {
+        font-size: var(--font-size-sm);
+        color: #525360;
+        margin: 0;
+        line-height: 1.5;
+    }
+}
+
+.login-modal-body {
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.btn-google-signin {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: white;
+    color: #525360;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .google-icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    span {
+        color: #21242c;
+    }
+
+    &:hover {
+        background-color: #f8f9fa;
+        border-color: #4285f4;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.login-modal-footer {
+    padding: var(--spacing-md) var(--spacing-lg) var(--spacing-xl);
+    text-align: center;
+    border-top: 1px solid #e0e0e0;
+
+    .login-modal-disclaimer {
+        font-size: var(--font-size-xs);
+        color: #525360;
+        margin: 0;
+        line-height: 1.6;
+
+        a {
+            color: var(--color-primary);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .login-modal-content {
+        max-width: 95%;
+    }
+
+    .login-modal-header {
+        padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
+
+        .login-modal-logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            font-size: 0.8125rem;
+        }
+    }
+
+    .login-modal-body {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    .btn-google-signin {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+}
+
+// Update login button style to match
+.btn-login {
+    i {
+        font-size: 1.25rem;
+        color: #525360;
+    }
+}

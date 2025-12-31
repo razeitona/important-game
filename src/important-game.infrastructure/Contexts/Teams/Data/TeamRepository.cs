@@ -28,6 +28,22 @@ public class TeamRepository : ITeamRepository
         return result.ToList();
     }
 
+    public async Task UpdateTeamAsync(TeamEntity entity)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(TeamQueries.UpdateTeam,
+            new
+            {
+                entity.Id,
+                entity.Name,
+                entity.ShortName,
+                entity.ThreeLetterName,
+                entity.NormalizedName,
+                entity.SlugName
+            }
+        );
+    }
+
     public async Task<TeamEntity> SaveTeamAsync(TeamEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -39,7 +55,7 @@ public class TeamRepository : ITeamRepository
             if (!exists)
             {
                 var insertedId = await connection.ExecuteScalarAsync<int>(TeamQueries.InsertTeam,
-                    new { entity.Name, entity.ShortName, entity.ThreeLetterName, entity.NormalizedName });
+                    new { entity.Name, entity.ShortName, entity.ThreeLetterName, entity.NormalizedName, entity.SlugName });
                 entity.Id = insertedId;
             }
         }

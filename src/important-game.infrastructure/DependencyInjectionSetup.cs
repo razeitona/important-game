@@ -6,6 +6,8 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
 using important_game.infrastructure.Contexts.ScoreCalculator;
 using important_game.infrastructure.Contexts.Teams.Data;
+using important_game.infrastructure.Contexts.Users;
+using important_game.infrastructure.Contexts.Users.Data;
 using important_game.infrastructure.Data.Connections;
 using important_game.infrastructure.Data.Repositories;
 using important_game.infrastructure.ImportantMatch;
@@ -72,6 +74,7 @@ public static class DependencyInjectionSetup
         services.AddScoped<IHeadToHeadRepository, HeadToHeadRepository>();
         services.AddScoped<IExternalProvidersRepository, ExternalProvidersRepository>();
         services.AddScoped<IMatchesRepository, MatchesRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         // Register external data synchronization service
         services.AddScoped<IExternalCompetitionSyncService, ExternalCompetitionSyncService>();
@@ -85,6 +88,9 @@ public static class DependencyInjectionSetup
 
         // Register matches services
         services.AddScoped<IMatchService, MatchService>();
+
+        // Register user services
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

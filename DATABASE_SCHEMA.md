@@ -1,16 +1,16 @@
 # Database Schema
 
-## Visão Geral
+## Visï¿½o Geral
 
-Serve este documento para descrever o schema da base de dados utilizadas na aplicação
+Serve este documento para descrever o schema da base de dados utilizadas na aplicaï¿½ï¿½o
 
 ---
 
 ## Modelo de Dados
 
 ### Tabela: `Competitions`
-Armazena informação base de cada competição.
-`UpdatedAt` indica a última vez que dados de tabela foram sincronizados no formato "yyyy-MM-dd HH:mm:ss".
+Armazena informaÃ§Ã£o base de cada competiÃ§Ã£o.
+`UpdatedAt` indica a ï¿½ltima vez que dados de tabela foram sincronizados no formato "yyyy-MM-dd HH:mm:ss".
 
 ```sql
 CREATE TABLE "Competitions" (
@@ -37,11 +37,11 @@ CREATE TABLE "Competitions" (
 35	Bundesliga	#ffffff	#e2080e	0.85	1	
 36	Scottish Premiership	#311b77	#ffffff	0.55	1	
 37	Eredivisie	#122e62	#122e62	0.7	1	
-52	Trendyol Süper Lig	#f00515	#f00918	0.6	1	
-155	Liga Profesional de Fútbol	#004a79	#33c5df	0.65	1	
+52	Trendyol Sï¿½per Lig	#f00515	#f00918	0.6	1	
+155	Liga Profesional de Fï¿½tbol	#004a79	#33c5df	0.65	1	
 185	Stoiximan Super League	#3c1c5a	#ffffff	0.55	1	
 238	Liga Portugal Betclic	#001841	#ffc501	0.6	1	
-325	Brasileirão Série A	#141528	#C7FF00	0.7	1	
+325	Brasileirï¿½o Sï¿½rie A	#141528	#C7FF00	0.7	1	
 955	Saudi Pro League	#ffffff	#2c9146	0.4	1	
 11621	Liga MX, Apertura	#3c1c5a	#ffffff	0.65	1	
 ```
@@ -49,7 +49,7 @@ CREATE TABLE "Competitions" (
 ---
 
 ### Tabela: `CompetitionSeasons`
-Armazena informação de temporadas associado a cada `Competitions`.
+Armazena informaï¿½ï¿½o de temporadas associado a cada `Competitions`.
 O campo `SeasonYear` indica o ano da temporada (e.g., "2023/2024").
 
 ```sql
@@ -70,7 +70,7 @@ CREATE TABLE "CompetitionSeasons" (
 ---
 
 ### Tabela: `CompetitionSeasons`
-Armazena informação de classificação de uma `Competition` associada a uma temporada `CompetitionSeasons`.
+Armazena informaï¿½ï¿½o de classificaï¿½ï¿½o de uma `Competition` associada a uma temporada `CompetitionSeasons`.
 
 ```sql
 CREATE TABLE "CompetitionTable" (
@@ -96,7 +96,7 @@ CREATE TABLE "CompetitionTable" (
 ---
 
 ### Tabela: `Team`
-Armazena informação de equipas.
+Armazena informaï¿½ï¿½o de equipas.
 
 ```sql
 CREATE TABLE "Teams" (
@@ -104,7 +104,8 @@ CREATE TABLE "Teams" (
 	"Name"	TEXT NOT NULL,
 	"ShortName"	TEXT,
 	"ThreeLetterName"	TEXT,
-	"NormalizedName"	TEXT
+	"NormalizedName"	TEXT,
+	"SlugName"	TEXT
 	CONSTRAINT "PK_team" PRIMARY KEY("Id" AUTOINCREMENT)
 );
 ```
@@ -112,7 +113,7 @@ CREATE TABLE "Teams" (
 ---
 
 ### Tabela: `ExternalProviders`
-Armazena informação de providers externas
+Armazena informaï¿½ï¿½o de providers externas
 
 ```sql
 CREATE TABLE "ExternalProviders" (
@@ -152,7 +153,7 @@ CREATE TABLE "ExternalProvidersLogs" (
 ---
 
 ### Tabela: `ExternalProviderTeams`
-Armazena informação do id da equipa interno da tabela `Teams` equipas com o Id externo da integração associada.
+Armazena informaï¿½ï¿½o do id da equipa interno da tabela `Teams` equipas com o Id externo da integraï¿½ï¿½o associada.
 
 ```sql
 CREATE TABLE "ExternalProviderTeams" (
@@ -167,7 +168,7 @@ CREATE TABLE "ExternalProviderTeams" (
 ---
 
 ### Tabela: `ExternalProviderCompetitions`
-Armazena informação do id da competition interno da tabela `Competitions` com o Id externo da integração associada.
+Armazena informaï¿½ï¿½o do id da competition interno da tabela `Competitions` com o Id externo da integraï¿½ï¿½o associada.
 
 ```sql
 CREATE TABLE "ExternalProviderCompetitions" (
@@ -182,7 +183,7 @@ CREATE TABLE "ExternalProviderCompetitions" (
 ---
 
 ### Tabela: `ExternalProviderCompetitionSeasons`
-Armazena informação do id da competition season interno da tabela `Competitions` com o Id externo da integração associada.
+Armazena informaï¿½ï¿½o do id da competition season interno da tabela `Competitions` com o Id externo da integraï¿½ï¿½o associada.
 
 ```sql
 CREATE TABLE "ExternalProviderCompetitionSeasons" (
@@ -197,7 +198,7 @@ CREATE TABLE "ExternalProviderCompetitionSeasons" (
 ---
 
 ### Tabela: `ExternalProviderMatches`
-Armazena informação do id interno da tabela `Matches` com o Id externo da integração associada.
+Armazena informaï¿½ï¿½o do id interno da tabela `Matches` com o Id externo da integraï¿½ï¿½o associada.
 
 ```sql
 CREATE TABLE "ExternalProviderMatches" (
@@ -212,7 +213,7 @@ CREATE TABLE "ExternalProviderMatches" (
 ---
 
 ### Tabela: `Matches`
-Armazena informação de todos os jogos de uma dada competição.
+Armazena informaï¿½ï¿½o de todos os jogos de uma dada competiï¿½ï¿½o.
 
 ```sql
 CREATE TABLE "Matches" (
@@ -247,5 +248,97 @@ CREATE TABLE "Matches" (
 );
 ```
 
+---
+
+## Authentication & User Management
+
+### Tabela: `Users`
+Armazena informaÃ§Ã£o de utilizadores registados.
+
+```sql
+CREATE TABLE "Users" (
+	"UserId"			INTEGER NOT NULL,
+	"GoogleId"			TEXT NOT NULL UNIQUE,
+	"Email"				TEXT NOT NULL,
+	"Name"				TEXT,
+	"ProfilePictureUrl"	TEXT,
+	"PreferredTimezone"	TEXT DEFAULT 'UTC',
+	"CreatedAt"			TEXT NOT NULL,
+	"LastLoginAt"		TEXT,
+	CONSTRAINT "PK_Users" PRIMARY KEY("UserId" AUTOINCREMENT)
+);
+
+CREATE INDEX "IX_Users_GoogleId" ON "Users" ("GoogleId");
+CREATE INDEX "IX_Users_Email" ON "Users" ("Email");
+```
+
+#### DescriÃ§Ã£o dos campos:
+- `UserId`: ID interno Ãºnico do utilizador
+- `GoogleId`: ID Ãºnico fornecido pelo Google (sub claim do JWT)
+- `Email`: Email do utilizador (do Google)
+- `Name`: Nome completo do utilizador
+- `ProfilePictureUrl`: URL da foto de perfil do Google
+- `PreferredTimezone`: Timezone preferido (UTC, CET, PST, GMT)
+- `CreatedAt`: Data de criaÃ§Ã£o da conta (formato "yyyy-MM-dd HH:mm:ss")
+- `LastLoginAt`: Ãšltima data de login
+
+---
+
+### Tabela: `UserFavoriteMatches`
+Armazena matches marcados como favoritos pelos utilizadores.
+
+```sql
+CREATE TABLE "UserFavoriteMatches" (
+	"UserId"		INTEGER NOT NULL,
+	"MatchId"		INTEGER NOT NULL,
+	"AddedAt"		TEXT NOT NULL,
+	PRIMARY KEY("UserId", "MatchId"),
+	FOREIGN KEY("UserId") REFERENCES "Users"("UserId") ON DELETE CASCADE,
+	FOREIGN KEY("MatchId") REFERENCES "Matches"("MatchId") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_UserFavoriteMatches_UserId" ON "UserFavoriteMatches" ("UserId");
+CREATE INDEX "IX_UserFavoriteMatches_MatchId" ON "UserFavoriteMatches" ("MatchId");
+```
+
+#### DescriÃ§Ã£o dos campos:
+- `UserId`: ReferÃªncia ao utilizador
+- `MatchId`: ReferÃªncia ao match favorito
+- `AddedAt`: Data em que foi adicionado aos favoritos
+
+---
+
+### Tabela: `MatchVotes`
+Armazena votos (likes) dos utilizadores em matches.
+
+```sql
+CREATE TABLE "MatchVotes" (
+	"UserId"		INTEGER NOT NULL,
+	"MatchId"		INTEGER NOT NULL,
+	"VoteType"		INTEGER NOT NULL DEFAULT 1,
+	"VotedAt"		TEXT NOT NULL,
+	PRIMARY KEY("UserId", "MatchId"),
+	FOREIGN KEY("UserId") REFERENCES "Users"("UserId") ON DELETE CASCADE,
+	FOREIGN KEY("MatchId") REFERENCES "Matches"("MatchId") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_MatchVotes_MatchId" ON "MatchVotes" ("MatchId");
+```
+
+#### DescriÃ§Ã£o dos campos:
+- `UserId`: ReferÃªncia ao utilizador que votou
+- `MatchId`: ReferÃªncia ao match votado
+- `VoteType`: Tipo de voto (1 = like/upvote, futuro: -1 = dislike)
+- `VotedAt`: Data do voto
+
+#### AgregaÃ§Ã£o de votos:
+Para obter o total de votos de um match:
+```sql
+SELECT MatchId, COUNT(*) as TotalVotes, SUM(VoteType) as VoteScore
+FROM MatchVotes
+GROUP BY MatchId;
+```
+
+---
 
 

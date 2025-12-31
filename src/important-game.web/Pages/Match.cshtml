@@ -42,222 +42,251 @@
     <meta name="twitter:url" content="@url">
 }
 <div class="match-detail" data-live="@(false)@* matchInfo.IsLive *@">
-    <div class="match-detail-content-left">
-        <span class="match-detail-back"><i class="bi bi-arrow-left"></i>BACK</span>
-        <div class="match-detail-info match-detail-card">
-            <div class="match-detail-league">
-                <div>
-                    <img src="@("/images/competition/" + matchInfo.CompetitionId + ".png")" alt="@(matchInfo.CompetitionName)" />
-                </div>
-                <div class="match-detail-league-title">
-                    @matchInfo.CompetitionName
-                </div>
-                <div class="match-detail-time">
-                    <time data-utc-time="@matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
-                        @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
-                    </time>
-                </div>
+    <span class="match-detail-back"><i class="bi bi-arrow-left"></i>BACK</span>
+
+    @* HERO SECTION - ES + TEAMS *@
+    <div class="match-detail-hero">
+        <div class="match-hero-header">
+            <div class="match-hero-competition">
+                <img src="@("/images/competition/" + matchInfo.CompetitionId + ".png")" alt="@(matchInfo.CompetitionName)" />
+                <span class="competition-name">@matchInfo.CompetitionName</span>
             </div>
-            <div class="match-detail-teams">
-                <div class="match-detail-team-info">
-                    <img src="@("/images/team/" + matchInfo.HomeTeamId + ".png")" alt="@(matchInfo.HomeTeamName)" />
-                    <p>@matchInfo.HomeTeamName</p>
-                </div>
-                <div class="match-detail-team-label">
-                    <span>vs</span>
-                </div>
-                <div class="match-detail-team-info">
-                    <img src="@("/images/team/" + matchInfo.AwayTeamId + ".png")" alt="@(matchInfo.AwayTeamName)" />
-                    <p>@matchInfo.AwayTeamName</p>
-                </div>
+            <div class="match-hero-time">
+                <i class="bi bi-calendar3"></i>
+                <time data-utc-time="@matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
+                    @matchInfo.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                </time>
+            </div>
+        </div>
+
+        <div class="match-hero-content">
+            @* HOME TEAM *@
+            <div class="match-hero-team">
+                <img src="@("/images/team/" + matchInfo.HomeTeamId + ".png")" alt="@(matchInfo.HomeTeamName)" />
+                <h2>@matchInfo.HomeTeamName</h2>
+                @if (matchInfo.HomeTeamTablePosition > 0)
+                {
+                    <span class="team-position">#@matchInfo.HomeTeamTablePosition</span>
+                }
             </div>
 
-            @* SHARE BUTTONS *@
+            @* EXCITEMENT SCORE CENTER *@
+            <div class="match-hero-score">
+                <div class="es-label">
+                    <i class="bi bi-fire"></i>
+                    <span>Excitement Score</span>
+                </div>
+                <div class="es-value" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString("0.00", CultureInfo.InvariantCulture))">
+                    @(Math.Round(matchInfo.ExcitmentScore * 100, 0))
+                </div>
+                <p class="es-description">@matchInfo.Description</p>
+                @if (matchInfo.IsRivalry || matchInfo.HasTitleHolder)
+                {
+                    <div class="es-badges">
+                        @if (matchInfo.IsRivalry)
+                        {
+                            <span class="badge badge-rivalry"><i class="bi bi-thermometer-high"></i>Rivalry</span>
+                        }
+                        @if (matchInfo.HasTitleHolder)
+                        {
+                            <span class="badge badge-title"><i class="bi bi-trophy"></i>Title Holder</span>
+                        }
+                    </div>
+                }
+            </div>
+
+            @* AWAY TEAM *@
+            <div class="match-hero-team">
+                <img src="@("/images/team/" + matchInfo.AwayTeamId + ".png")" alt="@(matchInfo.AwayTeamName)" />
+                <h2>@matchInfo.AwayTeamName</h2>
+                @if (matchInfo.AwayTeamTablePosition > 0)
+                {
+                    <span class="team-position">#@matchInfo.AwayTeamTablePosition</span>
+                }
+            </div>
+        </div>
+
+        @* ACTIONS BAR *@
+        <div class="match-hero-actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <button class="match-detail-like-btn"
+                        data-match-id="@matchInfo.MatchId"
+                        data-liked="false"
+                        title="Like this match">
+                    <i class="bi bi-heart"></i>
+                    <span class="like-count">0</span>
+                </button>
+            }
             <div class="share-buttons">
                 <span class="share-label">Share:</span>
-                <button class="share-btn share-whatsapp"
-                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
-                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
-                        data-share-type="whatsapp"
-                        title="Share on WhatsApp">
+                <button type="button" class="share-btn share-whatsapp"
+                    data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                    data-match-score="@Math.Round(matchInfo.ExcitmentScore * 100, 0)"
+                    data-share-type="whatsapp"
+                    title="Share on WhatsApp">
                     <i class="bi bi-whatsapp"></i>
                 </button>
-                <button class="share-btn share-twitter"
-                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
-                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
-                        data-share-type="twitter"
-                        title="Share on Twitter/X">
+                <button type="button" class="share-btn share-twitter"
+                    data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                    data-match-score="@Math.Round(matchInfo.ExcitmentScore * 100, 0)"
+                    data-share-type="twitter"
+                    title="Share on Twitter/X">
                     <i class="bi bi-twitter-x"></i>
                 </button>
-                <button class="share-btn share-facebook"
-                        data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
-                        data-match-score="@(Math.Round(matchInfo.ExcitmentScore * 100, 0))"
-                        data-share-type="facebook"
-                        title="Share on Facebook">
+                <button type="button" class="share-btn share-facebook"
+                    data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                    data-match-score="@Math.Round(matchInfo.ExcitmentScore * 100, 0)"
+                    data-share-type="facebook"
+                    title="Share on Facebook">
                     <i class="bi bi-facebook"></i>
                 </button>
-                <button class="share-btn share-copy"
-                        data-share-type="copy"
-                        title="Copy Link">
+                <button type="button" class="share-btn share-copy"
+                    data-share-type="copy"
+                    title="Copy Link">
                     <i class="bi bi-link-45deg"></i>
                 </button>
             </div>
         </div>
-        @* HEAD TO HEAD *@
-        <div class="match-detail-info match-detail-card match-detail-info-h2h">
-            <h1>Head to Head History</h1>
-            <div class="match-detail-info-h2h-content">
-                @if (matchInfo.HeadToHead.Count == 0)
-                {
-                    <span class="match-detail-info-h2h-empty">No matches between <i>@(matchInfo.HomeTeamName)</i> and <i>@(matchInfo.AwayTeamName)</i> the past two years </span>
-                }
-                else
-                {
-                    foreach (var match in matchInfo.HeadToHead)
+    </div>
+
+    @* TWO COLUMN LAYOUT - STATS *@
+    <div class="match-detail-stats">
+        <div class="match-detail-column">
+            @* EXCITEMENT BREAKDOWN *@
+            <div class="match-detail-card">
+                <h3><i class="bi bi-bar-chart-line"></i>Excitement Score Breakdown</h3>
+                <div class="esdetail-content">
+                    @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
                     {
-                        <div class="match-detail-info-h2h-item">
-                            <span class="h2h-date">
-                                <time data-utc-time="@match.MatchDateUTC.ToString("dd/MM/yyyy") 00:00">
-                                    @match.MatchDateUTC.ToString("dd/MM/yyyy")
-                                </time>
-                            </span>
-                            <div class="h2h-match">
-                                @if (match.HomeTeamScore > match.AwayTeamScore)
-                                {
-                                    <span>@(match.HomeTeamName)</span>
-                                    <span>@(match.HomeTeamScore)</span>
-                                    <span>-</span>
-                                    <span class="lost">@(match.AwayTeamScore)</span>
-                                    <span class="lost">@(match.AwayTeamName)</span>
-                                }
-                                else if (match.AwayTeamScore > match.HomeTeamScore)
-                                {
-                                    <span class="lost">@(match.HomeTeamName)</span>
-                                    <span class="lost">@(match.HomeTeamScore)</span>
-                                    <span>-</span>
-                                    <span>@(match.AwayTeamScore)</span>
-                                    <span>@(match.AwayTeamName)</span>
-                                }
-                                else
-                                {
-                                    <span>@(match.HomeTeamName) @(match.HomeTeamScore)-@(match.AwayTeamScore) @(match.AwayTeamName)</span>
-                                }
+                        var scoreValue = Math.Round(item.Value.Value * 100, 0);
+                        <div class="esdetail-item">
+                            <div class="esdetail-header">
+                                <span class="esdetail-name">@item.Key</span>
+                                <span class="esdetail-value">@scoreValue</span>
+                            </div>
+                            <div class="esdetail-bar">
+                                <div class="esdetail-bar-fill" style="width: @(scoreValue)%" data-score="@scoreValue"></div>
                             </div>
                         </div>
                     }
-                }
+                </div>
             </div>
-        </div>
-        @* TEAMS FORM *@
-        <div class="match-detail-info match-detail-card match-detail-info-form">
-            <h1>Recent Form</h1>
-            <div class="match-detail-info-form-content">
-                <div>
-                    <span>@matchInfo.HomeTeamName</span>
-                    <div>
-                        @foreach (var form in matchInfo.HomeTeamForm)
-                        {
-                            var formResult = form switch
+
+            @* RECENT FORM *@
+            <div class="match-detail-card">
+                <h3><i class="bi bi-graph-up-arrow"></i>Recent Form</h3>
+                <div class="form-content">
+                    <div class="form-team">
+                        <span class="form-team-name">@matchInfo.HomeTeamName</span>
+                        <div class="form-badges">
+                            @foreach (var form in matchInfo.HomeTeamForm)
                             {
-                                MatchResultType.Win => "W",
-                                MatchResultType.Draw => "D",
-                                MatchResultType.Lost => "L",
-                                _ => ""
-                            };
-                            <span data-form-score="@((int)form)">@formResult</span>
-                        }
+                                var formResult = form switch
+                                {
+                                    MatchResultType.Win => "W",
+                                    MatchResultType.Draw => "D",
+                                    MatchResultType.Lost => "L",
+                                    _ => ""
+                                };
+                                <span class="form-badge" data-form-score="@((int)form)">@formResult</span>
+                            }
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <span>@matchInfo.AwayTeamName</span>
-                    <div>
-                        @foreach (var form in matchInfo.AwayTeamForm)
-                        {
-                            var formResult = form switch
+                    <div class="form-team">
+                        <span class="form-team-name">@matchInfo.AwayTeamName</span>
+                        <div class="form-badges">
+                            @foreach (var form in matchInfo.AwayTeamForm)
                             {
-                                MatchResultType.Win => "W",
-                                MatchResultType.Draw => "D",
-                                MatchResultType.Lost => "L",
-                                _ => ""
-                            };
-                            <span data-form-score="@((int)form)">@formResult</span>
-                        }
+                                var formResult = form switch
+                                {
+                                    MatchResultType.Win => "W",
+                                    MatchResultType.Draw => "D",
+                                    MatchResultType.Lost => "L",
+                                    _ => ""
+                                };
+                                <span class="form-badge" data-form-score="@((int)form)">@formResult</span>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="match-detail-content-right">
-        <div class="ad-container ad-sidebar">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-XXXXXXXXXX"
-                 data-ad-slot="XXXXXXXXXX"
-                 data-ad-format="rectangle"
-                 data-full-width-responsive="true"></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-        @if (false)
-        {
-            <div class="match-detail-info match-detail-card match-detail-info-live">
-                <div class="match-detail-info-live-title">
-                    <p>Live</p>
-                    <div class="match-detail-info-live-title-score">
-                        <span>Score</span>
-                        <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitmentScore * 100, 0))</div>
-                    </div>
-                </div>
-            </div>
-        }
-        <div class="match-detail-info match-detail-card match-detail-info-esdetail">
-            <h1>Excitement Score Breakdown</h1>
-            <div class="match-detail-info-esdetail-content">
-                @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
-                {
-                    var scoreValue = Math.Round(item.Value.Value * 100, 0);
-                    <div class="esdetail-item">
-                        <div class="esdetail-title">
-                            <span class="esdetail-name">@item.Key</span>
-                            <span>@scoreValue</span>
-                        </div>
-                        <div class="progress esdetail-progress" role="progressbar" aria-label="@item.Key" aria-valuenow="@scoreValue" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar" style="width: @(scoreValue)%"></div>
-                        </div>
-                        @* <div class="text-xs text-gray-500 mt-1" data-id="element-66">Weight: 30%</div> *@
-                    </div>
-                }
-                @if (matchInfo.IsRivalry)
-                {
-                    <span><i class="bi bi-thermometer-high"></i>Rivalry</span>
-                }
-                @if (matchInfo.HasTitleHolder)
-                {
-                    <span><i class="bi bi-trophy"></i>Title Holder</span>
-                }
-            </div>
-        </div>
-        <div class="match-detail-info match-detail-card match-detail-info-esinfo">
-            <div class="match-detail-info-esinfo-title">
-                <i class="bi bi-broadcast-pin"></i>
-                <span>Excitement Score</span>
-            </div>
-            <div class="match-detail-info-esinfo-score" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString().Replace(",", "."))">@(Math.Round(matchInfo.ExcitmentScore * 100, 0))</div>
-            <p>@matchInfo.Description</p>
         </div>
 
+        <div class="match-detail-column">
+            @* HEAD TO HEAD *@
+            <div class="match-detail-card">
+                <h3><i class="bi bi-arrow-left-right"></i>Head to Head History</h3>
+                <div class="h2h-content">
+                    @if (matchInfo.HeadToHead.Count == 0)
+                    {
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No matches between <strong>@matchInfo.HomeTeamName</strong> and <strong>@matchInfo.AwayTeamName</strong> in the past two years</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var match in matchInfo.HeadToHead)
+                        {
+                            <div class="h2h-item">
+                                <span class="h2h-date">
+                                    <time data-utc-time="@match.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
+                                        @match.MatchDateUTC.ToString("dd/MM/yyyy")
+                                    </time>
+                                </span>
+                                <div class="h2h-result">
+                                    @if (match.HomeTeamScore > match.AwayTeamScore)
+                                    {
+                                        <span class="team-name winner">@match.HomeTeamName</span>
+                                        <span class="score winner">@match.HomeTeamScore</span>
+                                        <span class="separator">-</span>
+                                        <span class="score loser">@match.AwayTeamScore</span>
+                                        <span class="team-name loser">@match.AwayTeamName</span>
+                                    }
+                                    else if (match.AwayTeamScore > match.HomeTeamScore)
+                                    {
+                                        <span class="team-name loser">@match.HomeTeamName</span>
+                                        <span class="score loser">@match.HomeTeamScore</span>
+                                        <span class="separator">-</span>
+                                        <span class="score winner">@match.AwayTeamScore</span>
+                                        <span class="team-name winner">@match.AwayTeamName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="team-name draw">@match.HomeTeamName</span>
+                                        <span class="score draw">@match.HomeTeamScore</span>
+                                        <span class="separator">-</span>
+                                        <span class="score draw">@match.AwayTeamScore</span>
+                                        <span class="team-name draw">@match.AwayTeamName</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
 
+            @* AD PLACEHOLDER *@
+            <div class="ad-container">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXX"
+                     data-ad-slot="XXXXXXXXXX"
+                     data-ad-format="rectangle"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-
     <script>
         $(document).ready(function () {
             $(".match-detail-back").on("click", function () {
                 history.back();
             });
-
         });
     </script>
-
 }
