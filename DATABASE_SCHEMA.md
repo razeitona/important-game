@@ -306,36 +306,11 @@ CREATE INDEX "IX_UserFavoriteMatches_MatchId" ON "UserFavoriteMatches" ("MatchId
 - `MatchId`: Referência ao match favorito
 - `AddedAt`: Data em que foi adicionado aos favoritos
 
----
-
-### Tabela: `MatchVotes`
-Armazena votos (likes) dos utilizadores em matches.
-
-```sql
-CREATE TABLE "MatchVotes" (
-	"UserId"		INTEGER NOT NULL,
-	"MatchId"		INTEGER NOT NULL,
-	"VoteType"		INTEGER NOT NULL DEFAULT 1,
-	"VotedAt"		TEXT NOT NULL,
-	PRIMARY KEY("UserId", "MatchId"),
-	FOREIGN KEY("UserId") REFERENCES "Users"("UserId") ON DELETE CASCADE,
-	FOREIGN KEY("MatchId") REFERENCES "Matches"("MatchId") ON DELETE CASCADE
-);
-
-CREATE INDEX "IX_MatchVotes_MatchId" ON "MatchVotes" ("MatchId");
-```
-
-#### Descrição dos campos:
-- `UserId`: Referência ao utilizador que votou
-- `MatchId`: Referência ao match votado
-- `VoteType`: Tipo de voto (1 = like/upvote, futuro: -1 = dislike)
-- `VotedAt`: Data do voto
-
 #### Agregação de votos:
 Para obter o total de votos de um match:
 ```sql
-SELECT MatchId, COUNT(*) as TotalVotes, SUM(VoteType) as VoteScore
-FROM MatchVotes
+SELECT MatchId, COUNT(*) as TotalVotes
+FROM UserFavoriteMatches
 GROUP BY MatchId;
 ```
 
@@ -371,6 +346,149 @@ INNER JOIN UserFavoriteTeams uft ON (m.HomeTeamId = uft.TeamId OR m.AwayTeamId =
 WHERE uft.UserId = ?
   AND m.IsFinished = 0
   AND datetime(m.MatchDateUTC) >= datetime('now')
+ORDER BY m.MatchDateUTC ASC;
+```
+
+---
+
+## Broadcast Channels
+
+### Tabela: `Countries`
+Armazena informação de países.
+
+```sql
+CREATE TABLE "Countries" (
+	"CountryCode"		TEXT NOT NULL,
+	"CountryName"		TEXT NOT NULL,
+	CONSTRAINT "PK_Countries" PRIMARY KEY("CountryCode")
+);
+```
+
+#### Descrição dos campos:
+- `CountryCode`: Código ISO 3166-1 alpha-2 do país (e.g., "US", "GB", "PT", "ES")
+- `CountryName`: Nome completo do país (e.g., "United States", "United Kingdom", "Portugal")
+
+---
+
+### Tabela: `BroadcastChannels`
+Armazena informação de canais de televisão.
+
+```sql
+CREATE TABLE "BroadcastChannels" (
+	"ChannelId"			INTEGER NOT NULL,
+	"Name"				TEXT NOT NULL,
+	"Code"				TEXT NOT NULL UNIQUE,
+	"IsActive"			INTEGER NOT NULL DEFAULT 1,
+	"CreatedAt"			TEXT NOT NULL,
+	CONSTRAINT "PK_BroadcastChannels" PRIMARY KEY("ChannelId" AUTOINCREMENT)
+);
+
+CREATE INDEX "IX_BroadcastChannels_Code" ON "BroadcastChannels" ("Code");
+CREATE INDEX "IX_BroadcastChannels_IsActive" ON "BroadcastChannels" ("IsActive");
+```
+
+#### Descrição dos campos:
+- `ChannelId`: ID interno único do canal
+- `Name`: Nome do canal (e.g., "ESPN", "Sky Sports", "Sport TV1")
+- `Code`: Código único do canal (e.g., "ESPN", "SKY_SPORTS", "SPORT_TV1")
+- `IsActive`: Flag para indicar se o canal está ativo (1) ou inativo (0)
+- `CreatedAt`: Data de criação do registo (formato "yyyy-MM-dd HH:mm:ss")
+
+---
+
+### Tabela: `BroadcastChannelCountries`
+Relaciona canais com os países onde estão disponíveis.
+
+```sql
+CREATE TABLE "BroadcastChannelCountries" (
+	"ChannelId"			INTEGER NOT NULL,
+	"CountryCode"		TEXT NOT NULL,
+	PRIMARY KEY("ChannelId", "CountryCode"),
+	FOREIGN KEY("ChannelId") REFERENCES "BroadcastChannels"("ChannelId") ON DELETE CASCADE,
+	FOREIGN KEY("CountryCode") REFERENCES "Countries"("CountryCode") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_BroadcastChannelCountries_ChannelId" ON "BroadcastChannelCountries" ("ChannelId");
+CREATE INDEX "IX_BroadcastChannelCountries_CountryCode" ON "BroadcastChannelCountries" ("CountryCode");
+```
+
+#### Descrição dos campos:
+- `ChannelId`: Referência ao canal
+- `CountryCode`: Referência ao país
+
+---
+
+### Tabela: `MatchBroadcasts`
+Associa matches com os canais que os transmitem.
+
+```sql
+CREATE TABLE "MatchBroadcasts" (
+	"MatchId"			INTEGER NOT NULL,
+	"ChannelId"			INTEGER NOT NULL,
+	"CreatedAt"			TEXT NOT NULL,
+	PRIMARY KEY("MatchId", "ChannelId"),
+	FOREIGN KEY("MatchId") REFERENCES "Matches"("MatchId") ON DELETE CASCADE,
+	FOREIGN KEY("ChannelId") REFERENCES "BroadcastChannels"("ChannelId") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_MatchBroadcasts_MatchId" ON "MatchBroadcasts" ("MatchId");
+CREATE INDEX "IX_MatchBroadcasts_ChannelId" ON "MatchBroadcasts" ("ChannelId");
+```
+
+#### Descrição dos campos:
+- `MatchId`: Referência ao jogo
+- `ChannelId`: Referência ao canal de transmissão
+- `CreatedAt`: Data de criação do registo
+
+#### Query para obter canais de um match agrupados por país:
+```sql
+SELECT bc.*, c.CountryCode, c.CountryName
+FROM BroadcastChannels bc
+INNER JOIN MatchBroadcasts mb ON bc.ChannelId = mb.ChannelId
+INNER JOIN BroadcastChannelCountries bcc ON bc.ChannelId = bcc.ChannelId
+INNER JOIN Countries c ON bcc.CountryCode = c.CountryCode
+WHERE mb.MatchId = ?
+  AND bc.IsActive = 1
+ORDER BY c.CountryName, bc.Name;
+```
+
+---
+
+### Tabela: `UserFavoriteBroadcastChannels`
+Armazena canais favoritos dos utilizadores.
+
+```sql
+CREATE TABLE "UserFavoriteBroadcastChannels" (
+	"UserId"			INTEGER NOT NULL,
+	"ChannelId"			INTEGER NOT NULL,
+	"AddedAt"			TEXT NOT NULL,
+	PRIMARY KEY("UserId", "ChannelId"),
+	FOREIGN KEY("UserId") REFERENCES "Users"("UserId") ON DELETE CASCADE,
+	FOREIGN KEY("ChannelId") REFERENCES "BroadcastChannels"("ChannelId") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_UserFavoriteBroadcastChannels_UserId" ON "UserFavoriteBroadcastChannels" ("UserId");
+CREATE INDEX "IX_UserFavoriteBroadcastChannels_ChannelId" ON "UserFavoriteBroadcastChannels" ("ChannelId");
+```
+
+#### Descrição dos campos:
+- `UserId`: Referência ao utilizador
+- `ChannelId`: Referência ao canal favorito
+- `AddedAt`: Data em que foi adicionado aos favoritos (formato "yyyy-MM-dd HH:mm:ss")
+
+#### Query para obter matches transmitidos nos canais favoritos do utilizador:
+```sql
+SELECT DISTINCT m.*, bc.Name as ChannelName, c.CountryCode, c.CountryName
+FROM Matches m
+INNER JOIN MatchBroadcasts mb ON m.MatchId = mb.MatchId
+INNER JOIN BroadcastChannels bc ON mb.ChannelId = bc.ChannelId
+INNER JOIN UserFavoriteBroadcastChannels ufbc ON bc.ChannelId = ufbc.ChannelId
+INNER JOIN BroadcastChannelCountries bcc ON bc.ChannelId = bcc.ChannelId
+INNER JOIN Countries c ON bcc.CountryCode = c.CountryCode
+WHERE ufbc.UserId = ?
+  AND m.IsFinished = 0
+  AND datetime(m.MatchDateUTC) >= datetime('now')
+  AND bc.IsActive = 1
 ORDER BY m.MatchDateUTC ASC;
 ```
 

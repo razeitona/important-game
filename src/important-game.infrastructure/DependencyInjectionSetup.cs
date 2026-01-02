@@ -1,3 +1,5 @@
+using important_game.infrastructure.Contexts.BroadcastChannels;
+using important_game.infrastructure.Contexts.BroadcastChannels.Data;
 using important_game.infrastructure.Contexts.Competitions.Data;
 using important_game.infrastructure.Contexts.Matches;
 using important_game.infrastructure.Contexts.Matches.Data;
@@ -68,6 +70,7 @@ public static class DependencyInjectionSetup
         services.AddScoped<IExternalProvidersRepository, ExternalProvidersRepository>();
         services.AddScoped<IMatchesRepository, MatchesRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IBroadcastChannelRepository, BroadcastChannelRepository>();
 
         // Register external data synchronization service
         services.AddScoped<IExternalCompetitionSyncService, ExternalCompetitionSyncService>();
@@ -84,6 +87,9 @@ public static class DependencyInjectionSetup
 
         // Register user services
         services.AddScoped<IUserService, UserService>();
+
+        // Register broadcast channel services
+        services.AddScoped<IBroadcastChannelService, BroadcastChannelService>();
 
         return services;
     }

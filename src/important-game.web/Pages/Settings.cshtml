@@ -1,0 +1,212 @@
+@page
+@model SettingsModel
+@{
+    ViewData["Title"] = "Settings | Match to Watch";
+    ViewData["Description"] = "Manage your account settings and broadcast channel preferences.";
+}
+
+<div class="settings-page">
+    <div class="settings-header">
+        <h1><i class="bi bi-gear"></i>Settings</h1>
+        <p>Manage your account and preferences</p>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle"></i>
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="settings-sections">
+        <!-- Broadcast Channels Section -->
+        <div class="settings-section">
+            <div class="settings-section-header">
+                <h2><i class="bi bi-tv"></i>Favorite Broadcast Channels</h2>
+                <p>Select your preferred TV channels to filter match broadcasts</p>
+            </div>
+
+            <div class="settings-section-content">
+                <div class="channel-selector">
+                    <label for="settings-country-select" class="country-label">
+                        <i class="bi bi-globe"></i>
+                        Select a country to manage channels:
+                    </label>
+                    <select id="settings-country-select" class="country-dropdown">
+                        <option value="">Choose a country...</option>
+                        @foreach (var countryGroup in Model.ChannelsByCountry)
+                        {
+                            <option value="@countryGroup.Key">@countryGroup.Key</option>
+                        }
+                    </select>
+                </div>
+
+                @foreach (var countryGroup in Model.ChannelsByCountry)
+                {
+                    <div class="country-channels-container" data-country="@countryGroup.Key" style="display: none;">
+                        <div class="channels-grid">
+                            @foreach (var channel in countryGroup.Value)
+                            {
+                                <div class="channel-checkbox-item">
+                                    <input type="checkbox"
+                                           id="channel-@channel.ChannelId"
+                                           data-channel-id="@channel.ChannelId"
+                                           class="channel-checkbox"
+                                           @(Model.UserFavoriteChannelIds.Contains(channel.ChannelId) ? "checked" : "") />
+                                    <label for="channel-@channel.ChannelId" class="channel-label">
+                                        <span class="channel-name">@channel.Name</span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="channel-save-status" style="display: none;">
+                    <i class="bi bi-check-circle"></i>
+                    <span>Preferences saved</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Section -->
+        <div class="settings-section settings-danger-zone">
+            <div class="settings-section-header">
+                <h2><i class="bi bi-exclamation-triangle"></i>Danger Zone</h2>
+                <p>Irreversible actions</p>
+            </div>
+
+            <div class="settings-section-content">
+                <div class="danger-action">
+                    <div class="danger-action-info">
+                        <h3>Delete Account</h3>
+                        <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+                        <p class="gdpr-notice"><strong>GDPR Compliance:</strong> All your personal data will be permanently removed from our systems.</p>
+                    </div>
+                    <button type="button" class="btn-danger" id="delete-account-btn">
+                        <i class="bi bi-trash"></i>
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-exclamation-triangle"></i>Confirm Account Deletion</h3>
+        </div>
+        <div class="modal-body">
+            <p><strong>Are you absolutely sure?</strong></p>
+            <p>This action will permanently delete your account and all associated data including:</p>
+            <ul>
+                <li>Your profile information</li>
+                <li>Match likes and preferences</li>
+                <li>Favorite teams and channels</li>
+                <li>All other personal data</li>
+            </ul>
+            <p><strong>This action cannot be undone.</strong></p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancel-delete-btn">Cancel</button>
+            <form method="post" asp-page-handler="DeleteAccount" style="display: inline;">
+                <button type="submit" class="btn-danger-confirm">
+                    <i class="bi bi-trash"></i>
+                    Yes, Delete My Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Country dropdown handling
+            const countrySelect = $("#settings-country-select");
+            const savedCountry = localStorage.getItem("settingsSelectedCountry");
+
+            if (savedCountry && countrySelect.find(`option[value="${savedCountry}"]`).length > 0) {
+                countrySelect.val(savedCountry);
+                showChannelsForCountry(savedCountry);
+            }
+
+            countrySelect.on("change", function () {
+                const selectedCountry = $(this).val();
+                if (selectedCountry) {
+                    localStorage.setItem("settingsSelectedCountry", selectedCountry);
+                    showChannelsForCountry(selectedCountry);
+                } else {
+                    $(".country-channels-container").hide();
+                }
+            });
+
+            function showChannelsForCountry(country) {
+                $(".country-channels-container").hide();
+                $(`.country-channels-container[data-country="${country}"]`).show();
+            }
+
+            // Channel checkbox auto-save
+            $(".channel-checkbox").on("change", function () {
+                const channelId = $(this).data("channel-id");
+                const isChecked = $(this).is(":checked");
+
+                saveChannelPreference(channelId, isChecked);
+            });
+
+            function saveChannelPreference(channelId, isFavorite) {
+                const method = isFavorite ? "POST" : "DELETE";
+
+                $.ajax({
+                    url: "/api/FavoriteBroadcastChannel",
+                    method: method,
+                    contentType: "application/json",
+                    data: JSON.stringify({ channelId: channelId }),
+                    success: function () {
+                        showSaveStatus();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error saving channel preference:", error);
+                        alert("Error saving preference. Please try again.");
+                    }
+                });
+            }
+
+            function showSaveStatus() {
+                const status = $(".channel-save-status");
+                status.fadeIn(200);
+                setTimeout(function () {
+                    status.fadeOut(200);
+                }, 2000);
+            }
+
+            // Delete account modal
+            $("#delete-account-btn").on("click", function () {
+                $("#delete-modal").fadeIn(200);
+            });
+
+            $("#cancel-delete-btn").on("click", function () {
+                $("#delete-modal").fadeOut(200);
+            });
+
+            // Close modal on background click
+            $("#delete-modal").on("click", function (e) {
+                if (e.target.id === "delete-modal") {
+                    $(this).fadeOut(200);
+                }
+            });
+        });
+    </script>
+}

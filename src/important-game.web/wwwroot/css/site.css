@@ -740,7 +740,6 @@ header.scrolled {
   padding: 12px 18px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .wm-match-filter .mw-search:hover {
   border-color: rgba(255, 255, 255, 0.2);
@@ -1203,7 +1202,6 @@ header.scrolled {
   font-size: 0.85rem;
   letter-spacing: 0.05em;
   animation: pulse-live 2s ease-in-out infinite;
-  box-shadow: 0 0 12px rgba(220, 38, 38, 0.6);
 }
 .match-detail .match-detail-hero .match-hero-header .match-hero-time .match-detail-live-badge i {
   font-size: 0.6rem;
@@ -1592,7 +1590,6 @@ header.scrolled {
   font-size: 0.75rem;
   font-weight: 800;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .match-detail .match-detail-stats .form-badge:hover {
   transform: scale(1.1);
@@ -1720,6 +1717,124 @@ header.scrolled {
   color: #4a5568;
   font-weight: 400;
 }
+.match-detail .match-detail-stats .league-table-content .league-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.match-detail .match-detail-stats .league-table-content .league-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.match-detail .match-detail-stats .league-table-content .league-table-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+.match-detail .match-detail-stats .league-table-content .league-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.match-detail .match-detail-stats .league-table-content .league-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.match-detail .match-detail-stats .league-table-content .league-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr th {
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr th.col-pos {
+  width: 40px;
+  text-align: center;
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr th.col-team {
+  min-width: 150px;
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr th.col-stat {
+  width: 40px;
+  text-align: center;
+}
+.match-detail .match-detail-stats .league-table-content .league-table thead tr th.col-pts {
+  width: 50px;
+  text-align: center;
+  font-weight: 800;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team {
+  background-color: rgba(51, 181, 229, 0.12);
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team:hover {
+  background-color: rgba(51, 181, 229, 0.18);
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team td {
+  font-weight: 600;
+  color: #ffffff;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team .col-pos {
+  color: #33b5e5;
+  font-weight: 800;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team .team-name {
+  color: #ffffff;
+  font-weight: 700;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr.playing-team .col-pts {
+  color: #33b5e5;
+  font-weight: 800;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td {
+  padding: 12px 8px;
+  color: #cbd5e0;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-pos {
+  text-align: center;
+  font-weight: 700;
+  color: #718096;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-team .team-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-team .team-name {
+  color: #ffffff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-stat {
+  text-align: center;
+  font-weight: 500;
+}
+.match-detail .match-detail-stats .league-table-content .league-table tbody tr td.col-pts {
+  text-align: center;
+  font-weight: 800;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
 .match-detail .match-detail-stats .ad-container {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -1739,6 +1854,43 @@ header.scrolled {
   .match-detail {
     gap: 24px;
     padding: 24px 16px 32px;
+  }
+  .match-detail .match-detail-stats .league-table .col-desktop {
+    display: none;
+  }
+  .match-detail .match-detail-stats .league-table thead th.col-team,
+  .match-detail .match-detail-stats .league-table tbody td.col-team {
+    min-width: 120px;
+  }
+  .match-detail .match-detail-stats .league-table tbody td.col-team .team-name {
+    font-size: 0.8rem;
+  }
+  .match-detail .match-detail-stats .h2h-content .h2h-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+  }
+  .match-detail .match-detail-stats .h2h-content .h2h-item .h2h-date {
+    font-size: 0.75rem;
+    min-width: auto;
+  }
+  .match-detail .match-detail-stats .h2h-content .h2h-item .h2h-result {
+    width: 100%;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.85rem;
+  }
+  .match-detail .match-detail-stats .h2h-content .h2h-item .h2h-result .team-name {
+    max-width: 35%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .match-detail .match-detail-stats .h2h-content .h2h-item .h2h-result .score {
+    font-size: 0.9rem;
+    min-width: 18px;
   }
   .match-detail .match-detail-hero {
     padding: 16px;
@@ -2096,8 +2248,9 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   font-weight: bold;
   border-top: 5px solid var(--bgcolor);
   border-right: 5px solid #ffffff;
-  border-bottom: 5px solid #ffffff;
+  border-bottom: none;
   border-left: 5px solid #ffffff;
+  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
 }
@@ -2137,7 +2290,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   font-size: 0.65rem;
   letter-spacing: 0.05em;
   animation: pulse-live 2s ease-in-out infinite;
-  box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
 }
 .match-card-simple .match-header .match-card-live span {
   display: flex;
@@ -2332,7 +2484,99 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.match-card-simple .match-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background-color: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+  margin-bottom: 0;
+  gap: 0.5rem;
+}
+.match-card-simple .match-card-actions .match-card-action-like {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 0.7rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+.match-card-simple .match-card-actions .match-card-action-like:hover {
+  background-color: rgba(37, 140, 251, 0.08);
+  color: #258cfb;
+}
+.match-card-simple .match-card-actions .match-card-action-like:active {
+  transform: scale(0.95);
+}
+.match-card-simple .match-card-actions .match-card-action-like:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.match-card-simple .match-card-actions .match-card-action-like i {
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+.match-card-simple .match-card-actions .match-card-action-like[data-liked=true] {
+  color: #258cfb;
+  background-color: rgba(37, 140, 251, 0.08);
+}
+.match-card-simple .match-card-actions .match-card-action-like .action-like-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: auto;
+  text-align: left;
+}
+.match-card-simple .match-card-actions .match-card-action-like .action-like-count:empty {
+  display: none;
+}
+.match-card-simple .match-card-actions .match-card-action-share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+.match-card-simple .match-card-actions .match-card-action-share:hover {
+  background-color: rgba(108, 117, 125, 0.08);
+  color: #495057;
+  transform: scale(1.1);
+}
+.match-card-simple .match-card-actions .match-card-action-share:active {
+  transform: scale(0.95);
+}
+.match-card-simple .match-card-actions .match-card-action-share i {
+  pointer-events: none;
+}
+.match-card-simple.like-animate .match-card-action-like i {
+  animation: likeAnimation 0.3s ease;
+}
 
+@keyframes likeAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .site-footer {
   background-color: #1a1d24;
   padding: 3rem 0 1.5rem;
@@ -2978,6 +3222,114 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   position: relative;
 }
 
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: none;
+  pointer-events: none;
+}
+.share-modal.active {
+  display: block;
+  pointer-events: auto;
+}
+.share-modal .share-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+}
+.share-modal .share-modal-content {
+  position: fixed;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.15s ease;
+  z-index: 10001;
+  border: 1px solid #e9ecef;
+}
+.share-modal .share-modal-close {
+  display: none;
+}
+.share-modal .share-modal-header {
+  display: none;
+}
+.share-modal .share-modal-body .share-modal-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border: none;
+  border-radius: 6px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 0.2rem;
+  min-width: 50px;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn:active {
+  transform: scale(0.95);
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn i {
+  font-size: 1.4rem;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn span {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn.share-whatsapp i {
+  background-color: #25D366;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn.share-twitter i {
+  background-color: #1DA1F2;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn.share-facebook i {
+  background-color: #1877F2;
+}
+.share-modal .share-modal-body .share-modal-buttons .share-modal-btn.share-copy i {
+  background-color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .share-modal .share-modal-body .share-modal-buttons {
+    gap: 0.3rem;
+  }
+  .share-modal .share-modal-body .share-modal-buttons .share-modal-btn {
+    min-width: 45px;
+    padding: 0.3rem;
+  }
+  .share-modal .share-modal-body .share-modal-buttons .share-modal-btn i {
+    font-size: 1.2rem;
+    width: 28px;
+    height: 28px;
+  }
+  .share-modal .share-modal-body .share-modal-buttons .share-modal-btn span {
+    font-size: 0.6rem;
+  }
+}
 .match-card-like-btn {
   position: absolute;
   top: 0.5rem;
@@ -3198,7 +3550,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(37, 140, 251, 0.3);
 }
 .calendar-nav-btn:hover {
   background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
@@ -3207,7 +3558,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
 }
 .calendar-nav-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(37, 140, 251, 0.3);
 }
 
 .calendar-grid {
@@ -3256,7 +3606,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   border-color: #60a5fa;
   border-width: 2px;
   background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.08));
-  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
 }
 .calendar-day.calendar-day-today .calendar-day-number {
   color: #93c5fd;
@@ -3368,7 +3717,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   border: 1px solid rgba(255, 255, 255, 0.1);
   min-height: 20px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .mini-match-card.es-low {
   background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), rgba(239, 68, 68, 0.15));
@@ -3479,7 +3827,6 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   border: 1px solid rgba(96, 165, 250, 0.3);
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
   letter-spacing: -0.01em;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .calendar-view-all:hover {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));
@@ -4061,6 +4408,388 @@ scrollbar-width: none;*/ /* For Firefox: hide scrollbar */
   margin: 0;
   padding: 0;
   max-width: none;
+}
+
+.match-card-broadcast-channels {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: center;
+}
+.match-card-broadcast-channels .broadcast-channel-logo {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px;
+  transition: transform 0.2s ease;
+}
+.match-card-broadcast-channels .broadcast-channel-logo:hover {
+  transform: scale(1.1);
+}
+.match-card-broadcast-channels .broadcast-channel-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.match-card-broadcast-channels .broadcast-channel-logo .broadcast-channel-text {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  text-transform: uppercase;
+}
+.match-card-broadcast-channels .broadcast-channel-more {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.match-hero-broadcasts {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+.match-hero-broadcasts h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary, #fff);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.match-hero-broadcasts h3 i {
+  color: var(--accent-color, #00d4ff);
+}
+.match-hero-broadcasts .broadcasts-by-country {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-country-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-country-name i {
+  font-size: 0.875rem;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channels-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channel-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channel-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channel-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channel-item .broadcast-channel-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  text-align: center;
+}
+.match-hero-broadcasts .broadcast-country-group .broadcast-channel-item .broadcast-time {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.tv-listings-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+.tv-listings-page .tv-listings-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.tv-listings-page .tv-listings-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.tv-listings-page .tv-listings-header h1 i {
+  color: var(--accent-color, #00d4ff);
+}
+.tv-listings-page .tv-listings-header .tv-listings-subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1.5rem;
+}
+.tv-listings-page .tv-listings-header .tv-listings-filter-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  color: #ffd700;
+  font-size: 0.875rem;
+}
+.tv-listings-page .tv-listings-header .tv-listings-filter-info i {
+  font-size: 1rem;
+}
+.tv-listings-page .tv-listings-header .tv-listings-filter-info .manage-channels-link {
+  color: #ffd700;
+  text-decoration: underline;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+.tv-listings-page .tv-listings-header .tv-listings-filter-info .manage-channels-link:hover {
+  color: #ffed4e;
+}
+.tv-listings-page .tv-listings-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+.tv-listings-page .tv-listings-empty i {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 1rem;
+}
+.tv-listings-page .tv-listings-empty h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary, #fff);
+}
+.tv-listings-page .tv-listings-empty p {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+.tv-listings-page .tv-listings-empty .btn {
+  margin-top: 1.5rem;
+}
+.tv-listings-page .tv-listings-day {
+  margin-bottom: 3rem;
+}
+.tv-listings-page .tv-listings-day .tv-listings-day-header {
+  background: linear-gradient(135deg, var(--accent-color, #00d4ff) 0%, #0095ff 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 0;
+}
+.tv-listings-page .tv-listings-day .tv-listings-day-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+.tv-listings-page .tv-listings-day .tv-listings-timeslot {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--accent-color, #00d4ff);
+  margin-bottom: 0;
+}
+.tv-listings-page .tv-listings-day .tv-listings-timeslot:last-child {
+  border-radius: 0 0 12px 12px;
+}
+.tv-listings-page .tv-listings-day .tv-listings-timeslot .timeslot-header {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.tv-listings-page .tv-listings-day .tv-listings-timeslot .timeslot-header time {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-color, #00d4ff);
+}
+.tv-listings-page .tv-listings-day .tv-listings-timeslot .timeslot-matches {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.tv-listings-page .tv-listing-match-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.tv-listings-page .tv-listing-match-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
+}
+.tv-listings-page .tv-listing-match-card .tv-match-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-competition {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-competition img {
+  width: 32px;
+  height: 32px;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-competition span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams .tv-match-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams .tv-match-team img {
+  width: 32px;
+  height: 32px;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams .tv-match-team span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams .tv-match-vs {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 107, 0, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-score i {
+  color: #ff6b00;
+  font-size: 1.25rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-score span {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group:last-child {
+  margin-bottom: 0;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-country {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  min-width: 40px;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-channel {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-channel img {
+  height: 20px;
+  object-fit: contain;
+}
+.tv-listings-page .tv-listing-match-card .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-channel .channel-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+}
+
+@media (max-width: 768px) {
+  .match-hero-broadcasts {
+    padding: 1rem;
+  }
+  .match-hero-broadcasts .broadcast-channel-item img {
+    width: 40px;
+    height: 40px;
+  }
+  .tv-listings-page .tv-listing-match-card .tv-match-info {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-teams {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tv-listings-page .tv-listing-match-card .tv-match-info .tv-match-score {
+    align-self: center;
+  }
+  .tv-listings-page .tv-listings-header h1 {
+    font-size: 1.75rem;
+  }
+}
+@media (max-width: 480px) {
+  .match-card-broadcast-channels .broadcast-channel-logo {
+    width: 24px;
+    height: 24px;
+  }
+  .tv-match-broadcasts .tv-broadcast-country-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tv-match-broadcasts .tv-broadcast-country-group .tv-broadcast-country {
+    margin-bottom: 0.25rem;
+  }
 }
 
 /*# sourceMappingURL=site.css.map */

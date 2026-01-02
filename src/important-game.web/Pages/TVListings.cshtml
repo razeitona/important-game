@@ -1,0 +1,148 @@
+@page
+@using System.Globalization
+@using important_game.infrastructure.Extensions
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@model TvListingsModel
+@{
+    ViewData["Title"] = "TV Listings - Where to Watch Football Matches | Match to Watch";
+    ViewData["Description"] = "Find out where to watch upcoming football matches on TV. Browse broadcast schedules by channel and match.";
+    ViewData["Keywords"] = "tv listings, football on tv, where to watch, broadcast schedule, tv guide";
+
+    string GetCountryFlag(string countryCode)
+    {
+        var flagEmojis = new Dictionary<string, string>
+        {
+            { "GB", "🇬🇧" }, { "US", "🇺🇸" }, { "ES", "🇪🇸" }, { "DE", "🇩🇪" },
+            { "FR", "🇫🇷" }, { "IT", "🇮🇹" }, { "PT", "🇵🇹" }, { "BR", "🇧🇷" },
+            { "AR", "🇦🇷" }, { "MX", "🇲🇽" }, { "NL", "🇳🇱" }, { "BE", "🇧🇪" },
+            { "CA", "🇨🇦" }, { "AU", "🇦🇺" }, { "JP", "🇯🇵" }
+        };
+        return flagEmojis.ContainsKey(countryCode.ToUpper()) ? flagEmojis[countryCode.ToUpper()] : "🌍";
+    }
+}
+
+<div class="tv-listings-page">
+    <div class="tv-listings-header">
+        <h1><i class="bi bi-tv"></i>TV Listings</h1>
+        <p class="tv-listings-subtitle">Find out where to watch the most exciting football matches</p>
+
+        @if (User.Identity?.IsAuthenticated == true && Model.TvListings != null)
+        {
+            <div class="tv-listings-filter-info">
+                <i class="bi bi-star-fill"></i>
+                <span>Showing matches on your favorite channels</span>
+                <a href="/settings" class="manage-channels-link">Manage Channels</a>
+            </div>
+        }
+    </div>
+
+    @if (Model.TvListings == null || Model.TvListings.Days.Count == 0)
+    {
+        <div class="tv-listings-empty">
+            <i class="bi bi-tv"></i>
+            <h2>No Matches Found</h2>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <p>There are no upcoming matches on your favorite channels for the next 7 days.</p>
+                <a href="/settings" class="btn btn-primary">Manage Your Favorite Channels</a>
+            }
+            else
+            {
+                <p>There are no upcoming broadcast listings available at this time.</p>
+                <p>Log in to set your favorite channels and get a personalized TV guide.</p>
+            }
+        </div>
+    }
+    else
+    {
+        @foreach (var day in Model.TvListings.Days)
+        {
+            <div class="tv-listings-day">
+                <div class="tv-listings-day-header">
+                    <h2>@day.Date.ToString("dddd, dd MMMM yyyy", CultureInfo.InvariantCulture)</h2>
+                </div>
+
+                @foreach (var timeSlot in day.TimeSlots)
+                {
+                    <div class="tv-listings-timeslot">
+                        <div class="timeslot-header">
+                            <time>@timeSlot.TimeSlot.ToString("HH:mm", CultureInfo.InvariantCulture)</time>
+                        </div>
+
+                        <div class="timeslot-matches">
+                            @foreach (var match in timeSlot.Matches)
+                            {
+                                var homeSlug = SlugHelper.GenerateSlug(match.HomeTeamName);
+                                var awaySlug = SlugHelper.GenerateSlug(match.AwayTeamName);
+                                var matchUrl = $"/match/{homeSlug}-vs-{awaySlug}";
+
+                                <div class="tv-listing-match-card">
+                                    <a href="@matchUrl" class="tv-match-link">
+                                        <div class="tv-match-info">
+                                            <div class="tv-match-competition">
+                                                <img src="@("/images/competition/" + match.CompetitionId + ".png")" alt="@match.CompetitionName" />
+                                                <span>@match.CompetitionName</span>
+                                            </div>
+                                            <div class="tv-match-teams">
+                                                <div class="tv-match-team">
+                                                    <img src="@("/images/team/" + match.HomeTeamId + ".png")" alt="@match.HomeTeamName" />
+                                                    <span>@match.HomeTeamName</span>
+                                                </div>
+                                                <div class="tv-match-vs">vs</div>
+                                                <div class="tv-match-team">
+                                                    <img src="@("/images/team/" + match.AwayTeamId + ".png")" alt="@match.AwayTeamName" />
+                                                    <span>@match.AwayTeamName</span>
+                                                </div>
+                                            </div>
+                                            <div class="tv-match-score">
+                                                <i class="bi bi-fire"></i>
+                                                <span>@(Math.Round(match.ExcitmentScore * 100, 0))</span>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    @if (match.Broadcasts != null && match.Broadcasts.Count > 0)
+                                    {
+                                        <div class="tv-match-broadcasts">
+                                            @{
+                                                var broadcastsByCountry = match.Broadcasts
+                                                    .GroupBy(b => new { b.CountryCode, b.CountryName })
+                                                    .OrderBy(g => g.Key.CountryName);
+                                            }
+                                            @foreach (var countryGroup in broadcastsByCountry)
+                                            {
+                                                <div class="tv-broadcast-row">
+                                                    @foreach (var broadcast in countryGroup)
+                                                    {
+                                                        <div class="tv-broadcast-item" title="@broadcast.ChannelName - @countryGroup.Key.CountryName">
+                                                            <span class="tv-country-flag" data-country="@countryGroup.Key.CountryCode.ToLower()">
+                                                                @GetCountryFlag(countryGroup.Key.CountryCode)
+                                                            </span>
+                                                            <span class="tv-channel-name">@broadcast.ChannelName</span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Convert UTC times to user's local timezone
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeElements = document.querySelectorAll('.timeslot-header time');
+            timeElements.forEach(function(timeElement) {
+                // Time slot conversion could be added here if needed
+            });
+        });
+    </script>
+}

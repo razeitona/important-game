@@ -254,3 +254,146 @@
 .match-card-simple {
     position: relative;
 }
+
+// Share Modal Styles - Compact tooltip-like popup
+.share-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: none;
+    pointer-events: none;
+
+    &.active {
+        display: block;
+        pointer-events: auto;
+    }
+
+    .share-modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: transparent;
+    }
+
+    .share-modal-content {
+        position: fixed;
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: fadeIn 0.15s ease;
+        z-index: 10001;
+        border: 1px solid #e9ecef;
+    }
+
+    .share-modal-close {
+        display: none;
+    }
+
+    .share-modal-header {
+        display: none;
+    }
+
+    .share-modal-body {
+        .share-modal-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 0.4rem;
+
+            .share-modal-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 0.4rem;
+                border: none;
+                border-radius: 6px;
+                background-color: transparent;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                gap: 0.2rem;
+                min-width: 50px;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.05);
+                }
+
+                &:active {
+                    transform: scale(0.95);
+                }
+
+                i {
+                    font-size: 1.4rem;
+                    color: #ffffff;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                }
+
+                span {
+                    font-size: 0.65rem;
+                    font-weight: 500;
+                    color: #6c757d;
+                }
+
+                &.share-whatsapp {
+                    i {
+                        background-color: #25D366;
+                    }
+                }
+
+                &.share-twitter {
+                    i {
+                        background-color: #1DA1F2;
+                    }
+                }
+
+                &.share-facebook {
+                    i {
+                        background-color: #1877F2;
+                    }
+                }
+
+                &.share-copy {
+                    i {
+                        background-color: #6c757d;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive adjustments for share modal
+@media (max-width: 768px) {
+    .share-modal {
+        .share-modal-body {
+            .share-modal-buttons {
+                gap: 0.3rem;
+
+                .share-modal-btn {
+                    min-width: 45px;
+                    padding: 0.3rem;
+
+                    i {
+                        font-size: 1.2rem;
+                        width: 28px;
+                        height: 28px;
+                    }
+
+                    span {
+                        font-size: 0.6rem;
+                    }
+                }
+            }
+        }
+    }
+}

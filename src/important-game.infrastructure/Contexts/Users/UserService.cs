@@ -1,6 +1,7 @@
 using important_game.infrastructure.Contexts.Users.Data;
 using important_game.infrastructure.Contexts.Users.Data.Entities;
 using important_game.infrastructure.Contexts.Users.Models;
+using System.Security.Claims;
 
 namespace important_game.infrastructure.Contexts.Users;
 
@@ -80,68 +81,9 @@ public class UserService(IUserRepository userRepository) : IUserService
         return await _userRepository.IsFavoriteMatchAsync(userId, matchId, cancellationToken);
     }
 
-    // Match Votes
-    public async Task<MatchVoteDto?> GetUserVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default)
+    public async Task<int> GetFavoriteMatchCountAsync(int matchId, CancellationToken cancellationToken = default)
     {
-        var vote = await _userRepository.GetUserVoteAsync(userId, matchId, cancellationToken);
-        if (vote == null) return null;
-
-        return new MatchVoteDto
-        {
-            UserId = vote.UserId,
-            MatchId = vote.MatchId,
-            VoteType = vote.VoteType,
-            VotedAt = vote.VotedAt
-        };
-    }
-
-    public async Task ToggleVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default)
-    {
-        var existingVote = await _userRepository.GetUserVoteAsync(userId, matchId, cancellationToken);
-
-        if (existingVote != null)
-        {
-            // Remove vote (toggle off)
-            await _userRepository.RemoveVoteAsync(userId, matchId, cancellationToken);
-        }
-        else
-        {
-            // Add vote (toggle on)
-            await _userRepository.AddOrUpdateVoteAsync(userId, matchId, 1, cancellationToken);
-        }
-    }
-
-    public async Task<MatchVoteStatsDto> GetMatchVoteStatsAsync(int matchId, CancellationToken cancellationToken = default)
-    {
-        var totalVotes = await _userRepository.GetMatchVoteCountAsync(matchId, cancellationToken);
-
-        return new MatchVoteStatsDto
-        {
-            MatchId = matchId,
-            TotalVotes = totalVotes
-        };
-    }
-
-    public async Task<Dictionary<int, bool>> GetUserVotesForMatchesAsync(int userId, List<int> matchIds, CancellationToken cancellationToken = default)
-    {
-        var votes = await _userRepository.GetUserVotesForMatchesAsync(userId, matchIds, cancellationToken);
-        return votes.ToDictionary(kvp => kvp.Key, kvp => true);
-    }
-
-    public async Task AddOrUpdateVoteAsync(int userId, int matchId, int voteType, CancellationToken cancellationToken = default)
-    {
-        await _userRepository.AddOrUpdateVoteAsync(userId, matchId, voteType, cancellationToken);
-    }
-
-    public async Task RemoveVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default)
-    {
-        await _userRepository.RemoveVoteAsync(userId, matchId, cancellationToken);
-    }
-
-    public async Task<int> GetMatchVoteCountAsync(int matchId, CancellationToken cancellationToken = default)
-    {
-        var totalVotes = await _userRepository.GetMatchVoteCountAsync(matchId, cancellationToken);
-        return totalVotes;
+        return await _userRepository.GetFavoriteMatchCountAsync(matchId, cancellationToken);
     }
 
     public async Task<UserEntity?> GetUserByGoogleIdAsync(string googleId, CancellationToken cancellationToken = default)
@@ -168,5 +110,20 @@ public class UserService(IUserRepository userRepository) : IUserService
     public async Task<bool> IsFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
     {
         return await _userRepository.IsFavoriteTeamAsync(userId, teamId, cancellationToken);
+    }
+
+    public async Task DeleteUserAccountAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        await _userRepository.DeleteUserAsync(userId, cancellationToken);
+    }
+
+    public int? GetUserId(ClaimsPrincipal user)
+    {
+        var userIdClaim = user.FindFirst("UserId")?.Value;
+        if (int.TryParse(userIdClaim, out int userId))
+        {
+            return userId;
+        }
+        return null;
     }
 }

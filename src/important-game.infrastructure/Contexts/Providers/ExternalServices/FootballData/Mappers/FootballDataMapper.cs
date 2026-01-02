@@ -33,6 +33,7 @@ public static class FootballDataMapper
 
             teamStanding.Position = row.Position;
             teamStanding.PlayedGames = row.PlayedGames;
+            teamStanding.Points = row.Points;
             teamStanding.Won = row.Won;
             teamStanding.Draw = row.Draw;
             teamStanding.Lost = row.Lost;

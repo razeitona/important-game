@@ -115,60 +115,16 @@ public class UserRepository(IDbConnectionFactory connectionFactory) : IUserRepos
         return count > 0;
     }
 
-    // Match Votes
-    public async Task<MatchVoteEntity?> GetUserVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default)
+    public async Task<int> GetFavoriteMatchCountAsync(int matchId, CancellationToken cancellationToken)
     {
         using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryFirstOrDefaultAsync<MatchVoteEntity>(
-            UserQueries.GetUserVote,
-            new { UserId = userId, MatchId = matchId });
-        return result;
-    }
-
-    public async Task AddOrUpdateVoteAsync(int userId, int matchId, int voteType, CancellationToken cancellationToken = default)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
-            UserQueries.AddOrUpdateVote,
-            new
-            {
-                UserId = userId,
-                MatchId = matchId,
-                VoteType = voteType,
-                VotedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
-            });
-    }
-
-    public async Task RemoveVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
-            UserQueries.RemoveVote,
-            new { UserId = userId, MatchId = matchId });
-    }
-
-    public async Task<int> GetMatchVoteCountAsync(int matchId, CancellationToken cancellationToken = default)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryFirstOrDefaultAsync<int>(
-            UserQueries.GetMatchVoteCount,
+        var count = await connection.ExecuteScalarAsync<int>(
+            UserQueries.GetFavoriteMatchCount,
             new { MatchId = matchId });
-
-        return result;
+        return count;
     }
 
-    public async Task<Dictionary<int, MatchVoteEntity>> GetUserVotesForMatchesAsync(int userId, List<int> matchIds, CancellationToken cancellationToken = default)
-    {
-        if (matchIds == null || matchIds.Count == 0)
-            return new Dictionary<int, MatchVoteEntity>();
-
-        using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryAsync<MatchVoteEntity>(
-            UserQueries.GetUserVotesForMatches,
-            new { UserId = userId, MatchIds = matchIds });
-
-        return result.ToDictionary(v => v.MatchId);
-    }
+    // User Favorite Teams
 
     public async Task<List<int>> GetUserFavoriteTeamIdsAsync(int userId, CancellationToken cancellationToken = default)
     {
@@ -204,5 +160,13 @@ public class UserRepository(IDbConnectionFactory connectionFactory) : IUserRepos
             new { UserId = userId, TeamId = teamId });
 
         return result > 0;
+    }
+
+    public async Task DeleteUserAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(
+            UserQueries.DeleteUser,
+            new { UserId = userId });
     }
 }

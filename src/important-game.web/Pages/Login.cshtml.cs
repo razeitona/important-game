@@ -14,11 +14,11 @@ public class LoginModel(IUserService userService) : PageModel
 
     public async Task<IActionResult> OnGetAsync(string? returnUrl = null)
     {
-        // If already authenticated, redirect
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            return LocalRedirect(returnUrl ?? "/");
-        }
+        //// If already authenticated, redirect
+        //if (User.Identity?.IsAuthenticated == true)
+        //{
+        //    return LocalRedirect(returnUrl ?? "/");
+        //}
 
         // First check if this is the callback from Google
         var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);

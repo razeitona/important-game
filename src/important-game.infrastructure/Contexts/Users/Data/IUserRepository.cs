@@ -9,19 +9,14 @@ public interface IUserRepository
     Task<int> CreateUserAsync(UserEntity user, CancellationToken cancellationToken = default);
     Task UpdateLastLoginAsync(int userId, DateTime lastLoginAt, CancellationToken cancellationToken = default);
     Task UpdateUserPreferencesAsync(int userId, string timezone, string? name, string? profilePictureUrl, CancellationToken cancellationToken = default);
+    Task DeleteUserAsync(int userId, CancellationToken cancellationToken = default);
 
     // Favorite Matches
     Task<List<UserFavoriteMatchEntity>> GetUserFavoriteMatchesAsync(int userId, CancellationToken cancellationToken = default);
     Task AddFavoriteMatchAsync(int userId, int matchId, CancellationToken cancellationToken = default);
     Task RemoveFavoriteMatchAsync(int userId, int matchId, CancellationToken cancellationToken = default);
     Task<bool> IsFavoriteMatchAsync(int userId, int matchId, CancellationToken cancellationToken = default);
-
-    // Match Votes
-    Task<MatchVoteEntity?> GetUserVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default);
-    Task AddOrUpdateVoteAsync(int userId, int matchId, int voteType, CancellationToken cancellationToken = default);
-    Task RemoveVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default);
-    Task<int> GetMatchVoteCountAsync(int matchId, CancellationToken cancellationToken = default);
-    Task<Dictionary<int, MatchVoteEntity>> GetUserVotesForMatchesAsync(int userId, List<int> matchIds, CancellationToken cancellationToken = default);
+    Task<int> GetFavoriteMatchCountAsync(int matchId, CancellationToken cancellationToken);
 
     // Favorite Teams
     Task<List<int>> GetUserFavoriteTeamIdsAsync(int userId, CancellationToken cancellationToken = default);

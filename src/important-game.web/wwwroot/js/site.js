@@ -1138,4 +1138,238 @@
         initializeFavoriteStates();
     })();
 
+    // =============================================================================
+    // MATCH CARD ACTIONS - NEW IMPLEMENTATION
+    // =============================================================================
+    (function () {
+        // Match Card Action Like/Unlike Handler
+        const actionLikeButtons = document.querySelectorAll('.match-card-action-like');
+
+        if (actionLikeButtons.length > 0) {
+            // Initialize like states for all matches on page load
+            async function initializeActionLikeStates() {
+                for (const btn of actionLikeButtons) {
+                    const matchId = parseInt(btn.dataset.matchId);
+                    if (!matchId) continue;
+
+                    try {
+                        const response = await fetch(`/api/matchlike?matchId=${matchId}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            updateActionLikeButton(btn, data.liked, data.voteCount);
+                        }
+                    } catch (error) {
+                        console.error('Error initializing action like state:', error);
+                    }
+                }
+            }
+
+            // Update button visual state
+            function updateActionLikeButton(button, isLiked, voteCount) {
+                button.dataset.liked = isLiked;
+                const icon = button.querySelector('i');
+                const countSpan = button.querySelector('.action-like-count');
+
+                // Toggle icon class based on liked state
+                if (isLiked) {
+                    icon.className = 'bi bi-hand-thumbs-up-fill';
+                } else {
+                    icon.className = 'bi bi-hand-thumbs-up';
+                }
+
+                // Only show count if > 0
+                if (countSpan) {
+                    if (voteCount && voteCount > 0) {
+                        countSpan.textContent = voteCount;
+                    } else {
+                        countSpan.textContent = '';
+                    }
+                }
+            }
+
+            // Handle like/unlike toggle
+            async function toggleActionLike(button) {
+                const matchCard = button.closest('.match-card-simple');
+                const matchId = parseInt(button.dataset.matchId);
+                const isCurrentlyLiked = button.dataset.liked === 'true';
+
+                // Optimistic UI update
+                const newState = !isCurrentlyLiked;
+                button.disabled = true;
+
+                try {
+                    const method = newState ? 'POST' : 'DELETE';
+                    const response = await fetch('/api/matchlike', {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify({ matchId: matchId })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateActionLikeButton(button, data.liked, data.voteCount);
+
+                        // Show feedback animation
+                        if (matchCard) {
+                            matchCard.classList.add('like-animate');
+                            setTimeout(() => matchCard.classList.remove('like-animate'), 300);
+                        }
+                    } else if (response.status === 401) {
+                        // User not authenticated - show login modal
+                        const loginModal = document.getElementById('loginModal');
+                        if (loginModal) {
+                            loginModal.classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        }
+                    } else {
+                        throw new Error('Failed to toggle like');
+                    }
+                } catch (error) {
+                    console.error('Error toggling action like:', error);
+                    // Show error notification if available
+                    if (window.timezoneManager) {
+                        window.timezoneManager.showNotification('Failed to like match. Please try again.');
+                    }
+                } finally {
+                    button.disabled = false;
+                }
+            }
+
+            // Attach event listeners
+            actionLikeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleActionLike(this);
+                });
+            });
+
+            // Initialize states on page load
+            initializeActionLikeStates();
+        }
+
+        // Share Modal Handler
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModal = document.getElementById('closeShareModal');
+        const shareModalOverlay = shareModal?.querySelector('.share-modal-overlay');
+        const shareModalTitle = document.getElementById('shareModalTitle');
+        const actionShareButtons = document.querySelectorAll('.match-card-action-share');
+
+        let currentShareData = {
+            title: '',
+            score: '',
+            url: ''
+        };
+
+        // Open share modal positioned next to button
+        function openShareModal(title, score, url, buttonElement) {
+            if (!shareModal) return;
+
+            currentShareData = { title, score, url };
+
+            // Position modal next to the clicked button
+            const modalContent = shareModal.querySelector('.share-modal-content');
+            if (modalContent && buttonElement) {
+                const rect = buttonElement.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                // Position to the right of the button, or left if not enough space
+                let left = rect.right + scrollLeft + 8;
+                let top = rect.top + scrollTop;
+
+                // Check if there's enough space on the right
+                const modalWidth = 230; // Approximate width
+                if (left + modalWidth > window.innerWidth) {
+                    // Position to the left instead
+                    left = rect.left + scrollLeft - modalWidth - 8;
+                }
+
+                // Ensure it doesn't go off top
+                if (top < scrollTop) {
+                    top = scrollTop + 8;
+                }
+
+                modalContent.style.left = left + 'px';
+                modalContent.style.top = top + 'px';
+            }
+
+            shareModal.classList.add('active');
+        }
+
+        // Close share modal
+        function closeShareModalFn() {
+            if (!shareModal) return;
+
+            shareModal.classList.remove('active');
+            currentShareData = { title: '', score: '', url: '' };
+        }
+
+        // Attach event listeners to share action buttons
+        actionShareButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const matchCard = this.closest('.match-card-simple');
+                if (!matchCard) return;
+
+                const title = matchCard.dataset.matchTitle || '';
+                const score = matchCard.dataset.matchScoreNum || '';
+                const url = matchCard.dataset.matchUrl || '';
+
+                openShareModal(title, score, url, this);
+            });
+        });
+
+        // Close modal handlers
+        if (closeShareModal) {
+            closeShareModal.addEventListener('click', closeShareModalFn);
+        }
+
+        if (shareModalOverlay) {
+            shareModalOverlay.addEventListener('click', closeShareModalFn);
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && shareModal?.classList.contains('active')) {
+                closeShareModalFn();
+            }
+        });
+
+        // Handle share button clicks inside modal
+        if (shareModal) {
+            const shareModalButtons = shareModal.querySelectorAll('.share-modal-btn');
+
+            shareModalButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const shareType = this.dataset.shareType;
+
+                    switch(shareType) {
+                        case 'whatsapp':
+                            shareWhatsApp(currentShareData.title, currentShareData.score, currentShareData.url);
+                            break;
+                        case 'twitter':
+                            shareTwitter(currentShareData.title, currentShareData.score, currentShareData.url);
+                            break;
+                        case 'facebook':
+                            shareFacebook(currentShareData.url);
+                            break;
+                        case 'copy':
+                            copyLink(currentShareData.url);
+                            break;
+                    }
+
+                    // Close modal after sharing
+                    closeShareModalFn();
+                });
+            });
+        }
+    })();
+
 })();

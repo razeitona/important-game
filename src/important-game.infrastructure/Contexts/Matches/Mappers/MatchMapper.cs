@@ -16,6 +16,7 @@ internal static class MatchMapper
         matchDetail.CompetitionBackgroundColor = matchDetailDto.CompetitionBackgroundColor;
         matchDetail.MatchDateUTC = matchDetailDto.MatchDateUTC;
         matchDetail.ExcitmentScore = matchDetailDto.ExcitmentScore;
+        matchDetail.SeasonId = matchDetailDto.SeasonId;
 
         matchDetail.HomeTeamId = matchDetailDto.HomeTeamId;
         matchDetail.HomeTeamName = matchDetailDto.HomeTeamName;

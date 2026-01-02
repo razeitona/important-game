@@ -1,4 +1,6 @@
-﻿namespace important_game.infrastructure.Contexts.Matches.Data.Entities;
+﻿using important_game.infrastructure.Contexts.BroadcastChannels.Models;
+
+namespace important_game.infrastructure.Contexts.Matches.Data.Entities;
 public class MatchDto
 {
     public int MatchId { get; set; }
@@ -14,6 +16,7 @@ public class MatchDto
     public required string AwayTeamName { get; set; }
     public int? AwayTeamScore { get; set; }
     public double ExcitmentScore { get; set; }
+    public List<MatchBroadcastViewModel> Broadcasts { get; set; } = new();
 
     // Computed property - match is live if started within last 90 minutes
     public bool IsLive

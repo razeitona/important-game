@@ -1,4 +1,5 @@
-﻿using important_game.infrastructure.Contexts.Matches.Data.Entities;
+﻿using important_game.infrastructure.Contexts.BroadcastChannels.Models;
+using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using important_game.infrastructure.Contexts.Matches.Enums;
 
 namespace important_game.infrastructure.Contexts.Matches.Models;
@@ -26,4 +27,7 @@ public class MatchDetailViewModel
     public Dictionary<string, (bool Show, double Value)> ExcitmentScoreDetail { get; set; } = new();
     public string? Description { get; set; }
     public List<HeadToHeadDto> HeadToHead { get; set; } = new();
+    public List<LeagueTableRowDto> LeagueTable { get; set; } = new();
+    public int? SeasonId { get; set; }
+    public Dictionary<string, List<MatchBroadcastViewModel>> BroadcastsByCountry { get; set; } = new();
 }

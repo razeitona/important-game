@@ -54,31 +54,31 @@
 
     <!-- Schema.org SportsEvent structured data -->
     <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "SportsEvent",
-        "name": "@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName)",
-        "description": "@Html.Raw(matchInfo.Description)",
-        "startDate": "@matchInfo.MatchDateUTC.ToString("yyyy-MM-ddTHH:mm:ssZ")",
-        "eventStatus": "https://schema.org/@matchStatus",
-        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-        "sport": "Football",
-        "competitor": [
-            {
-                "@@type": "SportsTeam",
-                "name": "@Html.Raw(matchInfo.HomeTeamName)"
+        {
+            "@@context": "https://schema.org",
+            "@@type": "SportsEvent",
+            "name": "@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName)",
+            "description": "@Html.Raw(matchInfo.Description)",
+            "startDate": "@matchInfo.MatchDateUTC.ToString("yyyy-MM-ddTHH:mm:ssZ")",
+            "eventStatus": "https://schema.org/@matchStatus",
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "sport": "Football",
+            "competitor": [
+                {
+                    "@@type": "SportsTeam",
+                    "name": "@Html.Raw(matchInfo.HomeTeamName)"
+                },
+                {
+                    "@@type": "SportsTeam",
+                    "name": "@Html.Raw(matchInfo.AwayTeamName)"
+                }
+            ],
+            "organizer": {
+                "@@type": "SportsOrganization",
+                "name": "@Html.Raw(matchInfo.CompetitionName)"
             },
-            {
-                "@@type": "SportsTeam",
-                "name": "@Html.Raw(matchInfo.AwayTeamName)"
-            }
-        ],
-        "organizer": {
-            "@@type": "SportsOrganization",
-            "name": "@Html.Raw(matchInfo.CompetitionName)"
-        },
-        "url": "@matchUrl"
-    }
+            "url": "@matchUrl"
+        }
     </script>
 }
 <div class="match-detail" data-live="@(false)@* matchInfo.IsLive *@">
@@ -220,6 +220,43 @@
                 </button>
             </div>
         </div>
+
+        @* BROADCAST CHANNELS *@
+        @if (matchInfo.BroadcastsByCountry != null && matchInfo.BroadcastsByCountry.Count > 0)
+        {
+            <div class="match-hero-broadcasts">
+                <h3><i class="bi bi-tv"></i>Where to Watch</h3>
+
+                <div class="broadcast-country-selector">
+                    <label for="country-select">
+                        <i class="bi bi-globe"></i>
+                        Select your country:
+                    </label>
+                    <select id="country-select" class="country-dropdown">
+                        <option value="">Choose a country...</option>
+                        @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
+                        {
+                            <option value="@countryGroup.Key">@countryGroup.Key</option>
+                        }
+                    </select>
+                </div>
+
+                @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
+                {
+                    <div class="broadcast-channels-container" data-country="@countryGroup.Key" style="display: none;">
+                        <div class="broadcast-channels-list">
+                            @foreach (var broadcast in countryGroup.Value)
+                            {
+                                <div class="broadcast-channel-item" title="@broadcast.ChannelName">
+                                    <span class="broadcast-channel-name">@broadcast.ChannelName</span>
+                                    <span class="broadcast-time">@matchInfo.MatchDateUTC.ToString("HH:mm", CultureInfo.InvariantCulture)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 
     @* TWO COLUMN LAYOUT - STATS *@
@@ -283,9 +320,7 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="match-detail-column">
             @* HEAD TO HEAD *@
             <div class="match-detail-card">
                 <h3><i class="bi bi-arrow-left-right"></i>Head to Head History</h3>
@@ -338,6 +373,57 @@
                     }
                 </div>
             </div>
+        </div>
+
+        <div class="match-detail-column">
+
+            @* LEAGUE TABLE *@
+            @if (matchInfo.LeagueTable.Count > 0)
+            {
+                <div class="match-detail-card">
+                    <h3><i class="bi bi-trophy"></i>League Table</h3>
+                    <div class="league-table-content">
+                        <div class="league-table-wrapper">
+                            <table class="league-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-pos">#</th>
+                                        <th class="col-team">Team</th>
+                                        <th class="col-stat col-desktop">M</th>
+                                        <th class="col-stat col-desktop">W</th>
+                                        <th class="col-stat col-desktop">D</th>
+                                        <th class="col-stat col-desktop">L</th>
+                                        <th class="col-stat col-desktop">GF</th>
+                                        <th class="col-stat col-desktop">GA</th>
+                                        <th class="col-stat">GD</th>
+                                        <th class="col-pts">Pts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var row in matchInfo.LeagueTable)
+                                    {
+                                        <tr class="@(row.IsPlayingTeam ? "playing-team" : "")">
+                                            <td class="col-pos">@row.Position</td>
+                                            <td class="col-team">
+                                                <img src="@("/images/team/" + row.TeamId + ".png")" alt="@row.TeamName" class="team-logo" />
+                                                <span class="team-name">@row.TeamName</span>
+                                            </td>
+                                            <td class="col-stat col-desktop">@row.Matches</td>
+                                            <td class="col-stat col-desktop">@row.Wins</td>
+                                            <td class="col-stat col-desktop">@row.Draws</td>
+                                            <td class="col-stat col-desktop">@row.Losses</td>
+                                            <td class="col-stat col-desktop">@row.GoalsFor</td>
+                                            <td class="col-stat col-desktop">@row.GoalsAgainst</td>
+                                            <td class="col-stat">@(row.GoalDifference > 0 ? "+" + row.GoalDifference : row.GoalDifference.ToString())</td>
+                                            <td class="col-pts">@row.Points</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
 
             @* AD PLACEHOLDER *@
             <div class="ad-container">
@@ -362,6 +448,40 @@
             $(".match-detail-back").on("click", function () {
                 history.back();
             });
+
+            // Handle country dropdown for broadcasts
+            const countrySelect = $("#country-select");
+            if (countrySelect.length > 0) {
+                // Try to load saved country from localStorage
+                const savedCountry = localStorage.getItem("selectedBroadcastCountry");
+
+                // Auto-select first country if no saved preference
+                const firstCountry = countrySelect.find("option:not([value=''])").first().val();
+
+                if (savedCountry && countrySelect.find(`option[value="${savedCountry}"]`).length > 0) {
+                    countrySelect.val(savedCountry);
+                    showBroadcastsForCountry(savedCountry);
+                } else if (firstCountry) {
+                    countrySelect.val(firstCountry);
+                    showBroadcastsForCountry(firstCountry);
+                }
+
+                // Handle country selection change
+                countrySelect.on("change", function () {
+                    const selectedCountry = $(this).val();
+                    if (selectedCountry) {
+                        localStorage.setItem("selectedBroadcastCountry", selectedCountry);
+                        showBroadcastsForCountry(selectedCountry);
+                    } else {
+                        $(".broadcast-channels-container").hide();
+                    }
+                });
+            }
+
+            function showBroadcastsForCountry(country) {
+                $(".broadcast-channels-container").hide();
+                $(`.broadcast-channels-container[data-country="${country}"]`).show();
+            }
         });
     </script>
 }

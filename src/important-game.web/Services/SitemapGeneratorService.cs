@@ -121,6 +121,7 @@ public class SitemapGeneratorService : BackgroundService
         AddUrl(xmlWriter, baseUrl, "/", priority: 1.0, changeFreq: "daily");
         AddUrl(xmlWriter, baseUrl, "/matches", priority: 0.9, changeFreq: "hourly");
         AddUrl(xmlWriter, baseUrl, "/calendar", priority: 0.8, changeFreq: "daily");
+        AddUrl(xmlWriter, baseUrl, "/tvlistings", priority: 0.8, changeFreq: "hourly");
         AddUrl(xmlWriter, baseUrl, "/about", priority: 0.5, changeFreq: "weekly");
         AddUrl(xmlWriter, baseUrl, "/favorites", priority: 0.6, changeFreq: "daily");
 
@@ -214,8 +215,10 @@ public class SitemapGeneratorService : BackgroundService
         sb.AppendLine($"- [Home]({baseUrl}/): Main dashboard showing live matches, trending matches, and upcoming fixtures");
         sb.AppendLine($"- [Matches]({baseUrl}/matches): Browse all upcoming matches sorted by excitement score and competition");
         sb.AppendLine($"- [Calendar]({baseUrl}/calendar): Monthly calendar view of all matches with excitement indicators");
+        sb.AppendLine($"- [TV Listings]({baseUrl}/tvlistings): Browse upcoming matches by TV broadcast schedule and channels");
         sb.AppendLine($"- [About]({baseUrl}/about): Detailed information about our mission and how the Excitement Score works");
         sb.AppendLine($"- [Favorites]({baseUrl}/favorites): Personalized page for authenticated users to track their favorite matches");
+        sb.AppendLine($"- [Settings]({baseUrl}/settings): User account settings including favorite channels and account management");
         sb.AppendLine();
 
         // Features section
@@ -225,6 +228,8 @@ public class SitemapGeneratorService : BackgroundService
         sb.AppendLine("- **Live Match Tracking**: Real-time updates for ongoing matches");
         sb.AppendLine("- **Multi-Competition Coverage**: Tracks top football leagues worldwide");
         sb.AppendLine("- **Match Details**: Comprehensive analysis including head-to-head records, team form, and rivalry information");
+        sb.AppendLine("- **TV Broadcast Information**: Find where to watch matches on TV across different countries and channels");
+        sb.AppendLine("- **Favorite Channels**: Personalize your TV listings by selecting favorite broadcast channels");
         sb.AppendLine("- **Favorites System**: Users can save matches for quick access (requires Google authentication)");
         sb.AppendLine("- **Responsive Design**: Optimized for desktop and mobile viewing");
         sb.AppendLine();

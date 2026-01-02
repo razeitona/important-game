@@ -34,10 +34,10 @@ namespace important_game.web.Pages.Api
                 }
 
                 // Add or update vote (always type 1 for like)
-                await _userService.AddOrUpdateVoteAsync(user.UserId, request.MatchId, voteType: 1, cancellationToken);
+                await _userService.AddFavoriteMatchAsync(user.UserId, request.MatchId, cancellationToken);
 
                 // Get updated vote count
-                var voteCount = await _userService.GetMatchVoteCountAsync(request.MatchId, cancellationToken);
+                var voteCount = await _userService.GetFavoriteMatchCountAsync(request.MatchId, cancellationToken);
 
                 return new JsonResult(new
                 {
@@ -77,10 +77,10 @@ namespace important_game.web.Pages.Api
                 }
 
                 // Remove vote
-                await _userService.RemoveVoteAsync(user.UserId, request.MatchId, cancellationToken);
+                await _userService.RemoveFavoriteMatchAsync(user.UserId, request.MatchId, cancellationToken);
 
                 // Get updated vote count
-                var voteCount = await _userService.GetMatchVoteCountAsync(request.MatchId, cancellationToken);
+                var voteCount = await _userService.GetFavoriteMatchCountAsync(request.MatchId, cancellationToken);
 
                 return new JsonResult(new
                 {
@@ -110,20 +110,18 @@ namespace important_game.web.Pages.Api
                         var user = await _userService.GetUserByGoogleIdAsync(googleId, cancellationToken);
                         if (user != null)
                         {
-                            var vote = await _userService.GetUserVoteAsync(user.UserId, matchId, cancellationToken);
-                            isLiked = vote != null;
+                            isLiked = await _userService.IsFavoriteMatchAsync(user.UserId, matchId, cancellationToken);
                         }
                     }
                 }
 
                 // Get vote count
-                var voteCount = await _userService.GetMatchVoteCountAsync(matchId, cancellationToken);
+                var voteCount = await _userService.GetFavoriteMatchCountAsync(matchId, cancellationToken);
 
                 return new JsonResult(new
                 {
                     success = true,
-                    liked = isLiked,
-                    voteCount = voteCount
+                    liked = isLiked
                 });
             }
             catch (Exception ex)

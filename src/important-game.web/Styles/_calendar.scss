@@ -45,7 +45,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(37, 140, 251, 0.3);
 
     &:hover {
         background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
@@ -55,7 +54,6 @@
 
     &:active {
         transform: translateY(0);
-        box-shadow: 0 2px 6px rgba(37, 140, 251, 0.3);
     }
 }
 
@@ -107,7 +105,6 @@
         border-color: #60a5fa;
         border-width: 2px;
         background: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.08));
-        box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
 
         .calendar-day-number {
             color: #93c5fd;
@@ -242,7 +239,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     min-height: 20px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     // Sistema 4-tier
     &.es-low {
@@ -369,7 +365,6 @@
     border: 1px solid rgba(96, 165, 250, 0.3);
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.1));
     letter-spacing: -0.01em;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     &:hover {
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));

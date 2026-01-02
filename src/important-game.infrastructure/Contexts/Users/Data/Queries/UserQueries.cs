@@ -29,6 +29,10 @@ public static class UserQueries
             ProfilePictureUrl = @ProfilePictureUrl
         WHERE UserId = @UserId";
 
+    public const string DeleteUser = @"
+        DELETE FROM Users
+        WHERE UserId = @UserId";
+
     // Favorite Matches Queries
     public const string GetUserFavoriteMatches = @"
         SELECT ufm.UserId, ufm.MatchId, ufm.AddedAt
@@ -49,31 +53,10 @@ public static class UserQueries
         FROM UserFavoriteMatches
         WHERE UserId = @UserId AND MatchId = @MatchId";
 
-    // Match Votes Queries
-    public const string GetUserVote = @"
-        SELECT UserId, MatchId, VoteType, VotedAt
-        FROM MatchVotes
-        WHERE UserId = @UserId AND MatchId = @MatchId";
-
-    public const string AddOrUpdateVote = @"
-        INSERT INTO MatchVotes (UserId, MatchId, VoteType, VotedAt)
-        VALUES (@UserId, @MatchId, @VoteType, @VotedAt)
-        ON CONFLICT(UserId, MatchId)
-        DO UPDATE SET VoteType = @VoteType, VotedAt = @VotedAt";
-
-    public const string RemoveVote = @"
-        DELETE FROM MatchVotes
-        WHERE UserId = @UserId AND MatchId = @MatchId";
-
-    public const string GetMatchVoteCount = @"
-        SELECT COUNT(*)
-        FROM MatchVotes
+    public const string GetFavoriteMatchCount = @"
+        SELECT COUNT(1)
+        FROM UserFavoriteMatches
         WHERE MatchId = @MatchId";
-
-    public const string GetUserVotesForMatches = @"
-        SELECT UserId, MatchId, VoteType, VotedAt
-        FROM MatchVotes
-        WHERE UserId = @UserId AND MatchId IN @MatchIds";
 
     // Favorite Teams Queries
     public const string GetUserFavoriteTeamIds = @"

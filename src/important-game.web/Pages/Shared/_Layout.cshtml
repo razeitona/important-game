@@ -94,26 +94,35 @@
                             </li>
                         }
                         <li class="nav-item">
+                            <a class="nav-link" href="/tvlistings">TV Listings</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="/about">About</a>
                         </li>
                         <li class="nav-item mw-menu-item">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <div class="user-menu">
+                                <div class="user-menu dropdown">
                                     @{
                                         var userName = User.Identity.Name ?? "User";
                                         var userPicture = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
                                     }
-                                    @if (!string.IsNullOrEmpty(userPicture))
-                                    {
-                                        <img src="@userPicture" alt="@userName" class="user-avatar" />
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-person-circle user-avatar-icon"></i>
-                                    }
-                                    <span class="user-name">@userName</span>
-                                    <a href="/logout" class="btn btn-sm btn-logout">Logout</a>
+                                    <button class="btn dropdown-toggle user-menu-toggle" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @if (!string.IsNullOrEmpty(userPicture))
+                                        {
+                                            <img src="@userPicture" alt="@userName" class="user-avatar" />
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-person-circle user-avatar-icon"></i>
+                                        }
+                                        <span class="user-name">@userName</span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                                        <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear"></i> Settings</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                                    </ul>
                                 </div>
                             }
                             else
@@ -212,6 +221,40 @@
                 <p class="login-modal-disclaimer">
                     By signing in, you agree to our Terms of Service and Privacy Policy
                 </p>
+            </div>
+        </div>
+    </div>
+
+    @* Share Modal *@
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal-overlay"></div>
+        <div class="share-modal-content">
+            <button class="share-modal-close" id="closeShareModal">
+                <i class="bi bi-x"></i>
+            </button>
+            <div class="share-modal-header">
+                <h3>Share this match</h3>
+                <p id="shareModalTitle">Match</p>
+            </div>
+            <div class="share-modal-body">
+                <div class="share-modal-buttons">
+                    <button class="share-modal-btn share-whatsapp" data-share-type="whatsapp" title="Share on WhatsApp">
+                        <i class="bi bi-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="share-modal-btn share-twitter" data-share-type="twitter" title="Share on Twitter/X">
+                        <i class="bi bi-twitter-x"></i>
+                        <span>Twitter</span>
+                    </button>
+                    <button class="share-modal-btn share-facebook" data-share-type="facebook" title="Share on Facebook">
+                        <i class="bi bi-facebook"></i>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="share-modal-btn share-copy" data-share-type="copy" title="Copy Link">
+                        <i class="bi bi-link-45deg"></i>
+                        <span>Copy Link</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

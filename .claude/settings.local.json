@@ -10,7 +10,8 @@
       "Bash(dotnet add:*)",
       "Bash(npx sass:*)",
       "Bash(Select-String -Pattern \"error|succeed\")",
-      "Bash(Select-Object -First 5)"
+      "Bash(Select-Object -First 5)",
+      "Bash(npm run sass:*)"
     ]
   }
 }
