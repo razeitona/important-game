@@ -1,4 +1,5 @@
 ﻿using important_game.infrastructure.Contexts.Providers.ExternalServices;
+using important_game.infrastructure.Contexts.ScoreCalculator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -44,7 +45,9 @@ public class SyncUpcomingMatchesJob : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var matchProcessor = scope.ServiceProvider.GetRequiredService<IExternalMatchesSyncService>();
+            var calculator = scope.ServiceProvider.GetRequiredService<IMatchCalculatorOrchestrator>();
             await matchProcessor.SyncUpcomingMatchesAsync().ConfigureAwait(false);
+            await calculator.CalculateExcitmentScoreAsync(skipDateCondition : true).ConfigureAwait(false);
         }
         catch (OperationCanceledException ex)
         {

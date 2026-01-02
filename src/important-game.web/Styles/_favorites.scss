@@ -1,0 +1,93 @@
+// Favorites Page Styles
+
+.favorites-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+
+    .favorites-header {
+        text-align: center;
+        margin-bottom: 40px;
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+
+            i {
+                color: #ffd700;
+                font-size: 2.2rem;
+            }
+        }
+
+        .favorites-subtitle {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            margin: 0;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+
+        i {
+            font-size: 4rem;
+            color: #a0aec0;
+            margin-bottom: 24px;
+            opacity: 0.6;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0 0 12px 0;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin: 0 0 32px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: #33b5e5;
+            color: #ffffff;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #2a9fd1;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(51, 181, 229, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+        }
+    }
+
+    // Usar os estilos do Matches para a lista de matches
+    .wm-matches {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
+}

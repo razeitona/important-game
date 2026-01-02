@@ -1,5 +1,6 @@
 using important_game.infrastructure.Contexts.Users;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -75,13 +76,20 @@ public class LoginModel(IUserService userService) : PageModel
             appClaims.Add(new Claim("picture", user.ProfilePictureUrl));
         }
 
-        var identity = new ClaimsIdentity(appClaims, "Application");
+        var identity = new ClaimsIdentity(appClaims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 
         // Sign in with cookie authentication
-        await HttpContext.SignInAsync(principal);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
         // Redirect to return URL or home
-        return LocalRedirect(returnUrl ?? "/");
+        // Remove any query parameters from returnUrl to ensure clean redirect
+        var redirectUrl = returnUrl ?? "/";
+        if (redirectUrl.Contains('?'))
+        {
+            redirectUrl = redirectUrl.Split('?')[0];
+        }
+
+        return LocalRedirect(redirectUrl);
     }
 }

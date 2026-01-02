@@ -1,0 +1,15 @@
+# robots.txt for Match to Watch
+# https://www.matchtowatch.net/robots.txt
+
+# Allow all bots to access all pages
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.matchtowatch.net/sitemap.xml
+
+# LLMs.txt for AI agents
+https://www.matchtowatch.net/llms.txt
+
+# Crawl-delay (optional - uncomment if you experience server load issues)
+Crawl-delay: 1

@@ -59,9 +59,10 @@ Este guia explica como configurar a autenticação Google OAuth 2.0 para o Match
        https://localhost:5001/signin-google
        http://localhost:5000/signin-google
        ```
-     - Se tiveres domínio de produção, adiciona também:
+     - Se tiveres domínio de produção, adiciona também (com e sem www):
        ```
        https://teu-dominio.com/signin-google
+       https://www.teu-dominio.com/signin-google
        ```
 6. Clicar em **"CREATE"**
 
@@ -161,6 +162,19 @@ Ou usar uma ferramenta GUI para SQLite (DB Browser for SQLite) e executar o scri
 - Por defeito, a app fica em modo de teste
 - Apenas utilizadores adicionados em "Test users" podem fazer login
 - Para produção, ir para "OAuth consent screen" e clicar em **"PUBLISH APP"**
+
+### Erro: `redirect_uri_mismatch` com HTTP em vez de HTTPS (Produção)
+- **Causa**: Reverse proxy (Nginx/Cloudflare) termina SSL e encaminha para o container via HTTP
+- **Sintoma**: Erro mostra `http://` em vez de `https://` no redirect URI
+- **Solução**: O código já está configurado com `UseForwardedHeaders()` no `Program.cs`
+- **Verificar**:
+  1. Na Google Cloud Console, adicionar AMBOS os URIs:
+     - `https://www.matchtowatch.net/signin-google`
+     - `https://matchtowatch.net/signin-google`
+  2. Certificar que o proxy envia os headers:
+     - `X-Forwarded-Proto: https`
+     - `X-Forwarded-For: [client-ip]`
+  3. Esperar 2-3 minutos para propagação das alterações na Google
 
 ## Próximos Passos
 

@@ -105,7 +105,7 @@ header {
     font-weight: 600;
     transition: all 0.3s ease;
     text-decoration: none;
-    box-shadow: 0 2px 8px rgba(37, 140, 251, 0.3);
+    /*box-shadow: 0 2px 8px rgba(37, 140, 251, 0.3);*/
     white-space: nowrap;
 
     i {
@@ -121,7 +121,7 @@ header {
 
     &:active {
         transform: translateY(0);
-        box-shadow: 0 2px 6px rgba(37, 140, 251, 0.3);
+        /*box-shadow: 0 2px 6px rgba(37, 140, 251, 0.3);*/
     }
 }
 

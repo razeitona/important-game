@@ -1,0 +1,50 @@
+@page
+@using System.Globalization
+@using important_game.infrastructure.Extensions
+@model FavoritesModel
+@{
+    ViewData["Title"] = "My Favorite Teams - Upcoming Matches | Match to Watch";
+    ViewData["Description"] = "Track upcoming matches from your favorite football teams. Get excitement scores and never miss important games from the teams you follow.";
+    ViewData["Keywords"] = "favorite teams, my teams, football team tracker, personalized matches, team schedule";
+}
+
+<div class="favorites-page">
+    <div class="favorites-header">
+        <h1><i class="bi bi-star-fill"></i> My Favorite Teams</h1>
+        <p class="favorites-subtitle">Upcoming matches from your favorite teams</p>
+    </div>
+
+    @if (!User.Identity?.IsAuthenticated ?? true)
+    {
+        <div class="empty-state">
+            <i class="bi bi-lock"></i>
+            <h3>Login Required</h3>
+            <p>Please login to view your favorite teams' matches</p>
+            <a href="/Login" class="btn-primary">Login with Google</a>
+        </div>
+    }
+    else if (Model.Matches == null || !Model.Matches.Any())
+    {
+        <div class="empty-state">
+            <i class="bi bi-star"></i>
+            <h3>No Favorite Teams Yet</h3>
+            <p>Start adding teams to your favorites from match detail pages to see their upcoming matches here</p>
+            <a href="/Matches" class="btn-primary">Browse Matches</a>
+        </div>
+    }
+    else
+    {
+        <div class="wm-matches">
+            <div class="matches-section">
+                <div class="wm-match-date">
+                    <div class="matches-section-content">
+                        @foreach (var match in Model.Matches.OrderBy(c => c.MatchDateUTC.Date))
+                        {
+                            <partial name="_MatchCardSimple" for="@match" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

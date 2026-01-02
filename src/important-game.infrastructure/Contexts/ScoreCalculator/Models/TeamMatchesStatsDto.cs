@@ -1,4 +1,4 @@
-﻿using important_game.infrastructure.ImportantMatch.Models;
+﻿using important_game.infrastructure.Contexts.Matches.Enums;
 
 namespace important_game.infrastructure.Contexts.ScoreCalculator.Models;
 internal class TeamMatchesStatsDto

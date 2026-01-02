@@ -34,7 +34,7 @@ public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
         var matchResult = new MatchCalcsDto();
         matchResult.MatchId = match.MatchId;
         matchResult.CompetitionScore = match.LeagueRanking;
-        matchResult.CompetitionStandingScore = CalculateLeagueTableValue(homeTeamTable, awayTeamTable, match.NumberOfRounds);
+        matchResult.CompetitionStandingScore = CalculateLeagueTableValue(competitionTable.Count, homeTeamTable, awayTeamTable, match.NumberOfRounds);
         matchResult.FixtureScore = CalculateFixtureValue(match.Round, match.NumberOfRounds);
         matchResult.FormScore = CalculateFormScore(homeTeamMatchesStats, awayTeamMatchesStats);
         matchResult.GoalsScore = CalculateGoalScore(homeTeamMatchesStats, awayTeamMatchesStats);
@@ -57,7 +57,7 @@ public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
     {
         var homeTeamGoalScore = homeStats.Matches == 0 ? 0d : (double)homeStats.GoalsFor / ((double)homeStats.Matches * 2.0d);
         var awayTeamGoalScore = awayStats.Matches == 0 ? 0d : (double)awayStats.GoalsFor / ((double)awayStats.Matches * 2.0d);
-        return Math.Min(Math.Round((homeTeamGoalScore + awayTeamGoalScore)/2.0d, 3),1.0d);
+        return Math.Min(Math.Round((homeTeamGoalScore + awayTeamGoalScore) / 2.0d, 3), 1.0d);
     }
 
     private static double CalculateFixtureValue(int? currentRound, int? totalRounds)
@@ -75,15 +75,13 @@ public class MatchCalculator(ILogger<MatchCalculator> logger) : IMatchCalculator
         return Math.Round((homeTeamFormScore + awayTeamFormScore) / 2d, 3);
     }
 
-    private static double CalculateLeagueTableValue(CompetitionTableEntity homeTeamTable, CompetitionTableEntity awayTeamTable, int totalRounds)
+    private static double CalculateLeagueTableValue(int totalTeams, CompetitionTableEntity homeTeamTable, CompetitionTableEntity awayTeamTable, int totalRounds)
     {
         if (totalRounds == 0)
             return 0d;
 
         if (totalRounds <= 1)
             return 0.5d;
-
-        double totalTeams = ((double)totalRounds / 2) - 1;
 
         var homeTeamPosition = (double)homeTeamTable.Position;
         var awayTeamPosition = (double)awayTeamTable.Position;

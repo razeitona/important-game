@@ -196,6 +196,15 @@
             flex-grow: 1;
             font-size: 1.3rem;
             color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .live-indicator {
+                color: #dc2626;
+                font-size: 0.6rem;
+                animation: pulse-live 2s ease-in-out infinite;
+            }
         }
 
         a {

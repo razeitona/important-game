@@ -55,6 +55,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
 
             var listOfTeams = await _teamRepository.GetAllTeamsAsync();
             var externalIntegrationTeams = await _externalProvidersRepository.GetExternalIntegrationTeamsByIntegrationAsync(provider.Id);
+
             foreach (var teamId in teamsInCompetitions)
             {
                 var externalTeam = externalIntegrationTeams.FirstOrDefault(c => c.InternalTeamId == teamId);
@@ -185,7 +186,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
         try
         {
             DateTimeOffset dateFrom = DateTimeOffset.UtcNow;
-            DateTimeOffset dateTo = dateFrom.AddDays(15);
+            DateTimeOffset dateTo = dateFrom.AddDays(30);
 
             var externalMatches = await provider.GetCompetitionUpcomingMatchesAsync(
                 externalCompetitionId,
@@ -296,11 +297,14 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
     {
         // Try to find by external ID mapping
         var internalTeam = await FindInternalTeamByExternalIdAsync(providerId, externalTeam.Id, listOfTeams);
-
         if (internalTeam != null)
+        {
+            EnrichExistingTeam(internalTeam, listOfTeams, externalTeam.Name, externalTeam.ShortName, externalTeam.ThreeLetterName);
+            await _teamRepository.UpdateTeamAsync(internalTeam);
             return internalTeam;
+        }
 
-        // Try to find by fuzzy matching
+        //// Try to find by fuzzy matching
         internalTeam = IdentifyExistingTeam(listOfTeams, externalTeam.Name, externalTeam.ShortName);
 
         if (internalTeam != null)
@@ -350,6 +354,44 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
         return ranked?.Team;
     }
 
+    private static void EnrichExistingTeam(TeamEntity? teamFound, List<TeamEntity> listOfTeams, string name, string? shortName, string? threeLetterName)
+    {
+        if (listOfTeams.Count == 0)
+            return;
+
+        if (teamFound != null)
+        {
+            teamFound.Name = name;
+            teamFound.ShortName = shortName ?? name;
+            teamFound.ThreeLetterName = threeLetterName;
+            teamFound.NormalizedName = name.Normalize();
+            teamFound.SlugName = SlugHelper.GenerateSlug(name);
+            return;
+        }
+
+        var ranked = listOfTeams.Select(c => new
+        {
+            Team = c,
+            Score = Math.Max(
+                Fuzz.Ratio(c.NormalizedName ?? c.Name.Normalize(), name.Normalize()),
+                Fuzz.Ratio(c.ShortName?.Normalize() ?? c.Name.Normalize(), shortName?.Normalize() ?? "UNKNOWN_NAME"))
+        })
+        .Where(c => c.Score > 75)
+        .OrderByDescending(x => x.Score)
+        .Take(5);
+
+        var selectedTeam = ranked.FirstOrDefault();
+        if (teamFound == null && selectedTeam?.Team != null)
+        {
+            teamFound = selectedTeam.Team;
+            teamFound.Name = name;
+            teamFound.ShortName = shortName ?? name;
+            teamFound.ThreeLetterName = threeLetterName;
+            teamFound.NormalizedName = name.Normalize();
+            teamFound.SlugName = SlugHelper.GenerateSlug(name);
+        }
+    }
+
     private async Task<TeamEntity?> CreateTeamAsync(ExternalTeamDto externalTeam)
     {
         if (externalTeam == null)
@@ -363,7 +405,7 @@ public class ExternalMatchesSyncService : IExternalMatchesSyncService
                 ShortName = externalTeam.ShortName,
                 ThreeLetterName = externalTeam.ThreeLetterName,
                 NormalizedName = (externalTeam.Name ?? "Unknown Team").Normalize(),
-                SlugName = SlugHelper.GenerateSlug(externalTeam.ShortName ?? externalTeam.Name)
+                SlugName = SlugHelper.GenerateSlug(externalTeam.Name!)
             };
 
             teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);

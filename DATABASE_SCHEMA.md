@@ -341,4 +341,39 @@ GROUP BY MatchId;
 
 ---
 
+### Tabela: `UserFavoriteTeams`
+Armazena equipas marcadas como favoritas pelos utilizadores.
+
+```sql
+CREATE TABLE "UserFavoriteTeams" (
+	"UserId"		INTEGER NOT NULL,
+	"TeamId"		INTEGER NOT NULL,
+	"AddedAt"		TEXT NOT NULL,
+	PRIMARY KEY("UserId", "TeamId"),
+	FOREIGN KEY("UserId") REFERENCES "Users"("UserId") ON DELETE CASCADE,
+	FOREIGN KEY("TeamId") REFERENCES "Teams"("Id") ON DELETE CASCADE
+);
+
+CREATE INDEX "IX_UserFavoriteTeams_UserId" ON "UserFavoriteTeams" ("UserId");
+CREATE INDEX "IX_UserFavoriteTeams_TeamId" ON "UserFavoriteTeams" ("TeamId");
+```
+
+#### Descrição dos campos:
+- `UserId`: Referência ao utilizador
+- `TeamId`: Referência à equipa favorita
+- `AddedAt`: Data em que foi adicionada aos favoritos (formato "yyyy-MM-dd HH:mm:ss")
+
+#### Query para obter matches de equipas favoritas:
+```sql
+SELECT DISTINCT m.*
+FROM Matches m
+INNER JOIN UserFavoriteTeams uft ON (m.HomeTeamId = uft.TeamId OR m.AwayTeamId = uft.TeamId)
+WHERE uft.UserId = ?
+  AND m.IsFinished = 0
+  AND datetime(m.MatchDateUTC) >= datetime('now')
+ORDER BY m.MatchDateUTC ASC;
+```
+
+---
+
 

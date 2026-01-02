@@ -14,4 +14,15 @@ public class MatchDto
     public required string AwayTeamName { get; set; }
     public int? AwayTeamScore { get; set; }
     public double ExcitmentScore { get; set; }
+
+    // Computed property - match is live if started within last 90 minutes
+    public bool IsLive
+    {
+        get
+        {
+            var now = DateTimeOffset.UtcNow;
+            var matchEnd = MatchDateUTC.AddMinutes(120);
+            return now >= MatchDateUTC && now <= matchEnd;
+        }
+    }
 }

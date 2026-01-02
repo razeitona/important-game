@@ -74,4 +74,42 @@ public static class UserQueries
         SELECT UserId, MatchId, VoteType, VotedAt
         FROM MatchVotes
         WHERE UserId = @UserId AND MatchId IN @MatchIds";
+
+    // Favorite Teams Queries
+    public const string GetUserFavoriteTeamIds = @"
+        SELECT TeamId
+        FROM UserFavoriteTeams
+        WHERE UserId = @UserId
+        ORDER BY AddedAt DESC";
+
+    public const string AddFavoriteTeam = @"
+        INSERT OR IGNORE INTO UserFavoriteTeams (UserId, TeamId, AddedAt)
+        VALUES (@UserId, @TeamId, @AddedAt)";
+
+    public const string RemoveFavoriteTeam = @"
+        DELETE FROM UserFavoriteTeams
+        WHERE UserId = @UserId AND TeamId = @TeamId";
+
+    public const string IsFavoriteTeam = @"
+        SELECT COUNT(1)
+        FROM UserFavoriteTeams
+        WHERE UserId = @UserId AND TeamId = @TeamId";
+
+    public const string GetMatchesFromFavoriteTeams = @"
+        SELECT DISTINCT m.*,
+               c.CompetitionId,
+               c.Name as 'CompetitionName',
+               c.PrimaryColor as 'CompetitionPrimaryColor',
+               c.BackgroundColor as 'CompetitionBackgroundColor',
+               ht.Name as 'HomeTeamName',
+               at.Name as 'AwayTeamName'
+        FROM Matches m
+        INNER JOIN UserFavoriteTeams uft ON (m.HomeTeamId = uft.TeamId OR m.AwayTeamId = uft.TeamId)
+        INNER JOIN Competitions c ON m.CompetitionId = c.CompetitionId
+        INNER JOIN Teams ht ON m.HomeTeamId = ht.Id
+        INNER JOIN Teams at ON m.AwayTeamId = at.Id
+        WHERE uft.UserId = @UserId
+          AND m.IsFinished = 0
+          AND datetime(m.MatchDateUTC) >= datetime('now')
+        ORDER BY m.MatchDateUTC ASC";
 }

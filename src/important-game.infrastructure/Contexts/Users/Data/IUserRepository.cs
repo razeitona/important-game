@@ -22,4 +22,10 @@ public interface IUserRepository
     Task RemoveVoteAsync(int userId, int matchId, CancellationToken cancellationToken = default);
     Task<int> GetMatchVoteCountAsync(int matchId, CancellationToken cancellationToken = default);
     Task<Dictionary<int, MatchVoteEntity>> GetUserVotesForMatchesAsync(int userId, List<int> matchIds, CancellationToken cancellationToken = default);
+
+    // Favorite Teams
+    Task<List<int>> GetUserFavoriteTeamIdsAsync(int userId, CancellationToken cancellationToken = default);
+    Task AddFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default);
+    Task RemoveFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default);
+    Task<bool> IsFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default);
 }

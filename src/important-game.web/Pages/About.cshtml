@@ -2,31 +2,135 @@
 @using System.Globalization
 @model AboutModel
 @{
-    ViewData["Title"] = "Excitment Matches";
+    ViewData["Title"] = "About Match to Watch - How Our Excitement Score Works";
+    ViewData["Description"] = "Learn how Match to Watch uses our unique Excitement Score algorithm to analyze rivalries, form, standings, and fixture importance to help you find the most thrilling football matches.";
+    ViewData["Keywords"] = "about match to watch, excitement score algorithm, football match analysis, how it works, match prediction methodology";
 }
-<div class="wm-explanation">
-    <h1>The goal</h1>
-    <p><b>Match to watch</b>, we aim to cut through the clutter. With so many matches happening every day, it can be overwhelming to decide which matches truly deserve your time.</p>
-    <p>The idea is simple: spotlight the matches that will keep you hooked, deliver unforgettable moments, and provide you some 90' of excitment.</p>
-</div>
-<div class="wm-explanation">
-    <h1>How the decision is made</h1>
-    <p>Not every match makes the cut. It uses a combination of factors to identify matches with the highest potential for drama, excitement, and significance, therefore we created the <b><i>Exciment Score (ES)</i></b> :</p>
-    <ul>
-        <li>
-            <b>Historical Rivalries</b>, some matches are just more intense due to rivalry present in it.
-        </li>
-        <li>
-            <b>Form and Momentum</b>, teams current form and playing style has a big impact in the match result.
-        </li>
-        <li>
-            <b>League & league standings</b>, league competitivity and title matches are more prone to provide more excitment.
-        </li>
-        <li>
-            <b>Head to head</b>, league competitivity and title matches are more prone to provide more excitment.
-        </li>
-    </ul>
 
-    <p>A match with two big teams that ends in 0-0 after all might be less excitment over one with underdogs which the result was 4-4</p>
-    <p>Because, <i class="end">in the end it's all about football.</i></p>
+<div class="about-hero">
+    <div class="about-hero-content">
+        <i class="bi bi-fire about-hero-icon"></i>
+        <h1>Find the Most Exciting Football Matches</h1>
+        <p class="about-hero-subtitle">We help you discover which matches are truly worth watching, so you never miss the action.</p>
+    </div>
+</div>
+
+<div class="about-container">
+    <div class="about-section about-section-primary">
+        <div class="about-section-icon">
+            <i class="bi bi-trophy"></i>
+        </div>
+        <div class="about-section-content">
+            <h2>Our Mission</h2>
+            <p>With hundreds of football matches every week, it's overwhelming to decide which ones deserve your time. <strong>Match to Watch</strong> cuts through the clutter by highlighting the matches that will keep you on the edge of your seat.</p>
+            <p>Our goal is simple: help you find matches with unforgettable moments, high stakes, and 90 minutes of pure excitement.</p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <div class="about-section-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="about-section-content">
+            <h2>The Excitement Score</h2>
+            <p>Not every match makes the cut. We analyze multiple factors to calculate our unique <strong>Excitement Score (ES)</strong> - a number from 0 to 100 that predicts how thrilling a match will be.</p>
+
+            <div class="about-factors">
+                <div class="about-factor">
+                    <i class="bi bi-shield-fill-exclamation"></i>
+                    <div>
+                        <h3>Historical Rivalries</h3>
+                        <p>Classic rivalries bring extra intensity and passion to every encounter.</p>
+                    </div>
+                </div>
+
+                <div class="about-factor">
+                    <i class="bi bi-graph-up"></i>
+                    <div>
+                        <h3>Form & Momentum</h3>
+                        <p>Teams' recent performance and playing style heavily impact match dynamics.</p>
+                    </div>
+                </div>
+
+                <div class="about-factor">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    <div>
+                        <h3>League Standings</h3>
+                        <p>Title races, relegation battles, and top-4 fights create high-stakes drama.</p>
+                    </div>
+                </div>
+
+                <div class="about-factor">
+                    <i class="bi bi-clock-history"></i>
+                    <div>
+                        <h3>Head-to-Head History</h3>
+                        <p>Past encounters reveal patterns of competitiveness and unpredictability.</p>
+                    </div>
+                </div>
+
+                <div class="about-factor">
+                    <i class="bi bi-calendar-event"></i>
+                    <div>
+                        <h3>Fixture Importance</h3>
+                        <p>Cup finals, derbies, and crucial seasonal matches deliver higher excitement.</p>
+                    </div>
+                </div>
+
+                <div class="about-factor">
+                    <i class="bi bi-trophy-fill"></i>
+                    <div>
+                        <h3>League Quality</h3>
+                        <p>Top-tier competitions naturally feature higher quality and more engaging football.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section about-section-highlight">
+        <div class="about-section-icon">
+            <i class="bi bi-broadcast"></i>
+        </div>
+        <div class="about-section-content">
+            <h2>Live Match Tracking</h2>
+            <p>We don't just predict excitement - we track it in real-time! Our live scoring system monitors ongoing matches and updates their excitement levels based on actual game events like goals, cards, and possession battles.</p>
+            <p>This means you can discover thrilling matches even after they've kicked off.</p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <div class="about-section-icon">
+            <i class="bi bi-lightbulb"></i>
+        </div>
+        <div class="about-section-content">
+            <h2>More Than Just Numbers</h2>
+            <p>Remember: a 0-0 draw between two giants might be tactically fascinating but not particularly exciting, while a 4-4 thriller between underdogs can be absolutely unforgettable.</p>
+            <p class="about-closing">Because in the end, it's all about <strong>the beautiful game</strong>.</p>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <div class="about-section-icon">
+            <i class="bi bi-envelope"></i>
+        </div>
+        <div class="about-section-content">
+            <h2>Get in Touch</h2>
+            <p>Have questions, feedback, or suggestions? We'd love to hear from you!</p>
+            <p><a href="mailto:matchtowatch.web@gmail.com" class="about-email"><i class="bi bi-envelope-fill"></i> matchtowatch.web@gmail.com</a></p>
+        </div>
+    </div>
+
+    <div class="about-cta">
+        <h2>Ready to find your next great match?</h2>
+        <div class="about-cta-buttons">
+            <a href="/matches" class="btn btn-primary">
+                <i class="bi bi-fire"></i>
+                Explore Matches
+            </a>
+            <a href="/calendar" class="btn btn-secondary">
+                <i class="bi bi-calendar3"></i>
+                View Calendar
+            </a>
+        </div>
+    </div>
 </div>

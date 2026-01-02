@@ -91,7 +91,7 @@ public sealed class FootballDataProvider : IExternalIntegrationProvider,
         => GetAsync<FootballDataCompetition>($"competitions/{competitionId}", cancellationToken);
 
     public Task<FootballDataStandingsResponse?> InternalGetCompetitionStandingsAsync(string competitionId, string seasonId, CancellationToken cancellationToken = default)
-        => GetAsync<FootballDataStandingsResponse>($"competitions/{competitionId}/standings?season={seasonId}", cancellationToken);
+        => GetAsync<FootballDataStandingsResponse>($"competitions/{competitionId}/standings?seasonId={seasonId}", cancellationToken);
 
     public async Task<IReadOnlyList<FootballDataMatch>?> InternalGetTeamUpcomingMatchesAsync(string competitionId, DateTimeOffset fromDate, DateTimeOffset toDate, CancellationToken cancellationToken = default)
     {

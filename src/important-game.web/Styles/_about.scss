@@ -1,26 +1,312 @@
-﻿.wm-explanation {
-    color: #ffffff;
-    margin: 0 0 10px;
+﻿// About Page Styling
 
-    h1 {
-        font-size: 2rem;
+.about-hero {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    padding: 80px 20px;
+    text-align: center;
+    margin-bottom: 60px;
+    border-radius: 0 0 30px 30px;
+
+    .about-hero-content {
+        max-width: 800px;
+        margin: 0 auto;
     }
 
-    p {
-        font-size: 0.9rem;
-        font-weight: 200;
-        margin: 10px 0px;
+    .about-hero-icon {
+        font-size: 4rem;
+        color: #ff6b35;
+        margin-bottom: 20px;
+        animation: pulse-fire 2s ease-in-out infinite;
+    }
 
-        i.end {
-            font-weight: bold;
+    h1 {
+        font-size: 2.5rem;
+        color: #ffffff;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .about-hero-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.6;
+    }
+}
+
+@keyframes pulse-fire {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.about-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+}
+
+.about-section {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 50px;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .about-section-icon {
+        flex-shrink: 0;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+
+        i {
+            font-size: 2.5rem;
+            color: #ffffff;
         }
     }
 
-    ul {
-        li {
-            font-size: 0.9rem;
-        font-weight: 200;
-            margin: 10px 0px;
+    .about-section-content {
+        flex: 1;
+
+        h2 {
+            font-size: 1.8rem;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 15px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        strong {
+            color: #1e3c72;
+            font-weight: 600;
+        }
+    }
+}
+
+.about-section-primary {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    border-left: 5px solid #1e3c72;
+}
+
+.about-section-highlight {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8db 100%);
+    border-left: 5px solid #ff6b35;
+
+    .about-section-icon {
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8555 100%);
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    }
+}
+
+.about-factors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.about-factor {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #1e3c72;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-left-color: #ff6b35;
+    }
+
+    > i {
+        font-size: 1.5rem;
+        color: #1e3c72;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    div {
+        flex: 1;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        color: #1e3c72;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: #666;
+        line-height: 1.6;
+        margin: 0;
+    }
+}
+
+.about-closing {
+    font-size: 1.2rem !important;
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e8ecf1;
+    color: #1e3c72 !important;
+}
+
+.about-cta {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 20px;
+    margin-top: 60px;
+
+    h2 {
+        font-size: 2rem;
+        color: #ffffff;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .about-cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 35px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+
+        i {
+            font-size: 1.3rem;
+        }
+    }
+
+    .btn-primary {
+        background: #ff6b35;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+
+        &:hover {
+            background: #ff8555;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+        }
+    }
+
+    .btn-secondary {
+        background: #ffffff;
+        color: #1e3c72;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+
+        &:hover {
+            background: #f5f7fa;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 60px 20px;
+
+        .about-hero-icon {
+            font-size: 3rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .about-hero-subtitle {
+            font-size: 1rem;
+        }
+    }
+
+    .about-section {
+        flex-direction: column;
+        padding: 30px 20px;
+        gap: 20px;
+
+        .about-section-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+
+            i {
+                font-size: 2rem;
+            }
+        }
+
+        .about-section-content {
+            h2 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+        }
+    }
+
+    .about-factors {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .about-cta {
+        padding: 40px 20px;
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        .about-cta-buttons {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
         }
     }
 }

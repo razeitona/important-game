@@ -9,7 +9,7 @@ namespace important_game.infrastructure.Contexts.Matches.Data;
 public interface IMatchesRepository
 {
     /// <summary>
-    /// Gets all unfinished matches (IsFinished = 0).
+    /// Gets unfinished matches (IsFinished = 0).
     /// </summary>
     Task<List<UnfinishedMatchDto>> GetUnfinishedMatchesAsync();
 
@@ -22,13 +22,17 @@ public interface IMatchesRepository
     /// Update Match entity with new calculated excitement score
     /// </summary>
     Task UpdateMatchCalculatorAsync(MatchCalcsDto entity);
-    Task<List<MatchDto>> GetAllUpcomingMatchesAsync();
+
+    /// <summary>
+    /// Gets all unfinished matches (IsFinished = 0) with team information.
+    /// </summary>
+    Task<List<MatchDto>> GetAllUnfinishedMatchesAsync();
     Task<MatchDetailDto?> GetMatchByIdAsync(int matchId);
     Task<MatchDetailDto?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug);
     Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId);
     Task<List<MatchesEntity>> GetRecentMatchesForTeamAsync(int teamId, int numberOfMatches);
-
-
+    Task<bool> HasRecentFinishedMatchAsync(int competitionId, int seasonId, DateTimeOffset? dateTime);
+    Task<List<MatchDto>> GetUserFavoriteUpcomingMatchesAsync(int userId);
 
     #region Head To Head
     Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId);

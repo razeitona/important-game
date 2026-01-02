@@ -88,7 +88,7 @@ internal static class MatchesQueries
 	        ON cs.CompetitionId = c.CompetitionId AND cs.SeasonId = m.SeasonId
         WHERE m.IsFinished = 0";
 
-    internal const string SelectAllUpcomingMatches = @"
+    internal const string SelectAllUnfinishedMatches = @"
         SELECT 
             m.MatchId,
             c.CompetitionId,
@@ -106,12 +106,12 @@ internal static class MatchesQueries
             ON m.HomeTeamId = ht.Id
         INNER JOIN Teams at
             ON m.AwayTeamId = at.Id
-        INNER JOIN COmpetitions c
+        INNER JOIN Competitions c
 	        ON c.CompetitionId = m.CompetitionId
         WHERE 
             m.IsFinished = 0
-            AND datetime(m.MatchDateUTC) >= datetime('now')
         ORDER BY datetime(m.MatchDateUTC) ASC";
+
 
     internal const string SelectMatchById = @"
        SELECT
@@ -239,4 +239,41 @@ internal static class MatchesQueries
         AND (
 	        (m.HomeTeamId = @TeamOneId OR m.AwayTeamId = @TeamOneId)
 	        AND (m.HomeTeamId=@TeamTwoId OR m.AwayTeamId=@TeamTwoId))";
+
+    internal const string CheckRecentFinishedMatch = @"
+        SELECT 
+            COUNT(1)
+        FROM Matches
+        WHERE 
+            CompetitionId = @CompetitionId
+            AND SeasonId = @SeasonId
+            AND IsFinished = 1  
+            AND datetime(MatchDateUTC) > @DateTimeUTC;";
+
+    internal const string UserFavoriteUpcomingMatches = @"
+        SELECT 
+            m.MatchId,
+            c.CompetitionId,
+            c.Name as 'CompetitionName',
+            c.PrimaryColor as 'CompetitionPrimaryColor',
+            c.BackgroundColor as 'CompetitionBackgroundColor',
+            m.MatchDateUTC,
+            ht.Id as 'HomeTeamId',
+            ht.Name as 'HomeTeamName',
+            at.Name as 'AwayTeamName',
+            at.Id as 'AwayTeamId',
+            m.ExcitmentScore
+        FROM Matches m
+        INNER JOIN Teams ht
+            ON m.HomeTeamId = ht.Id
+        INNER JOIN Teams at
+            ON m.AwayTeamId = at.Id
+        INNER JOIN Competitions c
+            ON c.CompetitionId = m.CompetitionId
+        INNER JOIN UserFavoriteTeams uft
+	        ON uft.TeamId = ht.Id OR uft.TeamId = at.Id
+        WHERE 
+            m.IsFinished = 0
+	        AND uft.UserId = @UserId
+        ORDER BY datetime(m.MatchDateUTC) ASC;";
 }

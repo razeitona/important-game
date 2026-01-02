@@ -1,12 +1,23 @@
 using Dapper;
 using important_game.infrastructure;
 using important_game.web.Handlers;
+using important_game.web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 using SQLitePCL;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure forwarded headers for proxy support (HTTPS termination)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -59,16 +70,17 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-//builder.Services.AddHostedService<SyncCompetitionJob>();
-//builder.Services.AddHostedService<SyncFinishedMatchesJob>();
-//builder.Services.AddHostedService<SyncUpcomingMatchesJob>();
-//builder.Services.AddHostedService<MatchCalculatorJob>();
+// Register Background Services
+builder.Services.AddHostedService<SitemapGeneratorService>();
 
 Batteries.Init();
 SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
 SqlMapper.AddTypeHandler(new NullableDateTimeOffsetHandler());
 
 var app = builder.Build();
+
+// Use forwarded headers (must be before other middleware)
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

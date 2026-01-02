@@ -1,8 +1,5 @@
 using FluentAssertions;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
-using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Live;
-using important_game.infrastructure.LeagueProcessors;
 using important_game.infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,22 +23,6 @@ public class DependencyInjectionSetupTests
         services.AddLogging();
 
         services.MatchImportanceInfrastructure(config);
-
-        services.Should().ContainSingle(d => d.ServiceType == typeof(IExcitmentMatchProcessor)
-            && d.ImplementationType == typeof(ExcitementMatchProcessor)
-            && d.Lifetime == ServiceLifetime.Scoped);
-
-        services.Should().ContainSingle(d => d.ServiceType == typeof(IExcitmentMatchLiveProcessor)
-            && d.ImplementationType == typeof(ExcitmentMatchLiveProcessor)
-            && d.Lifetime == ServiceLifetime.Scoped);
-
-        services.Should().ContainSingle(d => d.ServiceType == typeof(IExcitmentMatchService)
-            && d.ImplementationType == typeof(ExcitmentMatchService)
-            && d.Lifetime == ServiceLifetime.Scoped);
-
-        services.Should().ContainSingle(d => d.ServiceType == typeof(ILeagueProcessor)
-            && d.ImplementationType == typeof(SofaScoreLeagueProcessor)
-            && d.Lifetime == ServiceLifetime.Scoped);
 
         services.Should().ContainSingle(d => d.ServiceType == typeof(ITelegramBot));
     }

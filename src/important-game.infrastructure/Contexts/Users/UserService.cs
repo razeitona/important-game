@@ -148,4 +148,25 @@ public class UserService(IUserRepository userRepository) : IUserService
     {
         return await _userRepository.GetUserByGoogleIdAsync(googleId, cancellationToken);
     }
+
+    // Favorite Teams
+    public async Task<List<int>> GetUserFavoriteTeamIdsAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.GetUserFavoriteTeamIdsAsync(userId, cancellationToken);
+    }
+
+    public async Task AddFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        await _userRepository.AddFavoriteTeamAsync(userId, teamId, cancellationToken);
+    }
+
+    public async Task RemoveFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        await _userRepository.RemoveFavoriteTeamAsync(userId, teamId, cancellationToken);
+    }
+
+    public async Task<bool> IsFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.IsFavoriteTeamAsync(userId, teamId, cancellationToken);
+    }
 }

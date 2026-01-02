@@ -128,7 +128,7 @@
                 if (hasTime) {
                     const formattedHours = String(utcDate.getHours()).padStart(2, '0');
                     const formattedMinutes = String(utcDate.getMinutes()).padStart(2, '0');
-                    return `${day}/${month}/${year} ${formattedHours}:${formattedMinutes} (${this.currentTimezone})`;
+                    return `${day}/${month}/${year} ${formattedHours}:${formattedMinutes}`;
                 } else {
                     // Date only, no timezone label needed for date headers
                     return `${day}/${month}/${year}`;
@@ -805,9 +805,10 @@
                                     <img src="/images/competition/${match.competitionId}.png" alt="${match.competitionName}" width="1.2rem" />
                                 </div>
                                 <div class="match-header-title">${match.competitionName}</div>
-                                <div class="match-card-time">
-                                    <time>${match.matchDate}</time>
-                                </div>
+                                ${match.isLive ?
+                                    '<div class="match-card-live"><span>LIVE</span></div>' :
+                                    `<div class="match-card-time"><time>${match.matchDate}</time></div>`
+                                }
                             </div>
                             <div class="card-body match-card-body">
                                 <div class="match-card-content">
@@ -927,6 +928,12 @@
                 window.location.href = `/login?returnUrl=${returnUrl}`;
             });
         }
+
+        // Close modal if user is authenticated (after redirect from login)
+        // Check if login button is not present (means user is authenticated)
+        if (!loginBtn && loginModal.classList.contains('active')) {
+            closeModal();
+        }
     })();
 
     // Match Like/Unlike Handler
@@ -1034,6 +1041,101 @@
 
         // Initialize states on page load
         initializeLikeStates();
+    })();
+
+    // =============================================================================
+    // FAVORITE TEAMS SYSTEM
+    // =============================================================================
+    (function () {
+        const favoriteButtons = document.querySelectorAll('.team-favorite-btn');
+        if (favoriteButtons.length === 0) return;
+
+        // Helper to update button state
+        function updateFavoriteButton(button, isFavorite) {
+            button.setAttribute('data-favorite', isFavorite);
+            const icon = button.querySelector('i');
+            if (isFavorite) {
+                icon.classList.remove('bi-star');
+                icon.classList.add('bi-star-fill');
+            } else {
+                icon.classList.remove('bi-star-fill');
+                icon.classList.add('bi-star');
+            }
+        }
+
+        // Initialize favorite states for all team buttons
+        async function initializeFavoriteStates() {
+            for (const button of favoriteButtons) {
+                const teamId = parseInt(button.getAttribute('data-team-id'));
+                if (!teamId) continue;
+
+                try {
+                    const response = await fetch(`/Api/FavoriteTeam?teamId=${teamId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateFavoriteButton(button, data.isFavorite);
+                    }
+                } catch (error) {
+                    console.error('Error loading favorite state:', error);
+                }
+            }
+        }
+
+        // Toggle favorite state
+        async function toggleFavorite(button) {
+            const teamId = parseInt(button.getAttribute('data-team-id'));
+            const isFavorite = button.getAttribute('data-favorite') === 'true';
+
+            button.disabled = true;
+
+            try {
+                const method = isFavorite ? 'DELETE' : 'POST';
+                const response = await fetch('/Api/FavoriteTeam', {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ teamId: teamId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateFavoriteButton(button, data.isFavorite);
+
+                    // Show feedback animation
+                    button.classList.add('favorite-animate');
+                    setTimeout(() => button.classList.remove('favorite-animate'), 300);
+                } else if (response.status === 401) {
+                    // User not authenticated - show login modal
+                    const loginModal = document.getElementById('loginModal');
+                    if (loginModal) {
+                        loginModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                } else {
+                    throw new Error('Failed to toggle favorite');
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('Failed to favorite team. Please try again.');
+                }
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        // Attach event listeners
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFavorite(this);
+            });
+        });
+
+        // Initialize states on page load
+        initializeFavoriteStates();
     })();
 
 })();

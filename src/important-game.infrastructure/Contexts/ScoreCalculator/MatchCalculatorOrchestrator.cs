@@ -30,7 +30,7 @@ internal class MatchCalculatorOrchestrator(
     private readonly ConcurrentDictionary<int, List<CompetitionTableEntity>> _competitionTableCache = new();
     private readonly ConcurrentDictionary<string, RivalryEntity> _rivalryCache = new();
 
-    public async Task CalculateExcitmentScoreAsync(CancellationToken cancellationToken = default)
+    public async Task CalculateExcitmentScoreAsync(bool skipDateCondition = false, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -50,7 +50,7 @@ internal class MatchCalculatorOrchestrator(
             List<Task> tasks = [];
             foreach (var unfinishedMatch in unfinishedMatches)
             {
-                if (DateTimeOffset.UtcNow < unfinishedMatch.UpdatedDateUTC.AddHours(2))
+                if (!skipDateCondition && DateTimeOffset.UtcNow < unfinishedMatch.UpdatedDateUTC.AddHours(2))
                     continue;
 
                 var task = CalculateAndSaveMatchAsync(unfinishedMatch, semaphore, cancellationToken);

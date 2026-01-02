@@ -1,6 +1,7 @@
 using FuzzySharp;
 using important_game.infrastructure.Contexts.Competitions.Data;
 using important_game.infrastructure.Contexts.Competitions.Data.Entities;
+using important_game.infrastructure.Contexts.Matches.Data;
 using important_game.infrastructure.Contexts.Providers.Data;
 using important_game.infrastructure.Contexts.Providers.Data.Entities;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.Integrations;
@@ -25,6 +26,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
     private readonly IExternalProvidersRepository _externalIntegrationRepository;
     private readonly ICompetitionRepository _competitionRepository;
     private readonly ITeamRepository _teamRepository;
+    private readonly IMatchesRepository _matchesRepository;
     private readonly ILogger<ExternalCompetitionSyncService> _logger;
 
     public ExternalCompetitionSyncService(
@@ -32,12 +34,14 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         IExternalProvidersRepository externalIntegrationRepository,
         ITeamRepository teamRepository,
         ICompetitionRepository competitionRepository,
+        IMatchesRepository matchesRepository,
         ILogger<ExternalCompetitionSyncService> logger)
     {
         _integrationProvider = integrationProvider ?? throw new ArgumentNullException(nameof(integrationProvider));
         _teamRepository = teamRepository ?? throw new ArgumentNullException(nameof(teamRepository));
         _externalIntegrationRepository = externalIntegrationRepository ?? throw new ArgumentNullException(nameof(externalIntegrationRepository));
         _competitionRepository = competitionRepository ?? throw new ArgumentNullException(nameof(competitionRepository));
+        _matchesRepository = matchesRepository ?? throw new ArgumentNullException(nameof(matchesRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -66,6 +70,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
             var externalCompetition = await externalProvider.GetCompetitionAsync(externalCompetitionId, cancellationToken);
             if (externalCompetition == null)
                 return;
+
             await SaveExternalProviderCompetitionMappingAsync(externalProvider.Id, competitionId, externalCompetitionId);
 
             // Identify and save current competition current season
@@ -74,7 +79,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
 
             if (currentSeason.SyncStandingsDate.HasValue && currentSeason.SyncStandingsDate.Value.AddHours(12) > DateTime.UtcNow)
             {
-                _logger.LogInformation("Skipping standings synchronization for competition {CompetitionId} as it was recently synchronized", competitionId);
+                _logger.LogInformation("No updates found for competition {CompetitionId} standings", competitionId);
                 return;
             }
 
@@ -89,16 +94,22 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
         }
     }
 
+    private async Task<bool> IsUpdatedStandingsAsync(int competitionId, CompetitionSeasonsEntity currentSeason)
+    {
+        var hasFinishedMatch = await _matchesRepository.HasRecentFinishedMatchAsync(competitionId, currentSeason.SeasonId, currentSeason.SyncStandingsDate);
+        return !hasFinishedMatch;
+    }
+
     private async Task SyncCompetitionStandingsAsync(int competitionId, ExternalCompetitionDto externalCompetition, int seasonId, IExternalCompetitionProvider externalProvider, CancellationToken cancellationToken = default)
     {
         try
         {
-            if (externalCompetition == null)
+            if (externalCompetition == null && externalCompetition.CurrentSeason != null)
                 return;
 
             _logger.LogInformation("Starting synchronization of competition {CompetitionId} standings from external source {ExternalCompetitionId}", competitionId, externalCompetition.Id);
 
-            var standings = await externalProvider.GetCompetitionStandingsAsync(externalCompetition.Id!, $"{externalCompetition.CurrentSeason!.StartDate:yyyy}", cancellationToken);
+            var standings = await externalProvider.GetCompetitionStandingsAsync(externalCompetition.Id!, externalCompetition.CurrentSeason.Id, cancellationToken);
             if (standings == null)
             {
                 _logger.LogWarning("Failed to retrieve standings for competition {ExternalCompetitionId}", externalCompetition.Id);
@@ -275,7 +286,7 @@ public class ExternalCompetitionSyncService : IExternalCompetitionSyncService
             ShortName = team.ShortName,
             ThreeLetterName = team.ThreeLetterName,
             NormalizedName = team.Name!.Normalize(),
-            SlugName = SlugHelper.GenerateSlug(team.ShortName ?? team.Name)
+            SlugName = SlugHelper.GenerateSlug(team.Name)
         };
 
         teamEntity = await _teamRepository.SaveTeamAsync(teamEntity);

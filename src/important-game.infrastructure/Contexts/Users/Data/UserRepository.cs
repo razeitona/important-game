@@ -169,4 +169,40 @@ public class UserRepository(IDbConnectionFactory connectionFactory) : IUserRepos
 
         return result.ToDictionary(v => v.MatchId);
     }
+
+    public async Task<List<int>> GetUserFavoriteTeamIdsAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<int>(
+            UserQueries.GetUserFavoriteTeamIds,
+            new { UserId = userId });
+
+        return result.ToList();
+    }
+
+    public async Task AddFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(
+            UserQueries.AddFavoriteTeam,
+            new { UserId = userId, TeamId = teamId, AddedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") });
+    }
+
+    public async Task RemoveFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(
+            UserQueries.RemoveFavoriteTeam,
+            new { UserId = userId, TeamId = teamId });
+    }
+
+    public async Task<bool> IsFavoriteTeamAsync(int userId, int teamId, CancellationToken cancellationToken = default)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<int>(
+            UserQueries.IsFavoriteTeam,
+            new { UserId = userId, TeamId = teamId });
+
+        return result > 0;
+    }
 }

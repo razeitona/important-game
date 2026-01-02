@@ -112,10 +112,17 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         });
     }
 
-    public async Task<List<MatchDto>> GetAllUpcomingMatchesAsync()
+    public async Task<List<MatchDto>> GetAllUnfinishedMatchesAsync()
     {
         using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryAsync<MatchDto>(MatchesQueries.SelectAllUpcomingMatches);
+        var result = await connection.QueryAsync<MatchDto>(MatchesQueries.SelectAllUnfinishedMatches);
+        return result.ToList();
+    }
+
+    public async Task<List<MatchDto>> GetUserFavoriteUpcomingMatchesAsync(int userId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<MatchDto>(MatchesQueries.UserFavoriteUpcomingMatches, new { UserId = userId });
         return result.ToList();
     }
 
@@ -146,6 +153,19 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         var result = await connection.QueryAsync<MatchesEntity>(MatchesQueries.SelectRecentMatchesForTeam,
             new { TeamId = teamId, NumberOfMatches = numberOfMatches });
         return result.ToList();
+    }
+
+    public async Task<bool> HasRecentFinishedMatchAsync(int competitionId, int seasonId, DateTimeOffset? dateTime)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<int>(MatchesQueries.CheckRecentFinishedMatch,
+            new
+            {
+                CompetitionId = competitionId,
+                SeasonId = seasonId,
+                DateTimeUTC = dateTime?.ToString("yyyy-MM-dd HH:mm:ss")
+            });
+        return result > 0;
     }
 
     #region Head To Head

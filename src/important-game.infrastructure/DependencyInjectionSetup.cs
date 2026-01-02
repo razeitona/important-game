@@ -9,10 +9,6 @@ using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Users;
 using important_game.infrastructure.Contexts.Users.Data;
 using important_game.infrastructure.Data.Connections;
-using important_game.infrastructure.Data.Repositories;
-using important_game.infrastructure.ImportantMatch;
-using important_game.infrastructure.ImportantMatch.Live;
-using important_game.infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -69,9 +65,6 @@ public static class DependencyInjectionSetup
         // Register specialized repositories following Single Responsibility Principle
         services.AddScoped<ICompetitionRepository, CompetitionRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
-        services.AddScoped<IMatchRepository, MatchRepositoryDapper>();
-        services.AddScoped<ILiveMatchRepository, LiveMatchRepository>();
-        services.AddScoped<IHeadToHeadRepository, HeadToHeadRepository>();
         services.AddScoped<IExternalProvidersRepository, ExternalProvidersRepository>();
         services.AddScoped<IMatchesRepository, MatchesRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

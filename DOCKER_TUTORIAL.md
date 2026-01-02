@@ -109,13 +109,13 @@ No Windows (PowerShell), substitua `YOUR_VPS_IP` pelo IP real:
 
 ```powershell
 # Copiar imagem web
-scp important-game-web.tar debian@YOUR_VPS_IP:~/
+scp important-game-web.tar debian@51.254.143.157:~/
 
 # Copiar imagem app
-scp important-game-app.tar debian@YOUR_VPS_IP:~/
+scp important-game-app.tar debian@51.254.143.157:~/
 
 # Copiar docker-compose.yml
-scp docker-compose.yml debian@YOUR_VPS_IP:~/
+scp docker-compose.yml debian@51.254.143.157:~/
 ```
 
 **Exemplo com IP real:**
@@ -130,7 +130,7 @@ scp docker-compose.yml debian@123.45.67.89:~/
 Se quiser usar a base de dados existente:
 
 ```powershell
-scp data/matchwatch.db debian@YOUR_VPS_IP:~/
+scp data/matchwatch.db debian@51.254.143.157:~/
 ```
 
 ### 3.4 Progresso do envio
@@ -147,7 +147,7 @@ important-game-web.tar    100%  130MB   5.2MB/s   00:25
 ### 4.1 Ligar ao VPS via SSH
 
 ```powershell
-ssh debian@YOUR_VPS_IP
+ssh debian@51.254.143.157
 ```
 
 ### 4.2 Verificar Docker instalado
@@ -406,7 +406,7 @@ docker compose up -d
 
 No Windows:
 ```powershell
-scp debian@YOUR_VPS_IP:~/important-game/data/matchwatch.db ./data/
+scp debian@51.254.143.157:~/important-game/data/matchwatch.db ./data/
 ```
 
 ### 7.6 Aceder à Base de Dados (SQLite)

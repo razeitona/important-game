@@ -4,7 +4,9 @@
 @using important_game.infrastructure.Extensions
 @model MatchesModel
 @{
-    ViewData["Title"] = "Upcoming Exciting Matches - Match to Watch";
+    ViewData["Title"] = "Upcoming Exciting Football Matches - Browse by Excitement Score";
+    ViewData["Description"] = "Browse all upcoming football matches sorted by excitement score. Filter by competition, teams, and find the most thrilling games to watch across all major leagues.";
+    ViewData["Keywords"] = "upcoming football matches, football fixtures, match excitement scores, football schedule, premier league, la liga, champions league";
 }
 
 <div class="wm-match-filter">
@@ -66,7 +68,7 @@
                 {
                     <div class="wm-match-date">
                         <h1 class="wm-match-date-title">
-                            <time data-utc-time="@dates.Key.ToString("dd/MM/yyyy") 00:00">
+                            <time data-utc-time="@dates.Key.ToString("dd/MM/yyyy")">
                                 @dates.Key.ToString("dd/MM/yyyy")
                             </time>
                         </h1>
@@ -243,7 +245,7 @@
                     const li = document.createElement('li');
                     li.setAttribute('data-id', game.id);
                     li.setAttribute('data-index', index);
-                    li.innerHTML = highlightMatch(`${game.home} v ${game.away}`, query);
+                    li.innerHTML = highlightMatch(`<span>${game.home} v ${game.away}</span>`, query);
 
                     // Add click event to navigate to the item
                     li.addEventListener('click', () => {

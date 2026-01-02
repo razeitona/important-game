@@ -8,7 +8,9 @@
       "Bash(timeout 10 bash:*)",
       "Bash(ls -la \"d:\\\\Ricardo\\\\repos\\\\important-game\\\\src\\\\important-game.web\\\\Pages\"\" | grep -E \".cshtml \")",
       "Bash(dotnet add:*)",
-      "Bash(npx sass:*)"
+      "Bash(npx sass:*)",
+      "Bash(Select-String -Pattern \"error|succeed\")",
+      "Bash(Select-Object -First 5)"
     ]
   }
 }

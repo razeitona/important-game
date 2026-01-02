@@ -1,6 +1,6 @@
 ﻿using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Matches.Enums;
 using important_game.infrastructure.Contexts.ScoreCalculator.Models;
-using important_game.infrastructure.ImportantMatch.Models;
 
 namespace important_game.infrastructure.Contexts.ScoreCalculator.Mappers;
 internal static class TeamMatchStatMapper

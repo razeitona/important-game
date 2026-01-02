@@ -4,22 +4,38 @@ using important_game.infrastructure.Contexts.Matches.Data;
 using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using important_game.infrastructure.Contexts.Matches.Mappers;
 using important_game.infrastructure.Contexts.Matches.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace important_game.infrastructure.Contexts.Matches;
-internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRepository competitionRepository) : IMatchService
+internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRepository competitionRepository, IMemoryCache memoryCache) : IMatchService
 {
-    public async Task<List<MatchDto>> GetAllUpcomingMatchesAsync(CancellationToken cancellationToken = default)
+    public async Task<List<MatchDto>> GetAllUnfinishedMatchesAsync(CancellationToken cancellationToken = default)
     {
-        var upcomingMatches = await matchesRepository.GetAllUpcomingMatchesAsync();
+        var upcomingMatches = memoryCache.Get<List<MatchDto>>("upcoming_matches");
+        if (upcomingMatches == null)
+        {
+            upcomingMatches = await matchesRepository.GetAllUnfinishedMatchesAsync();
+            if (upcomingMatches != null && upcomingMatches.Count > 0)
+                memoryCache.Set("upcoming_matches", upcomingMatches, TimeSpan.FromMinutes(10));
+        }
         return upcomingMatches?.OrderBy(c => c.MatchDateUTC).ToList() ?? [];
+    }
+
+    public async Task<List<MatchDto>> GetUserFavoriteUpcomingMatchesAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var userFavoriteMatches = await matchesRepository.GetUserFavoriteUpcomingMatchesAsync(userId).ConfigureAwait(false);
+        return userFavoriteMatches;
     }
 
     public async Task<MatchesViewModel> GetAllMatchesAsync(CancellationToken cancellationToken = default)
     {
-        var upcomingMatches = await matchesRepository.GetAllUpcomingMatchesAsync();
+        var upcomingMatches = await GetAllUnfinishedMatchesAsync(cancellationToken);
 
         if (upcomingMatches == null || upcomingMatches.Count == 0)
             return new();
+
+        DateTime now = DateTime.UtcNow;
+        upcomingMatches = upcomingMatches.Where(c => c.MatchDateUTC > now.AddMinutes(-120)).ToList();
 
         var matchViewModel = new MatchesViewModel();
         matchViewModel.Matches = upcomingMatches.OrderBy(c => c.MatchDateUTC).ToList();
@@ -47,7 +63,15 @@ internal class MatchService(IMatchesRepository matchesRepository, ICompetitionRe
 
     public async Task<MatchDetailViewModel?> GetMatchByIdAsync(int matchId, CancellationToken cancellationToken = default)
     {
-        var matchDetailDto = await matchesRepository.GetMatchByIdAsync(matchId);
+
+        var matchDetailDto = memoryCache.Get<MatchDetailDto>($"match_{matchId}");
+        if (matchDetailDto == null)
+        {
+            matchDetailDto = await matchesRepository.GetMatchByIdAsync(matchId);
+            if (matchDetailDto != null)
+                memoryCache.Set($"match_{matchId}", matchDetailDto, TimeSpan.FromMinutes(10));
+        }
+
         if (matchDetailDto == null)
             return default;
 

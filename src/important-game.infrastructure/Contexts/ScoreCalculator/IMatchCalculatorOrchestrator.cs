@@ -10,5 +10,5 @@ public interface IMatchCalculatorOrchestrator
     /// Calculates and updates excitement scores for all unfinished matches (IsFinished = 0).
     /// Processes matches in parallel with thread-safe semaphore control.
     /// </summary>
-    Task CalculateExcitmentScoreAsync(CancellationToken cancellationToken = default);
+    Task CalculateExcitmentScoreAsync(bool skipDateCondition = false, CancellationToken cancellationToken = default);
 }

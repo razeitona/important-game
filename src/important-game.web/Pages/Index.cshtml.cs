@@ -1,59 +1,56 @@
 using important_game.infrastructure.Contexts.Matches;
 using important_game.infrastructure.Contexts.Matches.Data.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Globalization;
 
 namespace important_game.web.Pages
 {
     public class IndexModel(IMatchService _matchService) : PageModel
     {
-        public List<MatchDto> TrendingMatches { get; set; }
-        public List<MatchDto> OtherMatches { get; set; }
+        public List<MatchDto> LiveMatches { get; set; } = [];
+        public List<MatchDto> TrendingMatches { get; set; } = [];
+        public List<MatchDto> OtherMatches { get; set; } = [];
+
         public async Task OnGet()
         {
-            var allMatches = await _matchService.GetAllUpcomingMatchesAsync();
 
-            TrendingMatches = GetTrendingMatches(allMatches);
-            OtherMatches = GetUpcomingMatches(allMatches);
+            var unfinishedMatches = await _matchService.GetAllUnfinishedMatchesAsync();
+            unfinishedMatches = unfinishedMatches.OrderByDescending(c => c.ExcitmentScore).ToList();
+
+            var now = DateTime.UtcNow;
+            foreach (var match in unfinishedMatches)
+            {
+                if (match.MatchDateUTC < now.AddMinutes(-120))
+                    continue;
+
+                if (IsLiveMatch(match, now))
+                {
+                    if (LiveMatches.Count >= 6)
+                        continue;
+
+                    LiveMatches.Add(match);
+                    continue;
+                }
+                else if (IsTrendingMatch(match, now) && TrendingMatches.Count < 5)
+                {
+                    TrendingMatches.Add(match);
+                    continue;
+                }
+                else if (OtherMatches.Count < 10)
+                {
+                    OtherMatches.Add(match);
+                }
+            }
+
         }
 
-        /// <summary>
-        /// Extract top 5 trending matches
-        /// </summary>
-        public List<MatchDto> GetTrendingMatches(List<MatchDto> allMatches)
+        private static bool IsLiveMatch(MatchDto match, DateTime now)
         {
-            DateTime now = DateTime.UtcNow;
-            CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-            Calendar calendar = cultureInfo.Calendar;
-            CalendarWeekRule calendarWeekRule = cultureInfo.DateTimeFormat.CalendarWeekRule;
-
-            int weekNumber = calendar.GetWeekOfYear(now, calendarWeekRule, DayOfWeek.Monday);
-
-            var matchesOfWeek = allMatches.Where(c =>
-                c.MatchDateUTC > now &&
-                calendar.GetWeekOfYear(c.MatchDateUTC.Date, calendarWeekRule, DayOfWeek.Monday) == weekNumber
-                && c.ExcitmentScore >= 0.6d
-            ).OrderByDescending(c => c.ExcitmentScore).Take(5).ToList();
-
-            var ids = matchesOfWeek.Select(c => c.MatchId).ToHashSet();
-
-            allMatches.RemoveAll(m => ids.Contains(m.MatchId));
-
-            return matchesOfWeek;
+            return match.MatchDateUTC <= now && match.MatchDateUTC >= now.AddMinutes(-120);
         }
 
-
-        /// <summary>
-        /// Extract remaining upcoming games after trending matches are removed
-        /// </summary>
-        public List<MatchDto> GetUpcomingMatches(List<MatchDto> allMatches)
+        private static bool IsTrendingMatch(MatchDto match, DateTime now)
         {
-            // allMatches already has trending matches removed (see line 40)
-            // Just return the remaining matches sorted by excitement score
-            return allMatches
-                .OrderByDescending(c => c.ExcitmentScore)
-                .Take(10)
-                .ToList();
+            return match.ExcitmentScore >= 0.6d && match.MatchDateUTC < now.AddDays(7);
         }
     }
 }

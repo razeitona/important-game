@@ -1,5 +1,5 @@
 ﻿using important_game.infrastructure.Contexts.Matches.Data.Entities;
-using important_game.infrastructure.ImportantMatch.Models;
+using important_game.infrastructure.Contexts.Matches.Enums;
 
 namespace important_game.infrastructure.Contexts.Matches.Models;
 public class MatchDetailViewModel
@@ -22,6 +22,7 @@ public class MatchDetailViewModel
     public double ExcitmentScore { get; set; }
     public bool IsRivalry { get; set; } = false;
     public bool HasTitleHolder { get; set; } = false;
+    public bool IsLive { get; set; } = false;
     public Dictionary<string, (bool Show, double Value)> ExcitmentScoreDetail { get; set; } = new();
     public string? Description { get; set; }
     public List<HeadToHeadDto> HeadToHead { get; set; } = new();

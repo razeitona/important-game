@@ -1,7 +1,7 @@
 ﻿using important_game.infrastructure.Contexts.Matches.Data.Entities;
+using important_game.infrastructure.Contexts.Matches.Enums;
 using important_game.infrastructure.Contexts.Matches.Models;
 using important_game.infrastructure.Contexts.Matches.Utils;
-using important_game.infrastructure.ImportantMatch.Models;
 
 namespace important_game.infrastructure.Contexts.Matches.Mappers;
 internal static class MatchMapper
@@ -29,6 +29,12 @@ internal static class MatchMapper
 
         matchDetail.ExcitmentScoreDetail = SetupExcitmentScoreDetail(matchDetailDto);
         matchDetail.Description = BuildSentence(matchDetail.ExcitmentScoreDetail);
+
+        // Calculate IsLive based on match start time (within last 90 minutes)
+        var now = DateTimeOffset.UtcNow;
+        var matchEnd = matchDetailDto.MatchDateUTC.AddMinutes(90);
+        matchDetail.IsLive = now >= matchDetailDto.MatchDateUTC && now <= matchEnd;
+
         return matchDetail;
     }
 

@@ -3,7 +3,9 @@
 @using important_game.infrastructure.Extensions
 @model CalendarModel
 @{
-    ViewData["Title"] = $"Calendar - {Model.MonthName} - Match to Watch";
+    ViewData["Title"] = $"Football Match Calendar - {Model.MonthName} {Model.Year} | Match to Watch";
+    ViewData["Description"] = $"View all exciting football matches scheduled for {Model.MonthName} {Model.Year}. Calendar view with excitement scores for easy match discovery and planning.";
+    ViewData["Keywords"] = $"football calendar {Model.MonthName}, match schedule, football fixtures {Model.Year}, upcoming matches calendar";
 }
 
 <div class="calendar-container">
@@ -146,6 +148,7 @@
                     matchDate = m.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
                     matchDateUTC = m.MatchDateUTC,
                     excitmentScore = m.ExcitmentScore,
+                    isLive = m.IsLive,
                     homeSlug = SlugHelper.GenerateSlug(m.HomeTeamName),
                     awaySlug = SlugHelper.GenerateSlug(m.AwayTeamName)
                 }).ToList()
