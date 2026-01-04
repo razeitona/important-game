@@ -1,6 +1,7 @@
 using important_game.infrastructure.Contexts.Users.Data;
 using important_game.infrastructure.Contexts.Users.Data.Entities;
 using important_game.infrastructure.Contexts.Users.Models;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace important_game.infrastructure.Contexts.Users;
@@ -117,13 +118,16 @@ public class UserService(IUserRepository userRepository) : IUserService
         await _userRepository.DeleteUserAsync(userId, cancellationToken);
     }
 
-    public int? GetUserId(ClaimsPrincipal user)
+    public async Task<int?> GetUserId(ClaimsPrincipal user)
     {
-        var userIdClaim = user.FindFirst("UserId")?.Value;
-        if (int.TryParse(userIdClaim, out int userId))
-        {
-            return userId;
-        }
-        return null;
+        var googleId = user.FindFirst("GoogleId")?.Value;
+        if (string.IsNullOrWhiteSpace(googleId))
+            return null;
+
+        var existingUser = await _userRepository.GetUserByGoogleIdAsync(googleId);
+        if (existingUser == null)
+            return null;
+
+        return existingUser.UserId;
     }
 }

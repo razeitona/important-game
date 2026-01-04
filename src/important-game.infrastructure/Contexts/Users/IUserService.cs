@@ -12,7 +12,7 @@ public interface IUserService
     Task UpdateUserPreferencesAsync(int userId, UserPreferencesDto preferences, CancellationToken cancellationToken = default);
     Task<UserEntity?> GetUserByGoogleIdAsync(string googleId, CancellationToken cancellationToken = default);
     Task DeleteUserAccountAsync(int userId, CancellationToken cancellationToken = default);
-    int? GetUserId(ClaimsPrincipal user);
+    Task<int?> GetUserId(ClaimsPrincipal user);
 
     // Favorite Matches
     Task<List<int>> GetUserFavoriteMatchIdsAsync(int userId, CancellationToken cancellationToken = default);

@@ -54,20 +54,6 @@ internal static class MatchesQueries
                 UpdatedDateUTC = @UpdatedDateUTC
             WHERE MatchId = @MatchId";
 
-    internal const string UpsertFinishedMatches = @"
-        INSERT INTO Matches (
-            CompetitionId, SeasonId, MatchDateUTC, HomeTeamId, AwayTeamId, 
-            HomeScore, AwayScore, IsFinished, UpdatedDateUTC
-        ) VALUES (
-            @CompetitionId, @SeasonId, @MatchDateUTC, @HomeTeamId, @AwayTeamId, 
-            @HomeScore, @AwayScore, @IsFinished, @UpdatedDateUTC
-        )
-        ON CONFLICT(CompetitionId, SeasonId, MatchDateUTC, HomeTeamId, AwayTeamId) DO UPDATE SET
-            HomeScore = excluded.HomeScore,
-            AwayScore = excluded.AwayScore,
-            IsFinished = excluded.IsFinished,
-            UpdatedDateUTC = excluded.UpdatedDateUTC;";
-
     internal const string SelectUnfinishedMatches = @"
         SELECT 
 	        m.MatchId,
@@ -276,4 +262,18 @@ internal static class MatchesQueries
             m.IsFinished = 0
 	        AND uft.UserId = @UserId
         ORDER BY datetime(m.MatchDateUTC) ASC;";
+
+    internal const string SelectMatchesInTimeRange = @"
+        SELECT 
+            m.MatchId,
+            m.MatchDateUTC,
+            ht.Name as 'HomeTeamName',
+            at.Name as 'AwayTeamName'
+        FROM Matches m
+        INNER JOIN Teams ht
+            ON m.HomeTeamId = ht.Id
+        INNER JOIN Teams at
+            ON m.AwayTeamId = at.Id
+        WHERE 
+            datetime(m.MatchDateUTC) >= datetime(@MinDateUTC);";
 }

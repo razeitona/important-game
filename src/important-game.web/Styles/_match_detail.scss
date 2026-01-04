@@ -451,6 +451,57 @@
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
 
+            .match-alert-btn {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: auto;
+                min-width: 48px;
+                height: 48px;
+                padding: 0 16px;
+                border-radius: 24px;
+                background: linear-gradient(135deg, rgba(37, 140, 251, 0.15), rgba(26, 115, 232, 0.15));
+                border: 2px solid rgba(37, 140, 251, 0.3);
+                color: #258cfb;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 1.1rem;
+                font-weight: 600;
+
+                .alert-text {
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                }
+
+                i {
+                    transition: all 0.3s ease;
+                }
+
+                &:hover {
+                    background: linear-gradient(135deg, rgba(37, 140, 251, 0.25), rgba(26, 115, 232, 0.25));
+                    border-color: rgba(37, 140, 251, 0.5);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(37, 140, 251, 0.3);
+                }
+
+                &.active {
+                    background: linear-gradient(135deg, #258cfb, #1a73e8);
+                    border-color: #258cfb;
+                    color: #ffffff;
+                    box-shadow: 0 4px 16px rgba(37, 140, 251, 0.4);
+
+                    i {
+                        animation: ring-bell 0.5s ease;
+                    }
+                }
+
+                &.alert-animate {
+                    animation: pulse-alert 0.3s ease;
+                }
+            }
+
             .match-detail-like-btn {
                 position: relative;
                 display: flex;
@@ -1156,5 +1207,30 @@
                 }
             }
         }
+    }
+}
+
+// Alert animations
+@keyframes pulse-alert {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes ring-bell {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: rotate(-10deg);
+    }
+    20%, 40%, 60%, 80% {
+        transform: rotate(10deg);
     }
 }

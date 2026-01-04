@@ -1,32 +1,147 @@
-// Ads Styles
-.ad-container {
-    margin: 2rem 0;
-    display: flex;
-    justify-content: center;
-    min-height: 90px; // Evitar layout shift
+// =====================================================
+// GOOGLE ADS STYLING - Optimized for Revenue
+// =====================================================
 
-    &.ad-leaderboard {
-        max-width: 728px;
-        margin: 1.5rem auto;
+.ad-container {
+    margin: 2rem auto;
+    display: block; // Changed from flex to block to prevent width collapse
+    justify-content: center;
+    align-items: center;
+    min-height: 90px; // Prevent layout shift (CLS)
+    min-width: 300px; // Ensure minimum width for ad rendering
+    max-width: 100%;
+    width: 100%; // Force width calculation
+    position: relative;
+
+    // Ad label for transparency
+    &::before {
+        content: 'Advertisement';
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
     }
 
+    // Top banner (leaderboard 728x90 or responsive)
+    &.ad-leaderboard,
+    &.ad-top-banner {
+        max-width: 728px;
+        margin: 1.5rem auto 2rem;
+
+        @media (max-width: 768px) {
+            max-width: 100%;
+            padding: 0 16px;
+        }
+    }
+
+    // Sidebar ads (300x250 or 300x600)
     &.ad-sidebar {
         max-width: 300px;
         position: sticky;
-        top: 100px; // Sticky ad
+        top: 100px;
+        margin: 0;
+        z-index: 10;
+
+        @media (max-width: 1024px) {
+            display: none; // Hide on tablets and mobile
+        }
     }
 
+    // Between sections - Native in-feed style
     &.ad-between-sections {
-        border-top: 1px solid #2a2d35;
-        border-bottom: 1px solid #2a2d35;
-        padding: 1rem 0;
-        background: rgba(255,255,255,0.02);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1.5rem 0;
+        background: linear-gradient(180deg,
+            rgba(255,255,255,0.01) 0%,
+            rgba(255,255,255,0.03) 50%,
+            rgba(255,255,255,0.01) 100%);
+        margin: 2rem 0;
+    }
+
+    // In-article ads - Highest engagement
+    &.ad-in-article {
+        margin: 2rem auto;
+        max-width: 100%;
+        padding: 0 20px;
+
+        ins.adsbygoogle {
+            min-height: 250px; // Prevent CLS
+        }
+    }
+
+    // Match page specific
+    &.ad-match-sidebar {
+        @media (min-width: 1200px) {
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+        }
     }
 }
 
-// Mobile
+// AdSense responsive container
+.adsbygoogle {
+    display: block !important; // Force block display
+    max-width: 100%;
+    min-width: 300px; // Ensure minimum width for ad slot
+    width: 100%; // Take full container width
+    margin: 0 auto; // Center the ad
+    overflow: hidden; // Prevent overflow issues
+
+    // Ensure visibility
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+// Loading state for ads
+.ad-container:empty::after {
+    content: 'Loading ad...';
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.8rem;
+}
+
+// Mobile optimizations
 @media (max-width: 768px) {
-    .ad-sidebar {
-        display: none; // Ocultar sidebar ads no mobile
+    .ad-container {
+        margin: 1.5rem auto;
+        padding: 0;
+
+        &::before {
+            font-size: 0.65rem;
+        }
+
+        // Hide sidebar ads completely on mobile
+        &.ad-sidebar,
+        &.ad-match-sidebar {
+            display: none !important;
+        }
+
+        // Optimize spacing for mobile
+        &.ad-between-sections {
+            margin: 1.5rem 0;
+            padding: 1rem 0;
+        }
+    }
+}
+
+// Tablet optimizations
+@media (min-width: 769px) and (max-width: 1024px) {
+    .ad-container {
+        &.ad-sidebar {
+            display: none; // Still hide sidebar on tablets
+        }
+    }
+}
+
+// Large screens - maximize sidebar potential
+@media (min-width: 1400px) {
+    .ad-container.ad-sidebar {
+        max-width: 336px; // Allow larger sidebar ads
     }
 }

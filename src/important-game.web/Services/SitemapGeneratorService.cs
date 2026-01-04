@@ -5,6 +5,14 @@ using System.Xml;
 
 namespace important_game.web.Services;
 
+/// <summary>
+/// StringWriter that uses UTF-8 encoding instead of UTF-16
+/// </summary>
+public class Utf8StringWriter : StringWriter
+{
+    public override Encoding Encoding => Encoding.UTF8;
+}
+
 public class SitemapGeneratorService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -84,12 +92,15 @@ public class SitemapGeneratorService : BackgroundService
 
             // Generate sitemap.xml
             var sitemap = GenerateSitemapXml(baseUrl, matches);
-            await File.WriteAllTextAsync(sitemapPath, sitemap, Encoding.UTF8, stoppingToken);
+            // Use UTF-8 with BOM for better compatibility
+            var utf8WithBom = new UTF8Encoding(true);
+            await File.WriteAllTextAsync(sitemapPath, sitemap, utf8WithBom, stoppingToken);
             _logger.LogInformation("Sitemap generated successfully with {MatchCount} matches at {Path}", matches.Count, sitemapPath);
 
             // Generate llms.txt
             var llmsTxt = GenerateLlmsTxt(baseUrl);
-            await File.WriteAllTextAsync(llmsTxtPath, llmsTxt, Encoding.UTF8, stoppingToken);
+            // Use UTF-8 with BOM for better compatibility
+            await File.WriteAllTextAsync(llmsTxtPath, llmsTxt, utf8WithBom, stoppingToken);
             _logger.LogInformation("LLMs.txt generated successfully at {Path}", llmsTxtPath);
         }
         catch (OperationCanceledException)
@@ -111,7 +122,7 @@ public class SitemapGeneratorService : BackgroundService
             OmitXmlDeclaration = false
         };
 
-        using var stringWriter = new StringWriter();
+        using var stringWriter = new Utf8StringWriter();
         using var xmlWriter = XmlWriter.Create(stringWriter, settings);
 
         xmlWriter.WriteStartDocument();

@@ -745,3 +745,36 @@
         max-width: 100%;
     }
 }
+
+// Google Calendar Button in Modal
+.match-card-action-calendar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #258cfb 0%, #1a73e8 100%);
+    border: none;
+    border-radius: 0 0 10px 10px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
+
+    i {
+        font-size: 1.1rem;
+    }
+
+    &:hover {
+        background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 140, 251, 0.4);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}

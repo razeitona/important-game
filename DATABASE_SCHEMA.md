@@ -375,11 +375,13 @@ Armazena informação de canais de televisão.
 
 ```sql
 CREATE TABLE "BroadcastChannels" (
-	"ChannelId"			INTEGER NOT NULL,
-	"Name"				TEXT NOT NULL,
-	"Code"				TEXT NOT NULL UNIQUE,
-	"IsActive"			INTEGER NOT NULL DEFAULT 1,
-	"CreatedAt"			TEXT NOT NULL,
+	"ChannelId"	INTEGER NOT NULL,
+	"Name"	TEXT NOT NULL,
+	"Code"	TEXT NOT NULL UNIQUE,
+	"CountryCode"	TEXT NOT NULL,
+	"IsActive"	INTEGER NOT NULL DEFAULT 1,
+	"CreatedAt"	TEXT NOT NULL,
+	FOREIGN KEY("CountryCode") REFERENCES "Countries"("CountryCode") ON DELETE CASCADE,
 	CONSTRAINT "PK_BroadcastChannels" PRIMARY KEY("ChannelId" AUTOINCREMENT)
 );
 
@@ -393,28 +395,6 @@ CREATE INDEX "IX_BroadcastChannels_IsActive" ON "BroadcastChannels" ("IsActive")
 - `Code`: Código único do canal (e.g., "ESPN", "SKY_SPORTS", "SPORT_TV1")
 - `IsActive`: Flag para indicar se o canal está ativo (1) ou inativo (0)
 - `CreatedAt`: Data de criação do registo (formato "yyyy-MM-dd HH:mm:ss")
-
----
-
-### Tabela: `BroadcastChannelCountries`
-Relaciona canais com os países onde estão disponíveis.
-
-```sql
-CREATE TABLE "BroadcastChannelCountries" (
-	"ChannelId"			INTEGER NOT NULL,
-	"CountryCode"		TEXT NOT NULL,
-	PRIMARY KEY("ChannelId", "CountryCode"),
-	FOREIGN KEY("ChannelId") REFERENCES "BroadcastChannels"("ChannelId") ON DELETE CASCADE,
-	FOREIGN KEY("CountryCode") REFERENCES "Countries"("CountryCode") ON DELETE CASCADE
-);
-
-CREATE INDEX "IX_BroadcastChannelCountries_ChannelId" ON "BroadcastChannelCountries" ("ChannelId");
-CREATE INDEX "IX_BroadcastChannelCountries_CountryCode" ON "BroadcastChannelCountries" ("CountryCode");
-```
-
-#### Descrição dos campos:
-- `ChannelId`: Referência ao canal
-- `CountryCode`: Referência ao país
 
 ---
 
@@ -445,8 +425,7 @@ CREATE INDEX "IX_MatchBroadcasts_ChannelId" ON "MatchBroadcasts" ("ChannelId");
 SELECT bc.*, c.CountryCode, c.CountryName
 FROM BroadcastChannels bc
 INNER JOIN MatchBroadcasts mb ON bc.ChannelId = mb.ChannelId
-INNER JOIN BroadcastChannelCountries bcc ON bc.ChannelId = bcc.ChannelId
-INNER JOIN Countries c ON bcc.CountryCode = c.CountryCode
+INNER JOIN Countries c ON bc.CountryCode = c.CountryCode
 WHERE mb.MatchId = ?
   AND bc.IsActive = 1
 ORDER BY c.CountryName, bc.Name;
@@ -483,8 +462,7 @@ FROM Matches m
 INNER JOIN MatchBroadcasts mb ON m.MatchId = mb.MatchId
 INNER JOIN BroadcastChannels bc ON mb.ChannelId = bc.ChannelId
 INNER JOIN UserFavoriteBroadcastChannels ufbc ON bc.ChannelId = ufbc.ChannelId
-INNER JOIN BroadcastChannelCountries bcc ON bc.ChannelId = bcc.ChannelId
-INNER JOIN Countries c ON bcc.CountryCode = c.CountryCode
+INNER JOIN Countries c ON bc.CountryCode = c.CountryCode
 WHERE ufbc.UserId = ?
   AND m.IsFinished = 0
   AND datetime(m.MatchDateUTC) >= datetime('now')

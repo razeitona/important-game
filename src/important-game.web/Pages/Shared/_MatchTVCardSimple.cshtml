@@ -1,0 +1,149 @@
+@using System.Globalization
+@using important_game.infrastructure.Contexts.BroadcastChannels.Models
+@using important_game.infrastructure.Contexts.Matches.Data.Entities
+@using important_game.infrastructure.Extensions
+@model TvListingMatchViewModel
+
+<div class="card match-card-simple"
+     style="--bgcolor: @(Model.CompetitionBackgroundColor);"
+     data-game-day="@Model.MatchDateUTC.ToString("MMMdd")"
+     data-game-date="@Model.MatchDateUTC.Ticks"
+     data-game-score="@(Math.Round(Model.ExcitmentScore * 100, 0))"
+     data-game-league="@Model.CompetitionId"
+     data-match-id="@Model.MatchId"
+     data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"
+     data-match-score-num="@(Math.Round(Model.ExcitmentScore * 100, 0))"
+     data-match-url="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))"
+     id="game-@(SlugHelper.GenerateSlug(Model.HomeTeamName))v@(SlugHelper.GenerateSlug(Model.AwayTeamName))">
+
+    <a href="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))" class="match-card-link">
+        <div class="card-header match-header">
+            <div>
+                <img src="@("images/competition/" + Model.CompetitionId + ".png")" alt="@Model.CompetitionName" width="1.2rem" />
+            </div>
+            <div class="match-header-title">
+                @Model.CompetitionName
+            </div>
+            @if (Model.IsLive)
+            {
+                <div class="match-card-live">
+                    <span>LIVE</span>
+                </div>
+            }
+            else
+            {
+                <div class="match-card-time">
+                    <time data-utc-time="@Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
+                        @Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                    </time>
+                </div>
+            }
+        </div>
+        <div class="card-body match-card-body">
+            <div class="match-card-content">
+                <div class="match-card-team">
+                    <div class="match-card-team-logo">
+                        <img src="@("images/team/" + Model.HomeTeamId + ".png")" alt="@(Model.HomeTeamName)" width="80px" />
+                    </div>
+                    <div class="match-card-team-name">
+                        <span>@Model.HomeTeamName</span>
+                    </div>
+                </div>
+                <div class="match-card-score">
+                    <div class="match-card-score-value" title="Excitement Score" data-es="@(Math.Round(Model.ExcitmentScore, 2).ToString().Replace(",", "."))">
+                        @if (false)
+                        {
+                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                        }
+                        else
+                        {
+                            <i class="bi bi-fire es-fire-icon"></i>
+                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                        }
+                    </div>
+                    <span>Excitment score</span>
+                </div>
+                <div class="match-card-team">
+                    <div class="match-card-team-logo">
+                        <img src="@("images/team/" + Model.AwayTeamId + ".png")" alt="@(Model.AwayTeamName)" width="80px" />
+                    </div>
+                    <div class="match-card-team-name">
+                        <span>@Model.AwayTeamName</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    @* Match Card Actions Bar *@
+    <div class="match-card-actions">
+        @* Like Button with Count (Left) *@
+        <button class="match-card-action-like"
+                data-match-id="@Model.MatchId"
+                data-liked="false"
+                title="Favorite this match">
+            <i class="bi bi-hand-thumbs-up"></i>
+            <span class="action-like-count">0</span>
+        </button>
+
+        @* Broadcast Channels (Center) *@
+        @if (Model.Broadcasts != null && Model.Broadcasts.Count > 0)
+        {
+            <div class="match-card-broadcast-channels">
+                @{
+                    var maxChannelsToShow = 3;
+                    var channelsToDisplay = Model.Broadcasts.Take(maxChannelsToShow).ToList();
+                    var remainingCount = Model.Broadcasts.Count - maxChannelsToShow;
+                }
+                @foreach (var broadcast in channelsToDisplay)
+                {
+                    <div class="broadcast-channel-logo" title="@broadcast.ChannelName (@broadcast.CountryCode)">
+                        <span class="broadcast-channel-text">@broadcast.ChannelCode</span>
+                    </div>
+                }
+                @if (remainingCount > 0)
+                {
+                    <div class="broadcast-channel-more" title="@remainingCount more channel(s)">
+                        +@remainingCount
+                    </div>
+                }
+            </div>
+        }
+
+        @* Share Button (Right) *@
+        <button class="match-card-action-share"
+                title="Share this match">
+            <i class="bi bi-share-fill"></i>
+        </button>
+    </div>
+
+    @* TV Broadcast Channels Section *@
+    @if (Model.Broadcasts != null && Model.Broadcasts.Count > 0)
+    {
+        <div class="match-card-tv-broadcasts">
+            @{
+                var broadcastsByCountry = Model.Broadcasts
+                    .GroupBy(b => new { b.CountryCode, b.CountryName })
+                    .OrderBy(g => g.Key.CountryName);
+            }
+            <div class="tv-broadcasts-wrapper">
+                @foreach (var broadcast in Model.Broadcasts.Take(6))
+                {
+                    <div class="tv-broadcast-item" title="@broadcast.ChannelName - @broadcast.CountryName">
+                        <img src="@($"images/country/{broadcast.CountryCode.ToLower()}.png")"
+                             alt="@broadcast.CountryName"
+                             class="tv-country-flag"
+                             onerror="this.style.display='none'" />
+                        <span class="tv-channel-name">@broadcast.ChannelName</span>
+                    </div>
+                }
+                @if (Model.Broadcasts.Count > 6)
+                {
+                    <div class="tv-broadcast-more">
+                        +@(Model.Broadcasts.Count - 6) more
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

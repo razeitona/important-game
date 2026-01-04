@@ -8,6 +8,7 @@ namespace important_game.infrastructure.Contexts.Matches.Data;
 /// </summary>
 public interface IMatchesRepository
 {
+    #region Matches
     /// <summary>
     /// Gets unfinished matches (IsFinished = 0).
     /// </summary>
@@ -33,6 +34,8 @@ public interface IMatchesRepository
     Task<List<MatchesEntity>> GetRecentMatchesForTeamAsync(int teamId, int numberOfMatches);
     Task<bool> HasRecentFinishedMatchAsync(int competitionId, int seasonId, DateTimeOffset? dateTime);
     Task<List<MatchDto>> GetUserFavoriteUpcomingMatchesAsync(int userId);
+    Task<List<MatchBroadcastFinderDto>> GetMatchesToBroadcastInTimeRangeAsync(DateTimeOffset minDate);
+    #endregion
 
     #region Head To Head
     Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId);

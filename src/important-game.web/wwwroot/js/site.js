@@ -404,14 +404,14 @@
         }
 
         function shareWhatsApp(title, score, url) {
-            const text = `${title} - Excitement Score: ${score}%\nCheck out this match on Match to Watch!`;
+            const text = `${title} - Excitement Score: ${score}\nCheck out this match on Match to Watch!`;
             const fullUrl = window.location.origin + url;
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + fullUrl)}`;
             window.open(whatsappUrl, '_blank');
         }
 
         function shareTwitter(title, score, url) {
-            const text = `${title} - Excitement Score: ${score}%`;
+            const text = `${title} - Excitement Score: ${score}`;
             const fullUrl = window.location.origin + url;
             const hashtags = 'MatchToWatch,Football,Soccer';
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}&hashtags=${hashtags}`;
@@ -794,6 +794,15 @@
                 const esDecimal = match.excitmentScore.toFixed(2).replace(',', '.');
                 const matchUrl = `/match/${match.homeSlug}-vs-${match.awaySlug}`;
 
+                // Generate Google Calendar URL
+                const matchTitle = `${match.homeTeamName} vs ${match.awayTeamName}`;
+                const matchDescription = `${match.competitionName} - Excitement Score: ${esScore}%0A%0AWatch on: https://matcht owatch.com${matchUrl}`;
+                const matchDate = new Date(match.matchDateUTC);
+                const startTime = matchDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                const endDate = new Date(matchDate.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
+                const endTime = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(matchTitle)}&dates=${startTime}/${endTime}&details=${matchDescription}&location=&sf=true&output=xml`;
+
                 matchesHTML += `
                     <div class="card match-card-simple"
                          style="--bgcolor: ${match.competitionBgColor};"
@@ -837,6 +846,14 @@
                                 </div>
                             </div>
                         </a>
+                        <div class="match-card-actions">
+                            <button class="match-card-action-calendar"
+                                    onclick="window.open('${googleCalendarUrl}', '_blank')"
+                                    title="Add to Google Calendar">
+                                <i class="bi bi-calendar-plus"></i>
+                                <span>Add to Calendar</span>
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -1370,6 +1387,359 @@
                 });
             });
         }
+    })();
+
+    // =============================================================================
+    // MATCH ALERTS SYSTEM - Web Push Notifications
+    // =============================================================================
+    (function () {
+        'use strict';
+
+        // Match Alerts Manager Class
+        class MatchAlertsManager {
+            constructor() {
+                this.STORAGE_KEY = 'match_alerts';
+                this.CHECK_INTERVAL = 60000; // Check every minute
+                this.ALERT_OFFSET_MINUTES = 30; // 30 minutes before kickoff
+                this.checkIntervalId = null;
+                this.notificationPermission = 'default';
+                this.init();
+            }
+
+            async init() {
+                // Check notification permission
+                if ('Notification' in window) {
+                    this.notificationPermission = Notification.permission;
+                }
+
+                // Initialize alert buttons
+                this.initializeAlertButtons();
+
+                // Start checking for alerts
+                this.startAlertChecker();
+
+                // Request notification permission on first interaction
+                this.setupPermissionRequest();
+            }
+
+            // Get all stored alerts from localStorage
+            getAlerts() {
+                try {
+                    const alerts = localStorage.getItem(this.STORAGE_KEY);
+                    return alerts ? JSON.parse(alerts) : [];
+                } catch (error) {
+                    console.error('Error reading alerts:', error);
+                    return [];
+                }
+            }
+
+            // Save alerts to localStorage
+            saveAlerts(alerts) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(alerts));
+                } catch (error) {
+                    console.error('Error saving alerts:', error);
+                }
+            }
+
+            // Add a new alert
+            addAlert(matchId, matchTitle, matchDate, matchUrl) {
+                const alerts = this.getAlerts();
+
+                // Check if alert already exists
+                const existingIndex = alerts.findIndex(a => a.matchId === matchId);
+
+                const newAlert = {
+                    matchId: matchId,
+                    matchTitle: matchTitle,
+                    matchDate: matchDate, // Store as UTC ISO string
+                    matchUrl: matchUrl,
+                    triggered: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                if (existingIndex !== -1) {
+                    // Update existing alert
+                    alerts[existingIndex] = newAlert;
+                } else {
+                    // Add new alert
+                    alerts.push(newAlert);
+                }
+
+                this.saveAlerts(alerts);
+                this.updateAllAlertButtons();
+
+                return true;
+            }
+
+            // Remove an alert
+            removeAlert(matchId) {
+                let alerts = this.getAlerts();
+                alerts = alerts.filter(a => a.matchId !== matchId);
+                this.saveAlerts(alerts);
+                this.updateAllAlertButtons();
+            }
+
+            // Check if alert exists for a match
+            hasAlert(matchId) {
+                const alerts = this.getAlerts();
+                return alerts.some(a => a.matchId === matchId);
+            }
+
+            // Request notification permission
+            async requestNotificationPermission() {
+                if (!('Notification' in window)) {
+                    if (window.timezoneManager) {
+                        window.timezoneManager.showNotification('Your browser does not support notifications');
+                    }
+                    return false;
+                }
+
+                if (Notification.permission === 'granted') {
+                    return true;
+                }
+
+                if (Notification.permission === 'denied') {
+                    if (window.timezoneManager) {
+                        window.timezoneManager.showNotification('Notifications are blocked. Please enable them in your browser settings.');
+                    }
+                    return false;
+                }
+
+                try {
+                    const permission = await Notification.requestPermission();
+                    this.notificationPermission = permission;
+
+                    if (permission === 'granted') {
+                        if (window.timezoneManager) {
+                            window.timezoneManager.showNotification('Notifications enabled! You will receive alerts 30 minutes before kickoff.');
+                        }
+                        return true;
+                    } else {
+                        if (window.timezoneManager) {
+                            window.timezoneManager.showNotification('Notification permission denied');
+                        }
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error requesting notification permission:', error);
+                    return false;
+                }
+            }
+
+            // Setup automatic permission request on first alert
+            setupPermissionRequest() {
+                document.addEventListener('click', async (e) => {
+                    const alertBtn = e.target.closest('.match-alert-btn');
+                    if (alertBtn && Notification.permission === 'default') {
+                        await this.requestNotificationPermission();
+                    }
+                });
+            }
+
+            // Show a notification
+            showNotification(title, body, icon, url) {
+                if (!('Notification' in window) || Notification.permission !== 'granted') {
+                    return;
+                }
+
+                try {
+                    const notification = new Notification(title, {
+                        body: body,
+                        icon: icon || '/images/logo.png',
+                        badge: '/images/logo.png',
+                        tag: 'match-alert',
+                        requireInteraction: true,
+                        vibrate: [200, 100, 200]
+                    });
+
+                    notification.onclick = function() {
+                        window.focus();
+                        if (url) {
+                            window.location.href = url;
+                        }
+                        notification.close();
+                    };
+                } catch (error) {
+                    console.error('Error showing notification:', error);
+                }
+            }
+
+            // Check for alerts that should be triggered
+            checkAlerts() {
+                const alerts = this.getAlerts();
+                const now = new Date();
+                let hasTriggered = false;
+
+                alerts.forEach(alert => {
+                    if (alert.triggered) return;
+
+                    const matchDate = new Date(alert.matchDate);
+                    const alertTime = new Date(matchDate.getTime() - (this.ALERT_OFFSET_MINUTES * 60000));
+
+                    // Check if alert time has passed
+                    if (now >= alertTime && now < matchDate) {
+                        // Trigger alert
+                        this.showNotification(
+                            `Match Starting Soon! ⚽`,
+                            `${alert.matchTitle} starts in ${this.ALERT_OFFSET_MINUTES} minutes`,
+                            '/images/logo.png',
+                            alert.matchUrl
+                        );
+
+                        // Mark as triggered
+                        alert.triggered = true;
+                        hasTriggered = true;
+
+                        // Also show in-page notification
+                        if (window.timezoneManager) {
+                            window.timezoneManager.showNotification(`⚽ ${alert.matchTitle} starts in ${this.ALERT_OFFSET_MINUTES} minutes!`);
+                        }
+                    }
+                });
+
+                // Remove old alerts (matches that have already started + 2 hours)
+                const updatedAlerts = alerts.filter(alert => {
+                    const matchDate = new Date(alert.matchDate);
+                    const twoHoursAfterMatch = new Date(matchDate.getTime() + (120 * 60000));
+                    return now < twoHoursAfterMatch;
+                });
+
+                if (hasTriggered || updatedAlerts.length !== alerts.length) {
+                    this.saveAlerts(updatedAlerts);
+                }
+            }
+
+            // Start periodic alert checking
+            startAlertChecker() {
+                // Check immediately
+                this.checkAlerts();
+
+                // Check every minute
+                this.checkIntervalId = setInterval(() => {
+                    this.checkAlerts();
+                }, this.CHECK_INTERVAL);
+            }
+
+            // Stop alert checker
+            stopAlertChecker() {
+                if (this.checkIntervalId) {
+                    clearInterval(this.checkIntervalId);
+                    this.checkIntervalId = null;
+                }
+            }
+
+            // Initialize alert buttons
+            initializeAlertButtons() {
+                const alertButtons = document.querySelectorAll('.match-alert-btn');
+
+                alertButtons.forEach(button => {
+                    const matchId = parseInt(button.dataset.matchId);
+                    if (matchId) {
+                        this.updateAlertButton(button);
+                    }
+
+                    // Add click handler
+                    button.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        await this.toggleAlert(button);
+                    });
+                });
+            }
+
+            // Update all alert buttons on page
+            updateAllAlertButtons() {
+                const alertButtons = document.querySelectorAll('.match-alert-btn');
+                alertButtons.forEach(button => this.updateAlertButton(button));
+            }
+
+            // Update single alert button state
+            updateAlertButton(button) {
+                const matchId = parseInt(button.dataset.matchId);
+                const hasAlert = this.hasAlert(matchId);
+
+                button.dataset.hasAlert = hasAlert;
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.alert-text');
+
+                if (hasAlert) {
+                    if (icon) {
+                        icon.className = 'bi bi-bell-fill';
+                    }
+                    if (text) {
+                        text.textContent = 'Alert Set';
+                    }
+                    button.classList.add('active');
+                } else {
+                    if (icon) {
+                        icon.className = 'bi bi-bell';
+                    }
+                    if (text) {
+                        text.textContent = 'Set Alert';
+                    }
+                    button.classList.remove('active');
+                }
+            }
+
+            // Toggle alert for a match
+            async toggleAlert(button) {
+                const matchId = parseInt(button.dataset.matchId);
+                const matchTitle = button.dataset.matchTitle;
+                const matchDate = button.dataset.matchDate; // Should be UTC ISO string
+                const matchUrl = button.dataset.matchUrl;
+
+                const hasAlert = this.hasAlert(matchId);
+
+                if (hasAlert) {
+                    // Remove alert
+                    this.removeAlert(matchId);
+                    if (window.timezoneManager) {
+                        window.timezoneManager.showNotification('Alert removed');
+                    }
+                } else {
+                    // Request permission if needed
+                    if (Notification.permission !== 'granted') {
+                        const granted = await this.requestNotificationPermission();
+                        if (!granted) {
+                            return; // Don't add alert if permission denied
+                        }
+                    }
+
+                    // Add alert
+                    this.addAlert(matchId, matchTitle, matchDate, matchUrl);
+                    if (window.timezoneManager) {
+                        window.timezoneManager.showNotification(`Alert set for ${matchTitle} - You'll be notified 30 minutes before kickoff`);
+                    }
+                }
+
+                // Visual feedback
+                button.classList.add('alert-animate');
+                setTimeout(() => button.classList.remove('alert-animate'), 300);
+            }
+
+            // Get count of active alerts
+            getAlertCount() {
+                const alerts = this.getAlerts();
+                const now = new Date();
+
+                return alerts.filter(alert => {
+                    const matchDate = new Date(alert.matchDate);
+                    return now < matchDate && !alert.triggered;
+                }).length;
+            }
+        }
+
+        // Initialize Match Alerts Manager globally
+        window.matchAlertsManager = new MatchAlertsManager();
+
+        // Expose helper function for checking alert count
+        window.getActiveAlertsCount = function() {
+            return window.matchAlertsManager ? window.matchAlertsManager.getAlertCount() : 0;
+        };
+
+        // Log initialization
+        console.log('Match Alerts System initialized');
     })();
 
 })();

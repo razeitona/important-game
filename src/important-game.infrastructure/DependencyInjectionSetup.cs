@@ -90,6 +90,9 @@ public static class DependencyInjectionSetup
 
         // Register broadcast channel services
         services.AddScoped<IBroadcastChannelService, BroadcastChannelService>();
+        services.AddScoped<IBroadcastOrchestrator, BroadcastOrchestrator>();
+        services.AddScoped<ITvGuideMatcher, TvGuideMatcher>();
+
 
         return services;
     }

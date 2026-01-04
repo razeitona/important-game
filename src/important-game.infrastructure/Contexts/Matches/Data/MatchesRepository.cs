@@ -168,6 +168,17 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         return result > 0;
     }
 
+    public async Task<List<MatchBroadcastFinderDto>> GetMatchesToBroadcastInTimeRangeAsync(DateTimeOffset minDate)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<MatchBroadcastFinderDto>(MatchesQueries.SelectMatchesInTimeRange,
+            new
+            {
+                MinDateUTC = minDate.ToString("yyyy-MM-dd HH:mm:ss")
+            });
+        return result.ToList();
+    }
+
     #region Head To Head
     public async Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId)
     {

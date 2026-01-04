@@ -180,6 +180,15 @@
 
         @* ACTIONS BAR *@
         <div class="match-hero-actions">
+            <button class="match-alert-btn"
+                    data-match-id="@matchInfo.MatchId"
+                    data-match-title="@matchInfo.HomeTeamName vs @matchInfo.AwayTeamName"
+                    data-match-date="@matchInfo.MatchDateUTC.ToString("o")"
+                    data-match-url="/match/@SlugHelper.GenerateSlug(matchInfo.HomeTeamName)-vs-@SlugHelper.GenerateSlug(matchInfo.AwayTeamName)"
+                    title="Set alert for this match (30 min before kickoff)">
+                <i class="bi bi-bell"></i>
+                <span class="alert-text">Set Alert</span>
+            </button>
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <button class="match-detail-like-btn"
@@ -221,42 +230,6 @@
             </div>
         </div>
 
-        @* BROADCAST CHANNELS *@
-        @if (matchInfo.BroadcastsByCountry != null && matchInfo.BroadcastsByCountry.Count > 0)
-        {
-            <div class="match-hero-broadcasts">
-                <h3><i class="bi bi-tv"></i>Where to Watch</h3>
-
-                <div class="broadcast-country-selector">
-                    <label for="country-select">
-                        <i class="bi bi-globe"></i>
-                        Select your country:
-                    </label>
-                    <select id="country-select" class="country-dropdown">
-                        <option value="">Choose a country...</option>
-                        @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
-                        {
-                            <option value="@countryGroup.Key">@countryGroup.Key</option>
-                        }
-                    </select>
-                </div>
-
-                @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
-                {
-                    <div class="broadcast-channels-container" data-country="@countryGroup.Key" style="display: none;">
-                        <div class="broadcast-channels-list">
-                            @foreach (var broadcast in countryGroup.Value)
-                            {
-                                <div class="broadcast-channel-item" title="@broadcast.ChannelName">
-                                    <span class="broadcast-channel-name">@broadcast.ChannelName</span>
-                                    <span class="broadcast-time">@matchInfo.MatchDateUTC.ToString("HH:mm", CultureInfo.InvariantCulture)</span>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-        }
     </div>
 
     @* TWO COLUMN LAYOUT - STATS *@
@@ -373,6 +346,52 @@
                     }
                 </div>
             </div>
+
+            @* BROADCAST CHANNELS *@
+            @if (matchInfo.BroadcastsByCountry != null && matchInfo.BroadcastsByCountry.Count > 0)
+            {
+                <div class="match-detail-card">
+                    <h3><i class="bi bi-tv"></i>Where to Watch</h3>
+
+                    <div class="broadcast-country-selector">
+                        <label for="country-select">
+                            <i class="bi bi-globe"></i>
+                            Select your country:
+                        </label>
+                        <select id="country-select" class="country-dropdown">
+                            <option value="">Choose a country...</option>
+                            @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
+                            {
+                                <option value="@countryGroup.Key">@countryGroup.Key</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="broadcast-channels-wrapper">
+                        <div class="broadcast-no-selection" id="broadcast-no-selection">
+                            <i class="bi bi-globe"></i>
+                            <p>Please select a country to view available channels</p>
+                        </div>
+
+                        @foreach (var countryGroup in matchInfo.BroadcastsByCountry.OrderBy(c => c.Key))
+                        {
+                            <div class="broadcast-channels-container" data-country="@countryGroup.Key" style="display: none;">
+                                <div class="broadcast-channels-list">
+                                    @foreach (var broadcast in countryGroup.Value)
+                                    {
+                                        <div class="broadcast-channel-item">
+                                            <i class="bi bi-tv-fill"></i>
+                                            <div class="broadcast-channel-info">
+                                                <span class="broadcast-channel-name">@broadcast.ChannelName</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
 
         <div class="match-detail-column">
@@ -425,13 +444,12 @@
                 </div>
             }
 
-            @* AD PLACEHOLDER *@
-            <div class="ad-container">
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1934500034472565"
-                        crossorigin="anonymous"></script>
+            @* In-Article Ad - High Engagement Area *@
+            <div class="ad-container ad-in-article">
                 <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-format="autorelaxed"
+                     style="display:block; text-align:center;"
+                     data-ad-layout="in-article"
+                     data-ad-format="fluid"
                      data-ad-client="ca-pub-1934500034472565"
                      data-ad-slot="8344811649"></ins>
                 <script>
@@ -455,15 +473,9 @@
                 // Try to load saved country from localStorage
                 const savedCountry = localStorage.getItem("selectedBroadcastCountry");
 
-                // Auto-select first country if no saved preference
-                const firstCountry = countrySelect.find("option:not([value=''])").first().val();
-
                 if (savedCountry && countrySelect.find(`option[value="${savedCountry}"]`).length > 0) {
                     countrySelect.val(savedCountry);
                     showBroadcastsForCountry(savedCountry);
-                } else if (firstCountry) {
-                    countrySelect.val(firstCountry);
-                    showBroadcastsForCountry(firstCountry);
                 }
 
                 // Handle country selection change
@@ -473,12 +485,14 @@
                         localStorage.setItem("selectedBroadcastCountry", selectedCountry);
                         showBroadcastsForCountry(selectedCountry);
                     } else {
+                        $("#broadcast-no-selection").show();
                         $(".broadcast-channels-container").hide();
                     }
                 });
             }
 
             function showBroadcastsForCountry(country) {
+                $("#broadcast-no-selection").hide();
                 $(".broadcast-channels-container").hide();
                 $(`.broadcast-channels-container[data-country="${country}"]`).show();
             }

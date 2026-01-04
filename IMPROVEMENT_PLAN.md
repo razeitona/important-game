@@ -1,1166 +1,601 @@
-# 🚀 Match to Watch - Plano de Melhorias
+# 🚀 Match to Watch - Strategic Improvement Plan
 
-## Visão Geral
-Este documento contém o plano completo de melhorias para o portal Match to Watch, organizado por prioridade e impacto. O objetivo é tornar o portal mais apelativo, melhorar a experiência do utilizador e maximizar o revenue através de Google Ads.
+## Vision Statement
+Match to Watch helps football fans discover the most exciting matches worth watching through data-driven Excitement Scores, personalized recommendations, and comprehensive broadcast information.
 
----
-
-## 📊 Status Geral - Prioridade Alta
-
-| # | Feature | Status | Impacto | Data Conclusão |
-|---|---------|--------|---------|----------------|
-| 1 | Google Ads Integration | 🟡 Parcial | Alto 💰 | Em progresso |
-| 2 | Loading States & Feedback | ✅ Completo | Alto | 30/12/2025 |
-| 3 | Clear All Filters Button | ✅ Completo | Médio | 30/12/2025 |
-| 4 | Melhorar Search UX | ✅ Completo | Alto | 30/12/2025 |
-
-**Progresso Geral: 75% completo (3 de 4 itens)**
-
-### 🎯 Próximos Passos Imediatos:
-1. Completar Google Ads nas páginas Matches e Match Detail
-2. Configurar Auto Ads do AdSense
-3. Monitorizar performance dos ads
+**Core Value:** Save time. Watch better football.
 
 ---
 
-## 🥇 PRIORIDADE ALTA - Quick Wins (1-2 dias)
+## 📊 Current Status (January 2026)
 
-### ✅ 1. Google Ads Integration 💰
-**Status:** ✅ Implementado (Index page)
-**Impacto:** Alto - Monetização imediata
+### ✅ Implemented Features
+- **Excitement Score Algorithm** - Core differentiation
+- **Calendar View** - Monthly match overview with ES indicators
+- **TV Listings** - Broadcast channels by country with user favorites
+- **Match Detail Pages** - Comprehensive analysis with H2H, team form
+- **User Authentication** - Google OAuth integration
+- **Favorite Channels** - Personalized TV listings
+- **Timezone Support** - Automatic timezone detection and conversion
+- **Responsive Design** - Mobile-optimized layout
+- **Google Calendar Integration** - Add matches directly to calendar
+- **Sitemap & LLMs.txt** - SEO optimization
 
-#### Posicionamentos Implementados:
-- ✅ Above the fold (Index) - Banner 728x90
-- ✅ Between sections (Index) - Banner fluid
-
-#### Próximos Passos:
-- [ ] Adicionar sidebar ad na página Match Detail (300x250)
-- [ ] Adicionar ad na página Matches (entre match cards)
-- [ ] Configurar Auto Ads do AdSense
-- [ ] Monitorizar performance e CTR
-
-**Revenue Estimado:**
-- Conservador: €90-270/mês
-- Otimista: €900-2.700/mês (com crescimento)
-
----
-
-### 2. Loading States & Feedback ⏳
-**Status:** ✅ Implementado Completo
-**Impacto:** Alto - Melhor UX
-
-#### Implementação Realizada:
-
-**Skeleton Screens com Shimmer Animation:**
-- ✅ `_skeleton.scss` - Estilos com animação shimmer CSS
-- ✅ `_SkeletonMatchCardSimple.cshtml` - Skeleton para match cards
-- ✅ `_SkeletonMatchDetail.cshtml` - Skeleton para match detail page
-- ✅ Skeleton containers em `Index.cshtml` (Trending + Upcoming matches)
-- ✅ Skeleton containers em `Matches.cshtml`
-
-**JavaScript Loading Manager:**
-- ✅ `LoadingStateManager` class em `site.js`
-- ✅ API: `showLoading()`, `hideLoading()`, `withLoading()`
-- ✅ Duração mínima configurável para evitar "flash"
-- ✅ Global: `window.loadingManager`
-
-**Abordagem Híbrida:**
-- ✅ SSR (Server-Side Render) para primeira carga - rápido, sem skeleton
-- ✅ Skeleton screens para interações do utilizador (filtros, pesquisa)
-
-**Documentação:**
-- ✅ `LOADING_STATES_GUIDE.md` - Guia completo com exemplos e API
-
-**Ficheiros Criados/Modificados:**
-- `src/important-game.web/Styles/_skeleton.scss`
-- `src/important-game.web/Pages/Shared/_SkeletonMatchCardSimple.cshtml`
-- `src/important-game.web/Pages/Shared/_SkeletonMatchDetail.cshtml`
-- `src/important-game.web/wwwroot/js/site.js` (LoadingStateManager)
-- `src/important-game.web/Pages/Index.cshtml` (skeleton containers)
-- `src/important-game.web/Pages/Matches.cshtml` (skeleton containers)
-- `LOADING_STATES_GUIDE.md`
+### 🎯 Key Metrics to Track
+- **Pageviews:** Current baseline unknown - Set goal: 10,000/month
+- **User Retention:** Track returning visitors (goal: 40%+)
+- **Engagement:** Avg session duration (goal: 3+ minutes)
+- **Conversion:** % users who favorite channels or matches
+- **Revenue:** Google Ads performance
 
 ---
 
-### 3. Clear All Filters Button 🔘
-**Status:** ✅ Implementado Completo
-**Impacto:** Médio - Melhor UX em Matches page
+## 🥇 PHASE 1 - Core User Experience (Week 1-2)
 
-#### Implementação Realizada:
+### 1. Enhanced Match Discovery 🔍
+**Impact:** HIGH | **Effort:** Medium | **Revenue Impact:** Indirect
 
-**HTML:**
-- ✅ Botão adicionado em `Matches.cshtml` (linha 16-19)
-- ✅ Ícone Bootstrap: `bi-x-circle`
-- ✅ Visível apenas quando há filtros ativos
+#### A. Smart Filters & Sorting
+```
+Features:
+- Filter by ES tier: "Unmissable" (75+), "Great" (50-74), "Good" (25-49)
+- Filter by match importance: "Title Decider", "Derby", "Cup Final"
+- Sort options: ES (default), Date/Time, Popularity
+- Quick presets: "Today's Best", "This Weekend", "Top Derbies"
 
-**JavaScript:**
-- ✅ Função `updateClearButtonVisibility()` - Controla visibilidade
-- ✅ Event listener para limpar filtros (linha 128-149)
-- ✅ Limpa filtros de liga E campo de pesquisa
-- ✅ Integração com `timezoneManager` para notificação
-- ✅ Animação de entrada suave
-
-**CSS:**
-- ✅ Estilos em `_matches.scss` (linha 111-146)
-- ✅ Cor vermelha (#ef4444) para destaque
-- ✅ Hover effects e animação
-- ✅ Animação `slideInRight` para entrada
-- ✅ Responsive design para mobile
-
-**Funcionalidades:**
-- ✅ Detecta filtros de liga ativos
-- ✅ Detecta texto no campo de pesquisa
-- ✅ Remove todos os filtros com um clique
-- ✅ Mostra notificação "All filters cleared"
-- ✅ Esconde automaticamente quando não há filtros
-
-**Ficheiros Modificados:**
-- `src/important-game.web/Pages/Matches.cshtml` (HTML + JavaScript)
-- `src/important-game.web/Styles/_matches.scss` (Estilos + Animações)
-
----
-
-### 4. Melhorar Search UX 🔍
-**Status:** ✅ Implementado Completo
-**Impacto:** Alto - Feature muito usada
-
-#### Implementação Realizada:
-
-**1. ✅ Posicionamento Correto:**
-- `position: relative` no container `.mw-search`
-- Dropdown `position: absolute` com `top: 100%`, `left: 0`, `right: 0`
-- Alinhamento perfeito com barra de pesquisa
-- `min-width: 100%` para largura igual ao search
-- Removida linha branca no focus (`outline: none`)
-
-**2. ✅ Mensagem "No Results":**
-- Elemento `<li class="search-no-results">` com ícone
-- Mensagem: `No matches found for "{query}"`
-- Estilo visual diferenciado (cinzento, não clicável)
-- Ícone Bootstrap: `bi-search`
-
-**3. ✅ Navegação Completa por Teclado:**
-- **ArrowDown**: Seleciona próximo resultado (circular)
-- **ArrowUp**: Seleciona resultado anterior (circular)
-- **Enter**: Navega para resultado selecionado (ou primeiro se nenhum selecionado)
-- **Escape**: Fecha dropdown e remove focus
-- Scroll automático para item selecionado
-- Estado visual `.selected` com fundo azul (#258cfb)
-
-**4. ✅ Highlight do Texto Pesquisado:**
-- Função `highlightMatch()` com regex
-- Termos pesquisados em `<strong>` azul (#258cfb)
-- Case-insensitive matching
-- Visual feedback do que foi encontrado
-
-**5. ✅ Melhorias Visuais:**
-- Custom scrollbar estilizada
-- Hover effects suaves
-- Estados: normal, hover, selected, active
-- Transições smooth (0.2s ease)
-- Box-shadow moderna
-- Border radius 8px
-
-**JavaScript:**
-- `selectedIndex` tracking (linha 152)
-- `highlightMatch()` - Highlight de termos (linha 155-159)
-- `updateSearchResults()` - Renderiza resultados (linha 161-184)
-- `selectResult()` - Navegação por teclado (linha 193-205)
-- `navigateToMatch()` - Navega para match (linha 186-191)
-- Keyboard event handlers (linha 226-268)
-- Click outside para fechar (linha 271-276)
-
-**CSS (_matches_section.scss):**
-- Linha 5-49: Container e dropdown
-- Linha 67-130: Estilos de resultados
-- Linha 49-65: Custom scrollbar
-- Linha 81-100: Hover e selected states
-- Linha 110-129: No results state
-
-**Ficheiros Modificados:**
-- `src/important-game.web/Pages/Matches.cshtml` (JavaScript)
-- `src/important-game.web/Styles/_matches_section.scss` (CSS)
-
-**Correções Adicionais (30/12/2025):**
-- ✅ **Footer Sticky**: Implementado flexbox layout para footer sempre no fundo
-  - `site.scss`: `body { display: flex; flex-direction: column; min-height: 100%; }`
-  - `_footer.scss`: `margin-top: auto; flex-shrink: 0;`
-- ✅ **Search Input**: Removida linha branca no focus (`outline: none`)
-- ✅ **Search Results**: Alinhamento perfeito com barra de pesquisa
-
----
-
-## 🥈 PRIORIDADE MÉDIA - UX Enhancements (3-5 dias)
-
-### 5. Sticky Navigation Mobile 📱
-**Status:** ❌ Não implementado
-**Impacto:** Alto em mobile
-
-#### Problema:
-- Após scroll, utilizador precisa voltar ao topo para navegar
-- Dificulta switching entre páginas
-
-#### Solução:
-```css
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: #f8f9fa;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+Why: Users overwhelmed by choice need quick ways to find their perfect match
 ```
 
-**Considerações:**
-- Adicionar padding-top ao body para compensar
-- Testar em diferentes dispositivos
-- Garantir que não cobre conteúdo importante
-
----
-
-### 6. Persist Filter State 💾
-**Status:** ❌ Não implementado
-**Impacto:** Alto - Evita frustração
-
-#### Problema:
-- Filtros resetam ao recarregar página
-- Utilizador perde seleções ao voltar atrás
-
-#### Solução 1: URL Parameters (Recomendado)
-```javascript
-// Ao aplicar filtro
-const leagues = getSelectedLeagues();
-const url = new URL(window.location);
-url.searchParams.set('leagues', leagues.join(','));
-history.pushState({}, '', url);
-
-// Ao carregar página
-const urlParams = new URLSearchParams(window.location.search);
-const leagues = urlParams.get('leagues')?.split(',') || [];
-applyFilters(leagues);
-```
-
-**Vantagens:**
-- URL é shareable
-- Funciona com back/forward do browser
-- SEO friendly
-
-#### Solução 2: localStorage
-```javascript
-// Guardar
-localStorage.setItem('selectedLeagues', JSON.stringify(leagues));
-
-// Carregar
-const saved = JSON.parse(localStorage.getItem('selectedLeagues'));
-```
-
----
-
-### 7. Match Card Visual Improvements 🎨
-**Status:** ❌ Não implementado
-**Impacto:** Médio - Melhor apelo visual
-
-#### Melhorias:
-
-**1. Sombras Sutis:**
-```scss
-.match-card-simple {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-  }
-}
-```
-
-**2. Excitement Score Badge:**
+#### B. "Why Watch This?" Summary
 ```html
-<div class="es-badge" data-es="0.75">
-  <i class="bi bi-fire"></i> 75
+<!-- On match cards -->
+<div class="match-insight">
+  <i class="bi bi-lightbulb"></i>
+  "Title race clash - Both teams unbeaten in last 5"
 </div>
+
+Why: Explain ES score in human terms, increase engagement
+Implementation: Template-based insights from match data
 ```
 
-**3. Team Logos Maiores:**
-```scss
-.match-card-team img {
-  width: 80px; // Era 60px
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-}
+#### C. Match Recommendations
 ```
+"Based on your interests" section on homepage
+- Track clicked matches and favorite channels
+- Suggest similar high-ES matches
+- "Because you watched Premier League derbies"
 
-**4. Gradientes Melhorados:**
-```scss
-.match-card-simple {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+Why: Personalization increases return visits by 2-3x
 ```
 
 ---
 
-### 8. Breadcrumbs Navigation 🍞
-**Status:** ❌ Não implementado
-**Impacto:** Baixo - Melhor orientação
+### 2. Social Proof & Community 👥
+**Impact:** HIGH | **Effort:** Low-Medium | **Revenue Impact:** High (engagement = pageviews)
 
-#### Implementação:
+#### A. Match Popularity Indicator
 ```html
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/">Home</a></li>
-    <li class="breadcrumb-item"><a href="/matches">Matches</a></li>
-    <li class="breadcrumb-item active">Liverpool vs Arsenal</li>
-  </ol>
-</nav>
+<div class="match-popularity">
+  <i class="bi bi-eye"></i>
+  <span>2,847 fans watching</span>
+</div>
+
+Why: FOMO drives engagement, shows which matches are "hot"
+Implementation: Simple counter updated every 30 seconds
 ```
 
-**CSS:**
-```scss
-.breadcrumb {
-  background: transparent;
-  padding: 0.5rem 0;
-  font-size: 0.875rem;
-  color: #fff;
-
-  a {
-    color: #258cfb;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-```
-
----
-
-### 9. Lazy Loading de Imagens 🖼️
-**Status:** ❌ Não implementado
-**Impacto:** Alto - Performance
-
-#### Problema:
-- Todas as imagens carregam imediatamente
-- Página lenta em conexões lentas
-- Desperdício de bandwidth
-
-#### Solução:
+#### B. Quick Share Feature
 ```html
-<img loading="lazy"
-     src="/images/team/{{teamId}}.png"
-     alt="{{teamName}}"
-     class="team-logo" />
-```
-
-**Fallback para browsers antigos:**
-```javascript
-if ('loading' in HTMLImageElement.prototype) {
-  // Browser suporta loading="lazy"
-} else {
-  // Usar IntersectionObserver
-  const imageObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        img.src = img.dataset.src;
-        imageObserver.unobserve(img);
-      }
-    });
-  });
-}
-```
-
-**Placeholder durante carregamento:**
-```css
-.team-logo {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-```
-
----
-
-## 🥉 PRIORIDADE BAIXA - Nice to Have (1-2 semanas)
-
-### 10. Favoritos/Watchlist ⭐
-**Status:** ❌ Não implementado
-**Impacto:** Alto - Engagement
-
-#### Funcionalidade:
-```html
-<!-- Botão no match card -->
-<button class="btn-favorite" data-match-id="{{matchId}}">
-  <i class="bi bi-star"></i>
-  <i class="bi bi-star-fill" style="display:none"></i>
+<button class="quick-share" data-match-id="123">
+  <i class="bi bi-share-fill"></i>
 </button>
+
+Share options:
+- WhatsApp: "🔥 Liverpool vs Arsenal - ES: 87% - Looks unmissable!"
+- Twitter/X: With match card image preview
+- Copy link: Pre-formatted message with match details
+
+Why: Viral growth - each share = potential new user
+Implementation: Web Share API + fallback
 ```
 
-**JavaScript:**
-```javascript
-class WatchlistManager {
-  constructor() {
-    this.favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-  }
-
-  toggle(matchId) {
-    const index = this.favorites.indexOf(matchId);
-    if (index > -1) {
-      this.favorites.splice(index, 1);
-    } else {
-      this.favorites.push(matchId);
-    }
-    this.save();
-  }
-
-  save() {
-    localStorage.setItem('favorites', JSON.stringify(this.favorites));
-  }
-}
-```
-
-**Página /my-matches:**
-```csharp
-public class MyMatchesModel : PageModel
-{
-  public List<MatchDto> FavoriteMatches { get; set; }
-
-  public async Task OnGetAsync(string favorites)
-  {
-    var ids = favorites.Split(',').Select(int.Parse);
-    FavoriteMatches = await _matchService.GetMatchesByIds(ids);
-  }
-}
-```
-
----
-
-### 11. Share Buttons 📤
-**Status:** ❌ Não implementado
-**Impacto:** Médio - Viral growth
-
-#### Implementação:
+#### C. Live Match Activity Badge
 ```html
-<div class="share-buttons">
-  <button onclick="shareWhatsApp()">
-    <i class="bi bi-whatsapp"></i> WhatsApp
-  </button>
-  <button onclick="shareTwitter()">
-    <i class="bi bi-twitter"></i> Tweet
-  </button>
-  <button onclick="copyLink()">
-    <i class="bi bi-clipboard"></i> Copy Link
-  </button>
-</div>
-```
-
-**JavaScript:**
-```javascript
-function shareWhatsApp() {
-  const text = `Check out this match: ${matchTitle}`;
-  const url = window.location.href;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
-}
-
-function shareTwitter() {
-  const text = `🔥 ${matchTitle} - Excitement Score: ${score}%`;
-  const url = window.location.href;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
-}
-
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href);
-  showToast('Link copied to clipboard!');
-}
-```
-
----
-
-### 12. Live Score Badge 🔴
-**Status:** ❌ Não implementado
-**Impacto:** Alto - Engagement
-
-#### Para jogos ao vivo:
-```html
-<div class="live-badge pulsing">
+<div class="live-activity">
   <span class="live-dot"></span>
-  <span>LIVE</span>
-  <span class="live-score">2-1</span>
+  <span>LIVE - 87' | 2-2</span>
+  <span class="live-excitement">🔥 Heating up!</span>
 </div>
+
+Why: Real-time updates create urgency, increase return visits
 ```
 
-**CSS:**
-```scss
-.live-badge {
-  background-color: #ef4444;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+---
 
-  .live-dot {
-    width: 8px;
-    height: 8px;
-    background-color: white;
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-  }
-}
+### 3. User Retention Features ⭐
+**Impact:** CRITICAL | **Effort:** Medium | **Revenue Impact:** Direct (retention = revenue)
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
+#### A. Enhanced Favorites System
+```
+Current: Users can favorite channels
+Add:
+- Favorite teams → Auto-highlight their matches
+- Favorite competitions → Filter presets
+- Watchlist → Save matches to personal calendar
+- Email digest → "Your teams play this weekend"
+
+Why: Personal investment = return visits
+Implementation: Extend existing favorites table
 ```
 
-**Backend (atualizar a cada 30s):**
+#### B. Match Alerts (Progressive Web App)
 ```javascript
-setInterval(async () => {
-  const liveMatches = await fetch('/api/live-matches');
-  updateLiveBadges(liveMatches);
-}, 30000);
+Features:
+- "Remind me 1 hour before kickoff"
+- "Notify when this match goes live"
+- Push notifications (web + PWA)
+- Email alerts (weekly digest)
+
+Why: Brings users back at optimal time (before match)
+Constraint: No betting - alerts are about watching, not wagering
+```
+
+#### C. "My Week in Football" Dashboard
+```
+Personal homepage showing:
+- Upcoming matches for favorite teams
+- High-ES matches in favorite leagues
+- Matches on favorite channels
+- Previous watches (with outcomes)
+
+Why: Personalized experience = sticky users
 ```
 
 ---
 
-### 13. Match Predictions/Odds 📊
-**Status:** ❌ Não implementado
-**Impacto:** Alto - Mais informação
+## 🥈 PHASE 2 - Monetization & Growth (Week 3-4)
 
-#### Se tiver acesso a dados de odds:
+### 4. Google Ads Optimization 💰
+**Impact:** CRITICAL | **Effort:** Low | **Revenue Impact:** Direct
+
+#### Strategic Ad Placements
+```
+Current: Basic ads on Index
+Implement:
+1. Match Detail Sidebar (300x250) - Highest value page
+2. Between match cards (Native ads) - Every 6 cards
+3. Auto Ads - Let Google optimize placement
+4. Sticky bottom banner (mobile) - Non-intrusive
+
+Ad Balance:
+- Max 3 ad units per page
+- Minimum 700px between ads
+- Never above the fold on Match Detail
+- Lazy load ads below fold
+
+Expected Revenue:
+- Conservative: €200-400/month (5k pageviews/day)
+- Target: €800-1,500/month (15k pageviews/day)
+- Optimistic: €2,000-4,000/month (30k pageviews/day)
+```
+
+#### Content for Ads (Not Betting!)
+```
+Acceptable ad categories:
+✅ Sports apparel/equipment
+✅ Streaming services (legal)
+✅ Sports news/media
+✅ Football games/FIFA
+✅ General consumer products
+
+❌ Betting/gambling sites
+❌ Prediction/tipster services
+❌ Fantasy sports for money
+```
+
+---
+
+### 5. SEO & Content Strategy 📈
+**Impact:** HIGH | **Effort:** Medium | **Revenue Impact:** Indirect (traffic = revenue)
+
+#### A. Match Preview Content
+```
+Auto-generate SEO content for each match:
+- "Liverpool vs Arsenal Preview: Why This Could Be the Match of the Season"
+- Key stats, recent form, head-to-head
+- "Where to Watch" section with broadcast info
+- Update after match with highlights/outcome
+
+Why: Ranks for "[Team A] vs [Team B]" searches
+Implementation: Template-based generation from existing data
+```
+
+#### B. "Best Matches This Week" Articles
+```
+Weekly auto-generated content:
+- "Top 10 Must-Watch Matches This Weekend"
+- Sorted by ES with commentary
+- Include TV broadcast details
+- Shareable social cards
+
+Why: Evergreen content, ranks for "best matches to watch"
+```
+
+#### C. Structured Data & Rich Snippets
+```schema
+Add Schema.org markup:
+- SportsEvent for each match
+- BroadcastEvent for TV listings
+- FAQPage for "Why is ES high?"
+- Article for previews
+
+Why: Rich results in Google = higher CTR
+```
+
+---
+
+### 6. Performance & UX Polish 🎨
+**Impact:** HIGH | **Effort:** Medium | **Revenue Impact:** Indirect (UX = retention)
+
+#### A. Loading States (Already Planned)
+```
+✅ Skeleton screens (in plan)
+✅ Optimistic UI updates
+✅ Progressive image loading
+
+Add:
+- Service Worker for offline capability
+- Cache API responses (5 min TTL)
+- Prefetch next/prev match in calendar
+```
+
+#### B. Mobile Optimization
+```
+Priority improvements:
+1. Bottom navigation bar (Home, Matches, Calendar, Favorites)
+2. Swipe gestures (match cards, calendar days)
+3. Pull-to-refresh
+4. Install PWA prompt ("Add to Home Screen")
+
+Why: 60%+ traffic is mobile
+```
+
+#### C. Accessibility
+```
+WCAG 2.1 AA compliance:
+- Keyboard navigation everywhere
+- Screen reader labels
+- Color contrast (ES badges)
+- Focus indicators
+- Alt text for team logos
+
+Why: Larger audience, better SEO
+```
+
+---
+
+## 🥉 PHASE 3 - Advanced Features (Month 2-3)
+
+### 7. Video & Media Integration 🎥
+**Impact:** HIGH | **Effort:** High | **Revenue Impact:** Very High
+
+#### A. Highlight Clips
+```
+Embed from legal sources:
+- Official league highlights (YouTube)
+- Broadcaster clips
+- Social media goals/moments
+
+Implementation:
+- YouTube API for highlights
+- Twitter/X embed for viral moments
+- "Best Moments" section on match detail
+
+Why: Increases time on site dramatically (2 min → 10 min)
+Revenue: Higher ad viewability, more impressions
+```
+
+#### B. Pre-Match Video Previews
+```
+Curated content:
+- Team news videos
+- Pundit predictions
+- Press conference clips
+
+Source: Official channels only (no piracy)
+
+Why: Keeps users engaged before match
+```
+
+---
+
+### 8. Match Stats & Data Visualization 📊
+**Impact:** MEDIUM | **Effort:** High | **Revenue Impact:** Indirect
+
+#### A. Live Stats Dashboard
+```
+During live matches:
+- Possession bar (animated)
+- Shots on target counter
+- Key events timeline
+- Formation diagram
+
+API: Free tier from API-Football or similar
+
+Why: Compete with score aggregators, increase stickiness
+```
+
+#### B. ES Score Breakdown
 ```html
-<div class="match-odds">
-  <div class="odd-item">
-    <span class="odd-label">Home Win</span>
-    <span class="odd-value">2.10</span>
+<div class="es-breakdown">
+  <div class="es-factor">
+    <span>League Importance</span>
+    <div class="factor-bar" style="width: 85%">85%</div>
   </div>
-  <div class="odd-item">
-    <span class="odd-label">Draw</span>
-    <span class="odd-value">3.20</span>
+  <div class="es-factor">
+    <span>Recent Form</span>
+    <div class="factor-bar" style="width: 72%">72%</div>
   </div>
-  <div class="odd-item">
-    <span class="odd-label">Away Win</span>
-    <span class="odd-value">3.50</span>
-  </div>
+  <!-- etc -->
 </div>
 
-<div class="prediction">
-  <div class="prediction-bar">
-    <div class="home-chance" style="width: 45%">45%</div>
-    <div class="draw-chance" style="width: 25%">25%</div>
-    <div class="away-chance" style="width: 30%">30%</div>
-  </div>
-</div>
-```
-
-**API Integration:**
-```csharp
-public async Task<OddsDto> GetMatchOdds(int matchId)
-{
-  // Integrar com API de odds (ex: The Odds API)
-  var response = await _httpClient.GetAsync($"https://api.the-odds-api.com/v4/sports/soccer/odds?apiKey={_apiKey}&regions=eu&markets=h2h");
-  return await response.Content.ReadAsAsync<OddsDto>();
-}
+Why: Transparency builds trust, explains our USP
 ```
 
 ---
 
-### 14. Calendar View 📅
-**Status:** ❌ Não implementado
-**Impacto:** Médio - Alternativa útil
+### 9. Community Features 💬
+**Impact:** MEDIUM | **Effort:** High | **Revenue Impact:** Indirect
 
-#### Vista de calendário mensal:
-```html
-<div class="calendar-view">
-  <div class="calendar-header">
-    <button onclick="previousMonth()">←</button>
-    <h2>January 2025</h2>
-    <button onclick="nextMonth()">→</button>
-  </div>
+#### A. Match Predictions (Not Betting!)
+```
+Fun, free predictions:
+- "Who will win?" - Vote & see %
+- "Will it be high-scoring?" - Community wisdom
+- "Star player to watch" - Select from lineups
 
-  <div class="calendar-grid">
-    <!-- 7 colunas x 5 linhas -->
-    <div class="calendar-day" data-date="2025-01-01">
-      <span class="day-number">1</span>
-      <div class="day-matches">
-        <span class="match-dot" data-es="0.75"></span>
-        <span class="match-dot" data-es="0.60"></span>
-      </div>
-    </div>
-  </div>
-</div>
+Display:
+- Community consensus
+- Your prediction vs outcome
+- Leaderboard (gamification)
+
+Why: Engagement, return visits to check results
+Note: No money involved - pure fun/bragging rights
 ```
 
-**Export para Google Calendar:**
-```javascript
-function exportToGoogleCalendar(match) {
-  const startDate = formatDateForGCal(match.dateTime);
-  const endDate = formatDateForGCal(addHours(match.dateTime, 2));
+#### B. Comments/Reactions (Phase 3)
+```
+Consider:
+- Pre-match hype comments
+- Live match reactions
+- Post-match discussion
 
-  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE
-    &text=${encodeURIComponent(match.title)}
-    &dates=${startDate}/${endDate}
-    &details=${encodeURIComponent(match.description)}
-    &location=${encodeURIComponent(match.venue)}`;
+Concerns:
+- Moderation effort
+- Toxicity risk
+- Server costs
 
-  window.open(url);
-}
+Alternative: Integrate with Twitter/X feed
 ```
 
 ---
 
-## 📱 Melhorias Específicas Mobile
+## 🚫 What We WON'T Do
 
-### Bottom Navigation Bar
-**Status:** ❌ Não implementado
-**Impacto:** Alto em mobile
+### Explicitly Avoiding
+1. **Betting Integration** - No odds, no bookmaker links, no tipsters
+2. **Paid Streaming** - Only legal, official broadcast info
+3. **Fantasy Sports for Money** - Conflicts with our mission
+4. **Paywalls** - Keep core features free
+5. **Intrusive Ads** - No pop-ups, auto-play videos, or interstitials
 
-```html
-<nav class="bottom-nav">
-  <a href="/" class="nav-item active">
-    <i class="bi bi-house"></i>
-    <span>Home</span>
-  </a>
-  <a href="/matches" class="nav-item">
-    <i class="bi bi-calendar"></i>
-    <span>Matches</span>
-  </a>
-  <a href="/stats" class="nav-item">
-    <i class="bi bi-graph-up"></i>
-    <span>Stats</span>
-  </a>
-  <a href="/favorites" class="nav-item">
-    <i class="bi bi-star"></i>
-    <span>Favorites</span>
-  </a>
-</nav>
-```
-
-**CSS:**
-```scss
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  padding: 0.5rem 0;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-  z-index: 1000;
-
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #666;
-    text-decoration: none;
-    font-size: 0.75rem;
-
-    i { font-size: 1.5rem; }
-
-    &.active {
-      color: #258cfb;
-    }
-  }
-}
-```
+### Why This Matters
+- **Brand Positioning:** We're a curation service, not a gambling platform
+- **Legal Safety:** Avoid gray areas around betting promotion
+- **User Trust:** Focus on helping, not exploiting
+- **Long-term Value:** Sustainable model, not quick cash-grab
 
 ---
 
-### Swipe Gestures
-**Status:** ❌ Não implementado
-**Impacto:** Médio - Melhor UX mobile
+## 📅 Implementation Roadmap
 
-```javascript
-class SwipeHandler {
-  constructor(element) {
-    this.element = element;
-    this.startX = 0;
-    this.startY = 0;
-
-    element.addEventListener('touchstart', this.handleStart.bind(this));
-    element.addEventListener('touchend', this.handleEnd.bind(this));
-  }
-
-  handleStart(e) {
-    this.startX = e.touches[0].clientX;
-    this.startY = e.touches[0].clientY;
-  }
-
-  handleEnd(e) {
-    const endX = e.changedTouches[0].clientX;
-    const diffX = this.startX - endX;
-
-    if (Math.abs(diffX) > 50) {
-      if (diffX > 0) {
-        this.onSwipeLeft();
-      } else {
-        this.onSwipeRight();
-      }
-    }
-  }
-
-  onSwipeLeft() {
-    // Próximo jogo
-    navigateToNext();
-  }
-
-  onSwipeRight() {
-    // Jogo anterior
-    navigateToPrevious();
-  }
-}
-```
-
----
-
-### Compact Card Mode
-**Status:** ❌ Não implementado
-**Impacto:** Médio
-
-```html
-<div class="view-toggle">
-  <button onclick="setView('normal')" class="active">
-    <i class="bi bi-grid-3x3"></i>
-  </button>
-  <button onclick="setView('compact')">
-    <i class="bi bi-list"></i>
-  </button>
-</div>
-```
-
-**CSS:**
-```scss
-.match-card-simple.compact {
-  flex-direction: row;
-  padding: 0.5rem;
-  height: 60px;
-
-  .match-card-team img {
-    width: 40px;
-  }
-
-  .match-card-score {
-    font-size: 1rem;
-  }
-}
-```
-
----
-
-## 🎨 Design System Consistency
-
-### Cores Padronizadas
-```scss
-// Adicionar ao site.scss
-$primary: #258cfb;
-$success: #00C851;
-$warning: #ffbb33;
-$danger: #ff4444;
-$info: #33b5e5;
-
-$border-radius-sm: 4px;
-$border-radius: 8px;
-$border-radius-lg: 10px;
-
-$spacing-unit: 1rem;
-$spacing-sm: 0.5rem;
-$spacing-lg: 2rem;
-```
-
-### Typography Hierarchy
-```scss
-h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-h3 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.text-sm { font-size: 0.875rem; }
-.text-xs { font-size: 0.75rem; }
-.text-lg { font-size: 1.125rem; }
-```
-
----
-
-## 💡 Novas Funcionalidades MVP
-
-### 1. Match Alerts 🔔
-```javascript
-class MatchAlerts {
-  requestPermission() {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        this.enabled = true;
-      }
-    });
-  }
-
-  schedule(matchId, matchDate) {
-    const alertTime = new Date(matchDate);
-    alertTime.setHours(alertTime.getHours() - 1); // 1 hora antes
-
-    const timeUntilAlert = alertTime - new Date();
-
-    setTimeout(() => {
-      this.sendNotification(matchId);
-    }, timeUntilAlert);
-
-    localStorage.setItem(`alert_${matchId}`, alertTime);
-  }
-
-  sendNotification(matchId) {
-    new Notification('Match Starting Soon!', {
-      body: 'Liverpool vs Arsenal starts in 1 hour',
-      icon: '/icon.png',
-      badge: '/badge.png'
-    });
-  }
-}
-```
-
----
-
-### 2. Quick Stats 📈
-```html
-<!-- Tooltip no hover -->
-<div class="match-quick-stats">
-  <div class="stat-row">
-    <span>Last 5:</span>
-    <span class="form-indicator">W W D L W</span>
-  </div>
-  <div class="stat-row">
-    <span>Goals:</span>
-    <span>15 scored / 8 conceded</span>
-  </div>
-  <div class="stat-row">
-    <span>Possession:</span>
-    <span>58% avg</span>
-  </div>
-</div>
-```
-
----
-
-### 3. Filter Presets 🎯
-```html
-<div class="filter-presets">
-  <button onclick="applyPreset('top')">
-    <i class="bi bi-star-fill"></i> Top Matches (ES > 70%)
-  </button>
-  <button onclick="applyPreset('today')">
-    <i class="bi bi-calendar-day"></i> Today
-  </button>
-  <button onclick="applyPreset('weekend')">
-    <i class="bi bi-calendar-week"></i> This Weekend
-  </button>
-  <button onclick="applyPreset('myleagues')">
-    <i class="bi bi-heart"></i> My Leagues
-  </button>
-</div>
-```
-
----
-
-### 4. Match Comparison ⚖️
-```html
-<div class="compare-mode">
-  <button onclick="enableCompareMode()">
-    <i class="bi bi-arrow-left-right"></i> Compare Matches
-  </button>
-</div>
-
-<!-- Quando 2 matches selecionados -->
-<div class="comparison-view">
-  <div class="compare-column">
-    <h3>Liverpool vs Arsenal</h3>
-    <div class="stat">ES: 75%</div>
-    <div class="stat">League Position: 1st vs 2nd</div>
-  </div>
-
-  <div class="compare-column">
-    <h3>Man City vs Chelsea</h3>
-    <div class="stat">ES: 68%</div>
-    <div class="stat">League Position: 3rd vs 5th</div>
-  </div>
-</div>
-```
-
----
-
-### 5. Dark/Light Mode Toggle 🌓
-```html
-<button class="theme-toggle" onclick="toggleTheme()">
-  <i class="bi bi-sun-fill" id="light-icon"></i>
-  <i class="bi bi-moon-fill" id="dark-icon" style="display:none"></i>
-</button>
-```
-
-```javascript
-function toggleTheme() {
-  const currentTheme = localStorage.getItem('theme') || 'dark';
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-  document.body.classList.remove(`theme-${currentTheme}`);
-  document.body.classList.add(`theme-${newTheme}`);
-
-  localStorage.setItem('theme', newTheme);
-  updateIcons(newTheme);
-}
-```
-
-```scss
-// Light theme colors
-.theme-light {
-  --background-color: #ffffff;
-  --text-color: #333333;
-  --card-background: #f5f5f5;
-
-  .match-card-simple {
-    background-color: var(--card-background);
-    color: var(--text-color);
-  }
-}
-```
-
----
-
-## 📊 Google Ads - Estratégia Completa
-
-### Posicionamentos Implementados ✅
-1. ✅ **Above the fold - Index** (728x90)
-2. ✅ **Between sections - Index** (Fluid)
-
-### Próximos Posicionamentos 📍
-
-#### Match Detail Page
-```html
-<!-- Sidebar direito -->
-<div class="match-detail-content-right">
-  <div class="ad-container ad-sidebar">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-1934500034472565"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="rectangle"></ins>
-  </div>
-
-  <!-- Conteúdo existente -->
-</div>
-```
-
-#### Matches Page
-```html
-<!-- A cada 5 match cards -->
-@{int cardCount = 0;}
-@foreach (var match in matches)
-{
-  <partial name="_MatchCardSimple" for="@match" />
-
-  cardCount++;
-  if (cardCount % 5 == 0)
-  {
-    <div class="ad-container ad-in-stream">
-      <ins class="adsbygoogle" ...></ins>
-    </div>
-  }
-}
-```
-
-### Auto Ads (Recomendado)
-```html
-<!-- Adicionar no <head> -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1934500034472565"
-     crossorigin="anonymous"
-     data-ad-frequency-hint="30s"></script>
-```
-
-### Ad Optimization Tips
-1. **A/B Testing:** Testar diferentes posicionamentos
-2. **Ad Balance:** Máximo 3 ads por página
-3. **Mobile First:** Priorizar responsive ads
-4. **Page Speed:** Lazy load ads abaixo do fold
-5. **Ad Placement Heatmap:** Usar Google Analytics
-
----
-
-## 🚀 Roadmap de Implementação
-
-### ✅ Semana 0 (Concluída)
-- [x] Google Ads integration (Index page)
-- [x] Timezone selector functionality
-- [x] Ad styling and layout
-
-### 📅 Semana 1
-- [ ] Loading states/skeletons
-- [ ] Clear filters button
-- [ ] Search improvements (keyboard nav, no results)
-- [ ] Compilar SCSS updates
-
-### 📅 Semana 2
-- [ ] Sticky navigation mobile
-- [ ] Persist filter state (URL params)
-- [ ] Card visual improvements (shadows, hover)
-- [ ] Lazy loading imagens
-
-### 📅 Semana 3
-- [ ] Watchlist/Favorites
+### Week 1-2: Quick Wins
+- [ ] Google Ads on Match Detail & Matches pages
+- [ ] Smart filters (ES tiers, presets)
+- [ ] Match popularity indicator
 - [ ] Share buttons
-- [ ] Live badge
-- [ ] Breadcrumbs
+- [ ] Loading states polish
 
-### 📅 Semana 4
-- [ ] Match alerts
-- [ ] Quick stats hover
-- [ ] Filter presets
-- [ ] Dark/Light toggle
+### Week 3-4: Core Features
+- [ ] Enhanced favorites (teams, competitions)
+- [ ] "My Week in Football" dashboard
+- [ ] Match alerts (web push)
+- [ ] SEO content generation
+- [ ] Mobile bottom nav
 
----
+### Month 2: Advanced UX
+- [ ] Match recommendations engine
+- [ ] Video highlights integration
+- [ ] Live stats dashboard
+- [ ] ES breakdown visualization
+- [ ] PWA install prompt
 
-## 💰 Estimativa de Revenue
-
-### Google Ads - Cenários
-
-#### Conservador
-- **Pageviews:** 1.000/dia
-- **Ad units:** 3 por página
-- **CTR:** 1-2%
-- **CPC:** €0.10-0.30
-- **Revenue Diário:** €3-9
-- **Revenue Mensal:** €90-270
-- **Revenue Anual:** €1.080-3.240
-
-#### Otimista (com crescimento)
-- **Pageviews:** 10.000/dia
-- **Ad units:** 3 por página
-- **CTR:** 1.5-2.5%
-- **CPC:** €0.15-0.40
-- **Revenue Diário:** €30-90
-- **Revenue Mensal:** €900-2.700
-- **Revenue Anual:** €10.800-32.400
-
-### Fatores que Aumentam Revenue
-1. ✅ Conteúdo de qualidade (Excitement Score único)
-2. ✅ Traffic orgânico (SEO)
-3. ✅ Engagement (tempo na página)
-4. ✅ Páginas por sessão
-5. 🔄 Ad placement optimization
-6. 🔄 Mobile optimization
-7. 🔄 Page speed
+### Month 3: Community
+- [ ] Match predictions (fun, no money)
+- [ ] User profiles
+- [ ] Weekly email digest
+- [ ] Social features
+- [ ] A/B testing framework
 
 ---
 
-## 📈 Métricas de Sucesso
+## 💰 Revenue Model
 
-### KPIs Principais
-- **Pageviews:** Target 5.000/dia
-- **Bounce Rate:** < 40%
-- **Avg Session Duration:** > 2 minutos
-- **Pages per Session:** > 2.5
-- **Return Visitors:** > 30%
+### Primary: Google Ads
+```
+Target: €1,000-3,000/month by Month 3
+Strategy:
+- Optimize ad placement
+- Increase pageviews through engagement
+- Improve CTR through content quality
+- Focus on high-value pages (Match Detail)
+```
 
-### Google Ads KPIs
-- **CTR:** > 1.5%
-- **CPC:** €0.20-0.40
-- **Viewability:** > 70%
-- **Invalid Traffic:** < 5%
+### Future Opportunities (Month 6+)
+1. **Affiliate Partnerships**
+   - Legal streaming services (DAZN, Paramount+, etc.)
+   - Sports merchandise retailers
+   - Football game sales (FIFA, Football Manager)
+   - Commission: 5-15% per sale
 
-### User Engagement
-- **Search Usage:** > 20% dos utilizadores
-- **Filter Usage:** > 40% dos utilizadores
-- **Match Detail Views:** > 60% dos visitantes
-- **Favorites Added:** > 10% dos utilizadores
+2. **Premium Features** (Freemium Model)
+   - Advanced stats & analytics
+   - Ad-free experience
+   - Priority match alerts
+   - Custom leagues/filters
+   - Price: €2.99/month or €24.99/year
+
+3. **API Access**
+   - Excitement Score API for developers
+   - Broadcast schedule API
+   - B2B licensing
+   - Price: Usage-based pricing
+
+4. **Sponsored Content** (Editorial Independence)
+   - "Match of the Week" sponsorship
+   - Brand partnerships (non-betting)
+   - Native advertising (clearly labeled)
+   - Price: €200-500 per placement
 
 ---
 
-## 🔧 Ferramentas Necessárias
+## 📊 Success Metrics
 
-### Analytics
-- ✅ Google Analytics (instalado)
-- [ ] Google Search Console
-- [ ] Hotjar (heatmaps)
-- [ ] Microsoft Clarity (session recordings)
+### Month 1 Targets
+- Daily pageviews: 5,000
+- Return visitors: 25%
+- Avg session duration: 2 minutes
+- Ad revenue: €300-500
 
-### Ads
-- ✅ Google AdSense (configurado)
-- [ ] AdSense Auto Ads
-- [ ] Ad Balance optimization
-- [ ] Ads.txt verification
+### Month 3 Targets
+- Daily pageviews: 15,000
+- Return visitors: 40%
+- Avg session duration: 4 minutes
+- Ad revenue: €1,000-2,000
+- User registrations: 1,000+
+
+### Month 6 Targets
+- Daily pageviews: 30,000+
+- Return visitors: 50%+
+- Avg session duration: 6 minutes
+- Total revenue: €3,000-5,000/month
+- Registered users: 5,000+
+
+### User Engagement KPIs
+- % users who click match details: >50%
+- % users who favorite channels: >20%
+- % users who use filters: >30%
+- % users who share matches: >5%
+- % users who return within 7 days: >35%
+
+---
+
+## 🔧 Technical Priorities
 
 ### Performance
-- [ ] Google PageSpeed Insights
-- [ ] Lighthouse CI
-- [ ] WebPageTest
-- [ ] GTmetrix
+- [ ] Lazy load images (loading="lazy")
+- [ ] Service Worker for caching
+- [ ] CDN for static assets
+- [ ] Minify CSS/JS
+- [ ] Database query optimization
+- Target: <2s page load, 90+ Lighthouse score
 
 ### SEO
-- [ ] Yoast SEO / Rank Math
+- [ ] Dynamic meta tags per page
+- [ ] XML sitemap (✅ Done)
 - [ ] Schema.org markup
-- [ ] Open Graph tags
-- [ ] Twitter Cards
+- [ ] Open Graph images
+- [ ] Canonical URLs
+- Target: Rank top 10 for "[Team A] vs [Team B]"
+
+### Analytics
+- [ ] Google Analytics 4 (enhanced events)
+- [ ] Google Search Console
+- [ ] Hotjar (heatmaps)
+- [ ] Custom event tracking (favorites, shares, etc.)
+- [ ] A/B testing framework
 
 ---
 
-## 📝 Notas de Implementação
+## 🎯 Competitive Advantages
 
-### Prioridades Absolutas
-1. **Loading States** - UX crítico
-2. **Clear Filters** - Frustração do utilizador
-3. **Search Improvements** - Feature muito usada
-4. **Google Ads Optimization** - Revenue
+### What Makes Us Unique
+1. **Excitement Score Algorithm** - Nobody else quantifies "watchability"
+2. **Curation Over Aggregation** - We help choose, not just list
+3. **Broadcast Discovery** - Find where to legally watch
+4. **No Betting Agenda** - Pure love of the game
+5. **Personalization** - Tailored to each user's interests
 
-### Quick Wins (< 2 horas cada)
-- Sticky navigation
-- Lazy loading
-- Breadcrumbs
-- Share buttons
-
-### Requires Planning (> 1 dia)
-- Watchlist/Favorites
-- Match alerts
-- Calendar view
-- Dark/Light mode
+### Why Users Choose Us
+- **Save Time:** Don't scroll through 50 matches
+- **Discover Gems:** Find exciting matches in leagues they don't follow
+- **Never Miss:** Alerts for their favorite teams
+- **Watch Legally:** Official broadcast channels
+- **Community:** See what other fans are watching
 
 ---
 
-## 🎯 Conclusão
+## 🚀 Launch Strategy
 
-Este plano está organizado por impacto e esforço. Recomenda-se:
+### Pre-Launch Checklist
+- [ ] Google Ads fully implemented
+- [ ] SEO optimized (meta tags, sitemap)
+- [ ] Analytics tracking ready
+- [ ] Mobile experience polished
+- [ ] 100+ matches with ES scores
+- [ ] TV listings for major leagues
 
-1. **Começar pelos Quick Wins** da Semana 1
-2. **Monitorizar Google Ads** performance
-3. **Iterar baseado em analytics**
-4. **Pedir feedback aos utilizadores**
+### Launch Channels
+1. **Reddit:** r/soccer, r/PremierLeague, etc.
+   - "I built a tool to find the most exciting matches"
+   - Focus on ES algorithm explanation
 
-O objetivo é **maximizar engagement e revenue** mantendo excelente UX.
+2. **Twitter/X:**
+   - Daily "Top Matches Today" thread
+   - Partner with football accounts
+   - Use relevant hashtags
+
+3. **Football Forums:**
+   - RedCafe, RAWK, Shed End, etc.
+   - Genuine contribution, not spam
+
+4. **Product Hunt:**
+   - "Discover the most exciting football matches to watch"
+   - Prepare launch day assets
+
+5. **Content Marketing:**
+   - "How we calculate Excitement Score" blog post
+   - "Best matches of the season so far" article
+   - Guest posts on football blogs
 
 ---
 
-**Última atualização:** 30 Dezembro 2025
-**Versão:** 1.0
-**Próxima revisão:** Após Semana 1
+## 📝 Final Notes
+
+### Core Principles
+1. **User Value First:** Every feature must answer "How does this help users watch better football?"
+2. **Data-Driven Decisions:** A/B test, measure, iterate
+3. **Sustainable Growth:** No shortcuts, no spam, no dark patterns
+4. **Community Trust:** Transparency about ES algorithm and revenue model
+5. **Legal & Ethical:** No betting, no piracy, no exploitation
+
+### Next Review
+- **Date:** February 15, 2026
+- **Triggers:** Launch completed, Month 1 metrics available
+- **Focus:** What's working? What's not? Pivot or persevere?
+
+---
+
+**Last Updated:** January 4, 2026
+**Version:** 2.0 (Complete Overhaul)
+**Next Update:** After Phase 1 completion

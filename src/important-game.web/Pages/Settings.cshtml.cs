@@ -23,7 +23,7 @@ public class SettingsModel(
 
     public async Task OnGetAsync()
     {
-        var userId = _userService.GetUserId(User);
+        var userId = await _userService.GetUserId(User);
 
         if (userId.HasValue)
         {
@@ -34,7 +34,7 @@ public class SettingsModel(
 
     public async Task<IActionResult> OnPostDeleteAccountAsync()
     {
-        var userId = _userService.GetUserId(User);
+        var userId = await _userService.GetUserId(User);
 
         if (!userId.HasValue)
         {

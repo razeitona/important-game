@@ -76,7 +76,18 @@
 
     @* Match Card Actions Bar *@
     <div class="match-card-actions">
-        @* Like Button with Count (Left) *@
+        @* Alert Button (Left) *@
+        <button class="match-alert-btn match-card-action-alert"
+                data-match-id="@Model.MatchId"
+                data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"
+                data-match-date="@Model.MatchDateUTC.ToString("o")"
+                data-match-url="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))"
+                data-has-alert="false"
+                title="Set alert (30 min before kickoff)">
+            <i class="bi bi-bell"></i>
+        </button>
+
+        @* Like Button with Count *@
         <button class="match-card-action-like"
                 data-match-id="@Model.MatchId"
                 data-liked="false"

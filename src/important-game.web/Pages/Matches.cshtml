@@ -9,6 +9,77 @@
     ViewData["Keywords"] = "upcoming football matches, football fixtures, match excitement scores, football schedule, premier league, la liga, champions league";
 }
 
+@* Top Ad - Above Filters *@
+<div class="ad-container ad-top-banner">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1934500034472565"
+         data-ad-slot="3310130902"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+@* Smart Filters Bar *@
+<div class="smart-filters-bar">
+    <div class="filter-section">
+        <label class="filter-label" id="es-tier-label">
+            <i class="bi bi-fire"></i>
+            Excitement:
+        </label>
+        <div class="es-tier-filters" role="group" aria-labelledby="es-tier-label">
+            <button class="es-tier-badge tier-unmissable" data-tier="unmissable" data-min="75" aria-label="Filter by Unmissable matches (ES 75+)">
+                <span class="tier-name">Unmissable</span>
+                <span class="tier-count">(0)</span>
+            </button>
+            <button class="es-tier-badge tier-great" data-tier="great" data-min="50" data-max="74" aria-label="Filter by Great matches (ES 50-74)">
+                <span class="tier-name">Great</span>
+                <span class="tier-count">(0)</span>
+            </button>
+            <button class="es-tier-badge tier-good" data-tier="good" data-min="25" data-max="49" aria-label="Filter by Good matches (ES 25-49)">
+                <span class="tier-name">Good</span>
+                <span class="tier-count">(0)</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <label class="filter-label" for="sortDropdown">
+            <i class="bi bi-sort-down"></i>
+            Sort by:
+        </label>
+        <select id="sortDropdown" class="sort-dropdown" aria-label="Sort matches by">
+            <option value="es-desc">ES Score (High to Low)</option>
+            <option value="es-asc">ES Score (Low to High)</option>
+            <option value="date-asc">Date (Earliest First)</option>
+            <option value="date-desc">Date (Latest First)</option>
+        </select>
+    </div>
+
+    <div class="filter-section quick-presets-section">
+        <label class="filter-label" id="presets-label">
+            <i class="bi bi-lightning"></i>
+            Quick:
+        </label>
+        <div class="quick-presets" role="group" aria-labelledby="presets-label">
+            <button class="preset-btn" data-preset="today" aria-label="Show today's matches">
+                <i class="bi bi-calendar-day"></i>
+                <span>Today</span>
+            </button>
+            <button class="preset-btn" data-preset="weekend" aria-label="Show weekend matches">
+                <i class="bi bi-calendar-week"></i>
+                <span>Weekend</span>
+            </button>
+            <button class="preset-btn" data-preset="top" aria-label="Show top matches">
+                <i class="bi bi-star-fill"></i>
+                <span>Top Matches</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="wm-match-filter">
     <div class="input-group mw-search">
         <i class="bi bi-search"></i>
@@ -103,11 +174,17 @@
                                             home = c.HomeTeamName,
                                             away = c.AwayTeamName,
                                             homeslug = SlugHelper.GenerateSlug(c.HomeTeamName),
-                                            awayslug = SlugHelper.GenerateSlug(c.AwayTeamName)
+                                            awayslug = SlugHelper.GenerateSlug(c.AwayTeamName),
+                                            es = c.ExcitmentScore,
+                                            date = c.MatchDateUTC,
+                                            league = c.CompetitionId
                                         })));
 
             // Initialize filter state
             var filterLeagues = [];
+            var filterESTier = null; // 'unmissable', 'great', 'good', or null
+            var currentSort = 'es-desc'; // Default sort
+            var activePreset = null;
 
             // URL Parameters Filter Persistence
             const urlParams = new URLSearchParams(window.location.search);
@@ -122,6 +199,20 @@
                     url.searchParams.delete('leagues');
                 }
 
+                // Update ES tier parameter
+                if (filterESTier) {
+                    url.searchParams.set('tier', filterESTier);
+                } else {
+                    url.searchParams.delete('tier');
+                }
+
+                // Update sort parameter
+                if (currentSort !== 'es-desc') {
+                    url.searchParams.set('sort', currentSort);
+                } else {
+                    url.searchParams.delete('sort');
+                }
+
                 // Update search parameter
                 const searchValue = searchInput ? searchInput.value : '';
                 if (searchValue && searchValue.length >= 3) {
@@ -132,6 +223,63 @@
 
                 // Update URL without reload
                 window.history.pushState({}, '', url);
+            }
+
+            // Calculate and update ES tier badge counts
+            function updateESTierCounts() {
+                const unmissableCount = $('.match-card-simple').filter(function() {
+                    const es = parseFloat($(this).data('game-score'));
+                    return es >= 75;
+                }).length;
+
+                const greatCount = $('.match-card-simple').filter(function() {
+                    const es = parseFloat($(this).data('game-score'));
+                    return es >= 50 && es < 75;
+                }).length;
+
+                const goodCount = $('.match-card-simple').filter(function() {
+                    const es = parseFloat($(this).data('game-score'));
+                    return es >= 25 && es < 50;
+                }).length;
+
+                $('.es-tier-badge[data-tier="unmissable"] .tier-count').text(`(${unmissableCount})`);
+                $('.es-tier-badge[data-tier="great"] .tier-count').text(`(${greatCount})`);
+                $('.es-tier-badge[data-tier="good"] .tier-count').text(`(${goodCount})`);
+            }
+
+            // Apply sorting to matches
+            function applySorting() {
+                const $dates = $('.wm-match-date');
+
+                $dates.each(function() {
+                    const $content = $(this).find('.matches-section-content');
+                    const $cards = $content.find('.match-card-simple:visible');
+
+                    const cardsArray = $cards.toArray();
+
+                    cardsArray.sort(function(a, b) {
+                        const aES = parseFloat($(a).data('game-score'));
+                        const bES = parseFloat($(b).data('game-score'));
+                        const aDate = new Date($(a).data('game-date'));
+                        const bDate = new Date($(b).data('game-date'));
+
+                        switch(currentSort) {
+                            case 'es-desc':
+                                return bES - aES;
+                            case 'es-asc':
+                                return aES - bES;
+                            case 'date-asc':
+                                return aDate - bDate;
+                            case 'date-desc':
+                                return bDate - aDate;
+                            default:
+                                return bES - aES;
+                        }
+                    });
+
+                    // Reorder DOM elements
+                    $content.append(cardsArray);
+                });
             }
 
             function loadFiltersFromURL() {
@@ -147,6 +295,20 @@
                     });
                 }
 
+                // Load ES tier filter
+                const tierParam = urlParams.get('tier');
+                if (tierParam && ['unmissable', 'great', 'good'].includes(tierParam)) {
+                    filterESTier = tierParam;
+                    $(`.es-tier-badge[data-tier="${tierParam}"]`).addClass('active');
+                }
+
+                // Load sort option
+                const sortParam = urlParams.get('sort');
+                if (sortParam) {
+                    currentSort = sortParam;
+                    $('#sortDropdown').val(sortParam);
+                }
+
                 // Load search filter
                 const searchParam = urlParams.get('search');
                 if (searchParam && searchInput) {
@@ -157,9 +319,12 @@
                 }
 
                 // Apply filters to matches
-                if (filterLeagues.length > 0) {
+                if (filterLeagues.length > 0 || filterESTier) {
                     updateGameHideStatus();
                 }
+
+                // Apply sorting
+                applySorting();
 
                 // Update clear button visibility
                 updateClearButtonVisibility();
@@ -181,7 +346,11 @@
             const searchInput = document.getElementById('search-match');
 
             function updateClearButtonVisibility() {
-                const hasActiveFilters = filterLeagues.length > 0 || (searchInput && searchInput.value.length > 0);
+                const hasActiveFilters = filterLeagues.length > 0 ||
+                                        filterESTier !== null ||
+                                        currentSort !== 'es-desc' ||
+                                        activePreset !== null ||
+                                        (searchInput && searchInput.value.length > 0);
 
                 if (hasActiveFilters) {
                     clearFiltersBtn.style.display = 'flex';
@@ -203,8 +372,26 @@
                 filterLeagues = [];
                 $('.match-league-item').removeClass('league-active');
 
+                // Clear ES tier filter
+                filterESTier = null;
+                $('.es-tier-badge').removeClass('active');
+
+                // Reset sort to default
+                currentSort = 'es-desc';
+                $('#sortDropdown').val('es-desc');
+
+                // Clear preset
+                activePreset = null;
+                $('.preset-btn').removeClass('active');
+
+                // Show all date sections
+                $('.wm-match-date').show();
+
                 // Show all matches
                 updateGameHideStatus();
+
+                // Apply default sorting
+                applySorting();
 
                 // Clear URL parameters
                 updateURLParams();
@@ -381,18 +568,51 @@
 
             function updateGameHideStatus() {
                 $(".match-card-simple").each(function (idx, elem) {
-                    if (filterLeagues.length == 0) {
-                        $(elem).removeClass("hide");
-                    } else {
-                        var matchLeague = $(elem).data("game-league");
+                    let show = true;
 
-                        if (filterLeagues.indexOf(matchLeague) > -1) {
-                            $(elem).removeClass("hide");
-                        } else {
-                            $(elem).addClass("hide");
+                    // Filter by league
+                    if (filterLeagues.length > 0) {
+                        var matchLeague = $(elem).data("game-league");
+                        if (filterLeagues.indexOf(matchLeague) === -1) {
+                            show = false;
                         }
                     }
+
+                    // Filter by ES tier
+                    if (show && filterESTier !== null) {
+                        const esScore = parseFloat($(elem).data("game-score"));
+                        const $tierBadge = $(`.es-tier-badge[data-tier="${filterESTier}"]`);
+                        const minES = parseInt($tierBadge.data('min'));
+                        const maxES = $tierBadge.data('max') ? parseInt($tierBadge.data('max')) : 100;
+
+                        if (esScore < minES || esScore > maxES) {
+                            show = false;
+                        }
+                    }
+
+                    // Show or hide based on filters
+                    if (show) {
+                        $(elem).removeClass("hide");
+                    } else {
+                        $(elem).addClass("hide");
+                    }
                 });
+
+                // Hide date sections with no visible matches
+                $('.wm-match-date').each(function() {
+                    const visibleMatches = $(this).find('.match-card-simple:not(.hide)').length;
+                    if (visibleMatches === 0) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+
+                // Apply sorting after filtering
+                applySorting();
+
+                // Update ES tier counts
+                updateESTierCounts();
             }
 
             $(".wm-match-date-title").on("click", function () {
@@ -404,6 +624,116 @@
                     $(this).parent().children("div.matches-section-content").addClass("hide");
                 }
             });
+
+            // ES Tier filter handlers
+            $('.es-tier-badge').on('click', function() {
+                const tier = $(this).data('tier');
+
+                if (filterESTier === tier) {
+                    // Deactivate if clicking the same tier
+                    filterESTier = null;
+                    $(this).removeClass('active');
+                } else {
+                    // Activate new tier
+                    filterESTier = tier;
+                    $('.es-tier-badge').removeClass('active');
+                    $(this).addClass('active');
+                }
+
+                updateGameHideStatus();
+                updateURLParams();
+                updateClearButtonVisibility();
+            });
+
+            // Sort dropdown handler
+            $('#sortDropdown').on('change', function() {
+                currentSort = $(this).val();
+                applySorting();
+                updateURLParams();
+                updateClearButtonVisibility();
+            });
+
+            // Quick preset handlers
+            $('.preset-btn').on('click', function() {
+                const preset = $(this).data('preset');
+                const now = new Date();
+
+                // Clear previous preset selection
+                $('.preset-btn').removeClass('active');
+
+                if (activePreset === preset) {
+                    // Deactivate if clicking the same preset
+                    activePreset = null;
+                    // Show all matches
+                    $('.wm-match-date').show();
+                } else {
+                    // Activate new preset
+                    activePreset = preset;
+                    $(this).addClass('active');
+
+                    // Apply preset logic
+                    if (preset === 'today') {
+                        // Show only today's matches
+                        $('.wm-match-date').each(function() {
+                            const dateText = $(this).find('.wm-match-date-title time').data('utc-time');
+                            const matchDate = new Date(dateText.split('/').reverse().join('-'));
+                            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                            const dateOnly = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
+
+                            if (dateOnly.getTime() === today.getTime()) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                        });
+                    } else if (preset === 'weekend') {
+                        // Show weekend matches (Saturday and Sunday)
+                        $('.wm-match-date').each(function() {
+                            const dateText = $(this).find('.wm-match-date-title time').data('utc-time');
+                            const matchDate = new Date(dateText.split('/').reverse().join('-'));
+                            const dayOfWeek = matchDate.getDay();
+                            const matchDateOnly = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
+
+                            // Determine the upcoming weekend
+                            let targetSaturday, targetSunday;
+                            const currentDay = now.getDay(); // 0=Sunday, 6=Saturday
+
+                            if (currentDay === 6) {
+                                // Today is Saturday - show this weekend
+                                targetSaturday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                targetSunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                            } else if (currentDay === 0) {
+                                // Today is Sunday - show this weekend
+                                targetSaturday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                                targetSunday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                            } else {
+                                // Weekday - show next weekend
+                                const daysUntilSaturday = 6 - currentDay;
+                                targetSaturday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilSaturday);
+                                targetSunday = new Date(targetSaturday.getFullYear(), targetSaturday.getMonth(), targetSaturday.getDate() + 1);
+                            }
+
+                            if (matchDateOnly.getTime() === targetSaturday.getTime() || matchDateOnly.getTime() === targetSunday.getTime()) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                        });
+                    } else if (preset === 'top') {
+                        // Filter by ES > 70 and show all dates with such matches
+                        filterESTier = 'unmissable';
+                        $('.es-tier-badge').removeClass('active');
+                        $('.es-tier-badge[data-tier="unmissable"]').addClass('active');
+                        updateGameHideStatus();
+                    }
+                }
+
+                updateURLParams();
+                updateClearButtonVisibility();
+            });
+
+            // Initialize ES tier counts on page load
+            updateESTierCounts();
 
             // Load filters from URL on page load
             loadFiltersFromURL();

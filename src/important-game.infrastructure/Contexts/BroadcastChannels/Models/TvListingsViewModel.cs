@@ -1,5 +1,3 @@
-using important_game.infrastructure.Contexts.Matches.Data.Entities;
-
 namespace important_game.infrastructure.Contexts.BroadcastChannels.Models;
 
 public class TvListingsViewModel
@@ -26,6 +24,7 @@ public class TvListingMatchViewModel
     public int MatchId { get; set; }
     public int CompetitionId { get; set; }
     public string? CompetitionName { get; set; }
+    public string? CompetitionBackgroundColor { get; set; }
     public DateTime MatchDateUTC { get; set; }
     public int HomeTeamId { get; set; }
     public required string HomeTeamName { get; set; }
@@ -33,4 +32,13 @@ public class TvListingMatchViewModel
     public required string AwayTeamName { get; set; }
     public double ExcitmentScore { get; set; }
     public List<MatchBroadcastViewModel> Broadcasts { get; set; } = new();
+    public bool IsLive
+    {
+        get
+        {
+            var now = DateTimeOffset.UtcNow;
+            var matchEnd = MatchDateUTC.AddMinutes(120);
+            return now >= MatchDateUTC && now <= matchEnd;
+        }
+    }
 }

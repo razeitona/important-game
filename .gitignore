@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/important-game-app.tar
+/important-game-web.tar
+/nul

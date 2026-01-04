@@ -50,30 +50,46 @@
                     </select>
                 </div>
 
-                @foreach (var countryGroup in Model.ChannelsByCountry)
-                {
-                    <div class="country-channels-container" data-country="@countryGroup.Key" style="display: none;">
-                        <div class="channels-grid">
-                            @foreach (var channel in countryGroup.Value)
+                <div class="country-channels-container">
+                    <div class="no-country-selected" id="no-country-selected">
+                        <i class="bi bi-globe"></i>
+                        <p>Please select a country to view available channels</p>
+                    </div>
+
+                    @foreach (var countryGroup in Model.ChannelsByCountry)
+                    {
+                        <div class="country-channels-grid" data-country="@countryGroup.Key" style="display: none;">
+                            @if (countryGroup.Value.Count == 0)
                             {
-                                <div class="channel-checkbox-item">
-                                    <input type="checkbox"
-                                           id="channel-@channel.ChannelId"
-                                           data-channel-id="@channel.ChannelId"
-                                           class="channel-checkbox"
-                                           @(Model.UserFavoriteChannelIds.Contains(channel.ChannelId) ? "checked" : "") />
-                                    <label for="channel-@channel.ChannelId" class="channel-label">
-                                        <span class="channel-name">@channel.Name</span>
-                                    </label>
+                                <div class="no-channels-available">
+                                    <i class="bi bi-tv"></i>
+                                    <p>No channels available for this country</p>
                                 </div>
                             }
+                            else
+                            {
+                                @foreach (var channel in countryGroup.Value)
+                                {
+                                    var isSelected = Model.UserFavoriteChannelIds.Contains(channel.ChannelId);
+                                    <div class="channel-item @(isSelected ? "selected" : "")">
+                                        <label>
+                                            <input type="checkbox"
+                                                   id="channel-@channel.ChannelId"
+                                                   data-channel-id="@channel.ChannelId"
+                                                   class="channel-checkbox"
+                                                   @(isSelected ? "checked" : "") />
+                                            <span>@channel.Name</span>
+                                        </label>
+                                    </div>
+                                }
+                            }
                         </div>
-                    </div>
-                }
+                    }
+                </div>
 
-                <div class="channel-save-status" style="display: none;">
-                    <i class="bi bi-check-circle"></i>
-                    <span>Preferences saved</span>
+                <div class="channel-save-status success" style="display: none;">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Preferences saved successfully</span>
                 </div>
             </div>
         </div>
@@ -93,7 +109,6 @@
                         <p class="gdpr-notice"><strong>GDPR Compliance:</strong> All your personal data will be permanently removed from our systems.</p>
                     </div>
                     <button type="button" class="btn-danger" id="delete-account-btn">
-                        <i class="bi bi-trash"></i>
                         Delete Account
                     </button>
                 </div>
@@ -103,30 +118,39 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="delete-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="bi bi-exclamation-triangle"></i>Confirm Account Deletion</h3>
-        </div>
-        <div class="modal-body">
-            <p><strong>Are you absolutely sure?</strong></p>
-            <p>This action will permanently delete your account and all associated data including:</p>
-            <ul>
-                <li>Your profile information</li>
-                <li>Match likes and preferences</li>
-                <li>Favorite teams and channels</li>
-                <li>All other personal data</li>
-            </ul>
-            <p><strong>This action cannot be undone.</strong></p>
-        </div>
-        <div class="modal-actions">
-            <button type="button" class="btn-secondary" id="cancel-delete-btn">Cancel</button>
-            <form method="post" asp-page-handler="DeleteAccount" style="display: inline;">
-                <button type="submit" class="btn-danger-confirm">
-                    <i class="bi bi-trash"></i>
-                    Yes, Delete My Account
-                </button>
-            </form>
+<div id="delete-modal" class="modal delete-modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Confirm Account Deletion
+                </h5>
+                <button type="button" class="btn-close" id="modal-close-btn" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>This action cannot be undone!</strong>
+                </div>
+                <p><strong>Are you absolutely sure?</strong></p>
+                <p>This action will permanently delete your account and all associated data including:</p>
+                <ul>
+                    <li>Your profile information</li>
+                    <li>Match favorites and preferences</li>
+                    <li>Favorite teams and channels</li>
+                    <li>All other personal data</li>
+                </ul>
+                <p>In compliance with GDPR, all your data will be permanently removed from our systems.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="cancel-delete-btn">Cancel</button>
+                <form method="post" asp-page-handler="DeleteAccount" style="display: inline;">
+                    <button type="submit" class="btn-danger">
+                        Yes, Delete My Account
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -149,19 +173,28 @@
                     localStorage.setItem("settingsSelectedCountry", selectedCountry);
                     showChannelsForCountry(selectedCountry);
                 } else {
-                    $(".country-channels-container").hide();
+                    $("#no-country-selected").show();
+                    $(".country-channels-grid").hide();
                 }
             });
 
             function showChannelsForCountry(country) {
-                $(".country-channels-container").hide();
-                $(`.country-channels-container[data-country="${country}"]`).show();
+                $("#no-country-selected").hide();
+                $(".country-channels-grid").hide();
+                $(`.country-channels-grid[data-country="${country}"]`).show();
             }
 
-            // Channel checkbox auto-save
+            // Channel checkbox auto-save with visual feedback
             $(".channel-checkbox").on("change", function () {
                 const channelId = $(this).data("channel-id");
                 const isChecked = $(this).is(":checked");
+                const channelItem = $(this).closest(".channel-item");
+
+                if (isChecked) {
+                    channelItem.addClass("selected");
+                } else {
+                    channelItem.removeClass("selected");
+                }
 
                 saveChannelPreference(channelId, isChecked);
             });
@@ -197,13 +230,13 @@
                 $("#delete-modal").fadeIn(200);
             });
 
-            $("#cancel-delete-btn").on("click", function () {
+            $("#cancel-delete-btn, #modal-close-btn").on("click", function () {
                 $("#delete-modal").fadeOut(200);
             });
 
             // Close modal on background click
             $("#delete-modal").on("click", function (e) {
-                if (e.target.id === "delete-modal") {
+                if ($(e.target).hasClass("modal") || $(e.target).hasClass("modal-dialog")) {
                     $(this).fadeOut(200);
                 }
             });

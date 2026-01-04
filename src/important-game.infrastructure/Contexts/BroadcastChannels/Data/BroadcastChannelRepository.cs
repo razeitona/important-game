@@ -3,6 +3,7 @@ using important_game.infrastructure.Contexts.BroadcastChannels.Data.Entities;
 using important_game.infrastructure.Contexts.BroadcastChannels.Data.Queries;
 using important_game.infrastructure.Data.Connections;
 using System.Diagnostics.CodeAnalysis;
+using static Dapper.SqlMapper;
 
 namespace important_game.infrastructure.Contexts.BroadcastChannels.Data;
 
@@ -16,7 +17,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     public async Task<List<CountryEntity>> GetAllCountriesAsync(CancellationToken cancellationToken = default)
     {
         using var connection = _connectionFactory.CreateConnection();
-        var result = await connection.QueryAsync<CountryEntity>(BroadcastChannelQueries.SelectAllCountries);
+        var result = await connection.QueryAsync<CountryEntity>(CountriesQueries.SelectAllCountries);
         return result.ToList();
     }
 
@@ -24,7 +25,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryFirstOrDefaultAsync<CountryEntity>(
-            BroadcastChannelQueries.SelectCountryByCode,
+            CountriesQueries.SelectCountryByCode,
             new { CountryCode = countryCode });
         return result;
     }
@@ -33,12 +34,45 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<CountryEntity>(
-            BroadcastChannelQueries.SelectBroadcastCountriesForMatch,
+            BroadcastMatchQueries.SelectBroadcastCountriesForMatch,
             new { MatchId = matchId });
         return result.ToList();
     }
 
     // ==================== Broadcast Channels ====================
+
+    public async Task<BroadcastChannelEntity> UpsertBroadcastChannelAsync(BroadcastChannelEntity broadcastEntity)
+    {
+        ArgumentNullException.ThrowIfNull(broadcastEntity);
+
+        using var connection = _connectionFactory.CreateConnection();
+        var broadcastId = await connection.ExecuteScalarAsync<int>(BroadcastChannelQueries.CheckIfBroadcastExists,
+            new { broadcastEntity.Code, broadcastEntity.CountryCode });
+
+        if (broadcastId > 0)
+        {
+            await connection.ExecuteAsync(BroadcastChannelQueries.UpdateBroadcastChannel, new
+            {
+                ChannelId = broadcastId,
+                broadcastEntity.Name,
+                broadcastEntity.Code,
+                broadcastEntity.CountryCode
+            });
+            broadcastEntity.ChannelId = broadcastId;
+            return broadcastEntity;
+        }
+        else
+        {
+            var insertedId = await connection.ExecuteScalarAsync<int>(BroadcastChannelQueries.InsertBroadcastChannel, new
+            {
+                broadcastEntity.Name,
+                broadcastEntity.Code,
+                broadcastEntity.CountryCode
+            });
+            broadcastEntity.ChannelId = insertedId;
+            return broadcastEntity;
+        }
+    }
 
     public async Task<List<BroadcastChannelEntity>> GetAllActiveChannelsAsync(CancellationToken cancellationToken = default)
     {
@@ -84,7 +118,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<MatchBroadcastDto>(
-            BroadcastChannelQueries.SelectBroadcastsByMatchId,
+            BroadcastMatchQueries.SelectBroadcastsByMatchId,
             new { MatchId = matchId });
         return result.ToList();
     }
@@ -96,7 +130,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
 
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<MatchBroadcastDto>(
-            BroadcastChannelQueries.SelectBroadcastsByMatchIds,
+            BroadcastMatchQueries.SelectBroadcastsByMatchIds,
             new { MatchIds = matchIds });
 
         return result
@@ -108,40 +142,19 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<MatchBroadcastDto>(
-            BroadcastChannelQueries.SelectBroadcastsByChannelId,
+            BroadcastMatchQueries.SelectBroadcastsByChannelId,
             new { ChannelId = channelId });
         return result.ToList();
     }
 
-    public async Task AddMatchBroadcastAsync(MatchBroadcastEntity entity, CancellationToken cancellationToken = default)
+    public async Task UpsertBroadcastMatchAsync(List<MatchBroadcastEntity> matchBroadCasts)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        ArgumentNullException.ThrowIfNull(matchBroadCasts);
 
         using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
-            BroadcastChannelQueries.InsertMatchBroadcast,
-            new
-            {
-                entity.MatchId,
-                entity.ChannelId,
-                CreatedAt = entity.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
-            });
-    }
+        await connection.ExecuteAsync(BroadcastMatchQueries.DeletePasthMatchBroadcasts, new { CurrentUtcDate = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss") });
+        await connection.ExecuteAsync(BroadcastMatchQueries.UpsertBroadcastMatches, matchBroadCasts);
 
-    public async Task RemoveMatchBroadcastAsync(int matchId, int channelId, string countryCode, CancellationToken cancellationToken = default)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
-            BroadcastChannelQueries.DeleteMatchBroadcast,
-            new { MatchId = matchId, ChannelId = channelId, CountryCode = countryCode });
-    }
-
-    public async Task RemoveAllMatchBroadcastsAsync(int matchId, CancellationToken cancellationToken = default)
-    {
-        using var connection = _connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
-            BroadcastChannelQueries.DeleteMatchBroadcastsByMatchId,
-            new { MatchId = matchId });
     }
 
     // ==================== User Favorite Channels ====================
@@ -150,7 +163,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<int>(
-            BroadcastChannelQueries.SelectUserFavoriteChannelIds,
+            UserFavoriteChannelsQueries.SelectUserFavoriteChannelIds,
             new { UserId = userId });
         return result.ToList();
     }
@@ -159,7 +172,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var result = await connection.QueryAsync<BroadcastChannelEntity>(
-            BroadcastChannelQueries.SelectUserFavoriteChannels,
+            UserFavoriteChannelsQueries.SelectUserFavoriteChannels,
             new { UserId = userId });
         return result.ToList();
     }
@@ -168,7 +181,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         var count = await connection.ExecuteScalarAsync<int>(
-            BroadcastChannelQueries.CheckIsFavoriteChannel,
+            UserFavoriteChannelsQueries.CheckIsFavoriteChannel,
             new { UserId = userId, ChannelId = channelId });
         return count > 0;
     }
@@ -177,7 +190,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         await connection.ExecuteAsync(
-            BroadcastChannelQueries.InsertUserFavoriteChannel,
+            UserFavoriteChannelsQueries.InsertUserFavoriteChannel,
             new
             {
                 UserId = userId,
@@ -190,7 +203,7 @@ public class BroadcastChannelRepository(IDbConnectionFactory connectionFactory) 
     {
         using var connection = _connectionFactory.CreateConnection();
         await connection.ExecuteAsync(
-            BroadcastChannelQueries.DeleteUserFavoriteChannel,
+            UserFavoriteChannelsQueries.DeleteUserFavoriteChannel,
             new { UserId = userId, ChannelId = channelId });
     }
 }

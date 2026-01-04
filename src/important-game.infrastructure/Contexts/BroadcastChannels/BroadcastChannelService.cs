@@ -22,7 +22,7 @@ internal class BroadcastChannelService(
         var cacheKey = "all_countries";
         var countries = _memoryCache.Get<List<CountryViewModel>>(cacheKey);
 
-        if (countries == null)
+        if (countries == null || countries.Count == 0)
         {
             var entities = await _broadcastChannelRepository.GetAllCountriesAsync(cancellationToken);
             countries = entities.Select(BroadcastChannelMapper.MapToCountryViewModel).ToList();
@@ -37,7 +37,7 @@ internal class BroadcastChannelService(
         var cacheKey = $"match_{matchId}_countries";
         var countries = _memoryCache.Get<List<CountryViewModel>>(cacheKey);
 
-        if (countries == null)
+        if (countries == null || countries.Count == 0)
         {
             var entities = await _broadcastChannelRepository.GetBroadcastCountriesForMatchAsync(matchId, cancellationToken);
             countries = entities.Select(BroadcastChannelMapper.MapToCountryViewModel).ToList();
@@ -54,7 +54,7 @@ internal class BroadcastChannelService(
         var cacheKey = "all_active_channels";
         var channels = _memoryCache.Get<List<BroadcastChannelViewModel>>(cacheKey);
 
-        if (channels == null)
+        if (channels == null || channels.Count == 0)
         {
             var entities = await _broadcastChannelRepository.GetAllActiveChannelsAsync(cancellationToken);
             channels = BroadcastChannelMapper.MapToViewModels(entities);
@@ -69,7 +69,7 @@ internal class BroadcastChannelService(
         var cacheKey = $"channels_country_{countryCode}";
         var channels = _memoryCache.Get<List<BroadcastChannelViewModel>>(cacheKey);
 
-        if (channels == null)
+        if (channels == null || channels.Count == 0)
         {
             var entities = await _broadcastChannelRepository.GetChannelsByCountryCodeAsync(countryCode, cancellationToken);
             channels = BroadcastChannelMapper.MapToViewModels(entities);
@@ -81,27 +81,19 @@ internal class BroadcastChannelService(
 
     public async Task<Dictionary<string, List<BroadcastChannelViewModel>>> GetChannelsGroupedByCountryAsync(CancellationToken cancellationToken = default)
     {
-        var cacheKey = "channels_grouped_by_country";
-        var groupedChannels = _memoryCache.Get<Dictionary<string, List<BroadcastChannelViewModel>>>(cacheKey);
+        var groupedChannels = new Dictionary<string, List<BroadcastChannelViewModel>>();
 
-        if (groupedChannels == null)
+        // Get all countries
+        var countries = await _broadcastChannelRepository.GetAllCountriesAsync(cancellationToken);
+
+        // For each country, get its channels
+        foreach (var country in countries.OrderBy(c => c.CountryName))
         {
-            groupedChannels = new Dictionary<string, List<BroadcastChannelViewModel>>();
-
-            // Get all countries
-            var countries = await _broadcastChannelRepository.GetAllCountriesAsync(cancellationToken);
-
-            // For each country, get its channels
-            foreach (var country in countries.OrderBy(c => c.CountryName))
+            var channels = await GetChannelsByCountryCodeAsync(country.CountryCode, cancellationToken);
+            if (channels.Count > 0)
             {
-                var channels = await GetChannelsByCountryCodeAsync(country.CountryCode, cancellationToken);
-                if (channels.Count > 0)
-                {
-                    groupedChannels[country.CountryName] = channels;
-                }
+                groupedChannels[country.CountryName] = channels;
             }
-
-            _memoryCache.Set(cacheKey, groupedChannels, TimeSpan.FromHours(1));
         }
 
         return groupedChannels;
@@ -114,7 +106,7 @@ internal class BroadcastChannelService(
         var cacheKey = $"match_broadcasts_{matchId}";
         var broadcasts = _memoryCache.Get<List<MatchBroadcastViewModel>>(cacheKey);
 
-        if (broadcasts == null)
+        if (broadcasts == null || broadcasts.Count == 0)
         {
             var dtos = await _broadcastChannelRepository.GetBroadcastsByMatchIdAsync(matchId, cancellationToken);
             broadcasts = BroadcastChannelMapper.MapToMatchBroadcastViewModels(dtos);
@@ -319,6 +311,7 @@ internal class BroadcastChannelService(
                             MatchId = match.MatchId,
                             CompetitionId = match.CompetitionId,
                             CompetitionName = match.CompetitionName,
+                            CompetitionBackgroundColor = match.CompetitionBackgroundColor,
                             MatchDateUTC = match.MatchDateUTC.DateTime,
                             HomeTeamId = match.HomeTeamId,
                             HomeTeamName = match.HomeTeamName,

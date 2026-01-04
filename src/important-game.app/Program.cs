@@ -26,6 +26,7 @@ builder.ConfigureServices((context, services) =>
     services.AddHostedService<SyncCompetitionJob>();
     services.AddHostedService<SyncFinishedMatchesJob>();
     services.AddHostedService<SyncUpcomingMatchesJob>();
+    services.AddHostedService<BroadcastFinderJob>();
 });
 
 // Add Dapper type handlers
