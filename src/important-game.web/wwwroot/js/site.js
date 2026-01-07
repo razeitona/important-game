@@ -413,7 +413,7 @@
         function shareTwitter(title, score, url) {
             const text = `${title} - Excitement Score: ${score}`;
             const fullUrl = window.location.origin + url;
-            const hashtags = 'MatchToWatch,Football,Soccer';
+            const hashtags = 'matchtowatch,football,soccer';
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}&hashtags=${hashtags}`;
             window.open(twitterUrl, '_blank');
         }
@@ -811,7 +811,7 @@
                         <a href="${matchUrl}" class="match-card-link">
                             <div class="card-header match-header">
                                 <div>
-                                    <img src="/images/competition/${match.competitionId}.png" alt="${match.competitionName}" width="1.2rem" />
+                                    <img src="/images/competition/${match.competitionId}.webp" alt="${match.competitionName}" width="1.2rem" />
                                 </div>
                                 <div class="match-header-title">${match.competitionName}</div>
                                 ${match.isLive ?
@@ -823,7 +823,7 @@
                                 <div class="match-card-content">
                                     <div class="match-card-team">
                                         <div class="match-card-team-logo">
-                                            <img src="/images/team/${match.homeTeamId}.png" alt="${match.homeTeamName}" width="80px" />
+                                            <img src="/images/team/${match.homeTeamId}.webp" alt="${match.homeTeamName}" width="80px" />
                                         </div>
                                         <div class="match-card-team-name">
                                             <span>${match.homeTeamName}</span>
@@ -837,7 +837,7 @@
                                     </div>
                                     <div class="match-card-team">
                                         <div class="match-card-team-logo">
-                                            <img src="/images/team/${match.awayTeamId}.png" alt="${match.awayTeamName}" width="80px" />
+                                            <img src="/images/team/${match.awayTeamId}.webp" alt="${match.awayTeamName}" width="80px" />
                                         </div>
                                         <div class="match-card-team-name">
                                             <span>${match.awayTeamName}</span>
@@ -1740,6 +1740,80 @@
 
         // Log initialization
         console.log('Match Alerts System initialized');
+    })();
+
+    // =============================================================================
+    // GOOGLE ADS FIX - Ensure proper ad container dimensions
+    // =============================================================================
+    (function () {
+        'use strict';
+
+        // Fix for "No slot size for availableWidth=0" error
+        function initializeAds() {
+            // Find all ad containers
+            const adContainers = document.querySelectorAll('.ad-container');
+
+            adContainers.forEach(container => {
+                const adSlot = container.querySelector('.adsbygoogle');
+
+                if (!adSlot) return;
+
+                // Check if ad has already been initialized
+                if (adSlot.getAttribute('data-adsbygoogle-status')) {
+                    return; // Already initialized
+                }
+
+                // Ensure container has proper dimensions
+                const containerWidth = container.offsetWidth;
+                const containerHeight = container.offsetHeight;
+
+                if (containerWidth === 0 || containerHeight === 0) {
+                    console.warn('Ad container has zero dimensions:', container.className);
+
+                    // Force minimum dimensions
+                    container.style.minWidth = '300px';
+                    container.style.minHeight = '90px';
+                    container.style.display = 'block';
+                    container.style.width = '100%';
+                }
+
+                // Verify parent elements are visible
+                let parent = container.parentElement;
+                while (parent && parent !== document.body) {
+                    const parentStyle = window.getComputedStyle(parent);
+
+                    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden') {
+                        console.warn('Ad container parent is hidden:', parent);
+                    }
+
+                    parent = parent.parentElement;
+                }
+            });
+        }
+
+        // Run when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAds);
+        } else {
+            // DOM already loaded
+            initializeAds();
+        }
+
+        // Also check after window load (images, styles fully loaded)
+        window.addEventListener('load', function() {
+            // Small delay to ensure all CSS is applied
+            setTimeout(initializeAds, 100);
+        });
+
+        // Re-check when ads fail to load
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'INS' && e.target.classList.contains('adsbygoogle')) {
+                console.error('Ad failed to load, checking container dimensions...');
+                setTimeout(initializeAds, 500);
+            }
+        }, true);
+
+        console.log('Google Ads dimension checker initialized');
     })();
 
 })();

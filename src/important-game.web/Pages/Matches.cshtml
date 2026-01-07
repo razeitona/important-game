@@ -24,22 +24,26 @@
 
 @* Smart Filters Bar *@
 <div class="smart-filters-bar">
-    <div class="filter-section">
+    <div class="filter-section filter-excitment">
         <label class="filter-label" id="es-tier-label">
             <i class="bi bi-fire"></i>
             Excitement:
         </label>
         <div class="es-tier-filters" role="group" aria-labelledby="es-tier-label">
-            <button class="es-tier-badge tier-unmissable" data-tier="unmissable" data-min="75" aria-label="Filter by Unmissable matches (ES 75+)">
+            <button class="es-tier-badge tier-unmissable" data-tier="unmissable" data-min="70" aria-label="Filter by Unmissable matches (ES 70+)">
                 <span class="tier-name">Unmissable</span>
                 <span class="tier-count">(0)</span>
             </button>
-            <button class="es-tier-badge tier-great" data-tier="great" data-min="50" data-max="74" aria-label="Filter by Great matches (ES 50-74)">
-                <span class="tier-name">Great</span>
+            <button class="es-tier-badge tier-great" data-tier="great" data-min="50" data-max="69" aria-label="Filter by Great matches (ES 50-69)">
+                <span class="tier-name">Highly Exciting</span>
                 <span class="tier-count">(0)</span>
             </button>
             <button class="es-tier-badge tier-good" data-tier="good" data-min="25" data-max="49" aria-label="Filter by Good matches (ES 25-49)">
-                <span class="tier-name">Good</span>
+                <span class="tier-name">Decent Watch</span>
+                <span class="tier-count">(0)</span>
+            </button>
+            <button class="es-tier-badge tier-decent" data-tier="decent" data-min="0" data-max="24" aria-label="Filter by Good matches (ES 25-24)">
+                <span class="tier-name">Decent</span>
                 <span class="tier-count">(0)</span>
             </button>
         </div>
@@ -106,7 +110,7 @@
         @foreach (var competition in Model.Matches.Competitions)
         {
             <div class="match-league-item" data-league="@competition.CompetitionId">
-                <img src="@("images/competition/" + competition.CompetitionId + ".png")" alt="@competition.Name" width="20px" />
+                <img src="@("images/competition/" + competition.CompetitionId + ".webp")" alt="@competition.Name" width="20px" />
                 <span>@competition.Name</span>
             </div>
         }
@@ -229,12 +233,12 @@
             function updateESTierCounts() {
                 const unmissableCount = $('.match-card-simple').filter(function() {
                     const es = parseFloat($(this).data('game-score'));
-                    return es >= 75;
+                    return es >= 70;
                 }).length;
 
                 const greatCount = $('.match-card-simple').filter(function() {
                     const es = parseFloat($(this).data('game-score'));
-                    return es >= 50 && es < 75;
+                    return es >= 50 && es < 70;
                 }).length;
 
                 const goodCount = $('.match-card-simple').filter(function() {
@@ -242,9 +246,15 @@
                     return es >= 25 && es < 50;
                 }).length;
 
+                const decentCount = $('.match-card-simple').filter(function() {
+                    const es = parseFloat($(this).data('game-score'));
+                    return es < 25;
+                }).length;
+
                 $('.es-tier-badge[data-tier="unmissable"] .tier-count').text(`(${unmissableCount})`);
                 $('.es-tier-badge[data-tier="great"] .tier-count').text(`(${greatCount})`);
                 $('.es-tier-badge[data-tier="good"] .tier-count').text(`(${goodCount})`);
+                $('.es-tier-badge[data-tier="decent"] .tier-count').text(`(${decentCount})`);
             }
 
             // Apply sorting to matches
@@ -297,7 +307,7 @@
 
                 // Load ES tier filter
                 const tierParam = urlParams.get('tier');
-                if (tierParam && ['unmissable', 'great', 'good'].includes(tierParam)) {
+                if (tierParam && ['unmissable', 'great', 'good', 'decent'].includes(tierParam)) {
                     filterESTier = tierParam;
                     $(`.es-tier-badge[data-tier="${tierParam}"]`).addClass('active');
                 }

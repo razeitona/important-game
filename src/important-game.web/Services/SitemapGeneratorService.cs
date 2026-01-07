@@ -1,5 +1,6 @@
 using important_game.infrastructure.Contexts.Matches;
 using important_game.infrastructure.Extensions;
+using important_game.infrastructure.Services;
 using System.Text;
 using System.Xml;
 
@@ -13,104 +14,71 @@ public class Utf8StringWriter : StringWriter
     public override Encoding Encoding => Encoding.UTF8;
 }
 
-public class SitemapGeneratorService : BackgroundService
+/// <summary>
+/// Generates sitemap.xml and llms.txt files on a cron schedule.
+/// Default: Daily at 2:00 AM UTC ("0 0 2 * * *")
+/// Configure via appsettings.json: "BackgroundJobs:SitemapGenerator:CronExpression"
+/// </summary>
+public class SitemapGeneratorService : CronBackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<SitemapGeneratorService> _logger;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
 
     public SitemapGeneratorService(
         IServiceProvider serviceProvider,
-        ILogger<SitemapGeneratorService> logger,
+        ILogger<CronBackgroundService> logger,
         IConfiguration configuration,
         IWebHostEnvironment environment)
+        : base(
+            cronExpression: configuration["BackgroundJobs:SitemapGenerator:CronExpression"] ?? "0 0 2 * * *",
+            logger: logger,
+            timeZone: TimeZoneInfo.Utc)
     {
         _serviceProvider = serviceProvider;
-        _logger = logger;
         _configuration = configuration;
         _environment = environment;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        // Wait a bit on startup to ensure the application is fully initialized
-        await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken).ConfigureAwait(false);
-
-        // Generate files immediately on startup
-        await GenerateFilesAsync(stoppingToken).ConfigureAwait(false);
-
-        // Then run every 7 days
-        using var timer = new PeriodicTimer(TimeSpan.FromDays(7));
-
-        try
-        {
-            while (await timer.WaitForNextTickAsync(stoppingToken).ConfigureAwait(false))
-            {
-                await GenerateFilesAsync(stoppingToken).ConfigureAwait(false);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("Sitemap and LLMs.txt generator service is stopping.");
-        }
-    }
-
-    private async Task GenerateFilesAsync(CancellationToken stoppingToken)
+    protected override async Task DoWorkAsync(CancellationToken stoppingToken)
     {
         if (stoppingToken.IsCancellationRequested)
         {
             return;
         }
 
-        try
+        var baseUrl = _configuration["SiteSettings:BaseUrl"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
         {
-            _logger.LogInformation("Starting sitemap and llms.txt generation...");
-
-            var baseUrl = _configuration["SiteSettings:BaseUrl"];
-            if (string.IsNullOrWhiteSpace(baseUrl))
-            {
-                _logger.LogError("BaseUrl is not configured in SiteSettings:BaseUrl");
-                return;
-            }
-
-            // Ensure base URL ends without trailing slash
-            baseUrl = baseUrl.TrimEnd('/');
-
-            var sitemapPath = Path.Combine(_environment.WebRootPath, "sitemap.xml");
-            var llmsTxtPath = Path.Combine(_environment.WebRootPath, "llms.txt");
-
-            using var scope = _serviceProvider.CreateScope();
-            var matchService = scope.ServiceProvider.GetRequiredService<IMatchService>();
-
-            // Get all unfinished matches
-            var matches = await matchService.GetAllUnfinishedMatchesAsync(stoppingToken);
-
-            // Filter to only include future matches (not past live matches)
-            var now = DateTime.UtcNow;
-            matches = matches.Where(m => m.MatchDateUTC > now.AddMinutes(-120)).ToList();
-
-            // Generate sitemap.xml
-            var sitemap = GenerateSitemapXml(baseUrl, matches);
-            // Use UTF-8 with BOM for better compatibility
-            var utf8WithBom = new UTF8Encoding(true);
-            await File.WriteAllTextAsync(sitemapPath, sitemap, utf8WithBom, stoppingToken);
-            _logger.LogInformation("Sitemap generated successfully with {MatchCount} matches at {Path}", matches.Count, sitemapPath);
-
-            // Generate llms.txt
-            var llmsTxt = GenerateLlmsTxt(baseUrl);
-            // Use UTF-8 with BOM for better compatibility
-            await File.WriteAllTextAsync(llmsTxtPath, llmsTxt, utf8WithBom, stoppingToken);
-            _logger.LogInformation("LLMs.txt generated successfully at {Path}", llmsTxtPath);
+            throw new InvalidOperationException("BaseUrl is not configured in SiteSettings:BaseUrl");
         }
-        catch (OperationCanceledException)
-        {
-            _logger.LogInformation("File generation was cancelled.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error generating sitemap and llms.txt");
-        }
+
+        // Ensure base URL ends without trailing slash
+        baseUrl = baseUrl.TrimEnd('/');
+
+        var sitemapPath = Path.Combine(_environment.WebRootPath, "sitemap.xml");
+        var llmsTxtPath = Path.Combine(_environment.WebRootPath, "llms.txt");
+
+        using var scope = _serviceProvider.CreateScope();
+        var matchService = scope.ServiceProvider.GetRequiredService<IMatchService>();
+
+        // Get all unfinished matches
+        var matches = await matchService.GetAllUnfinishedMatchesAsync(stoppingToken);
+
+        // Filter to only include future matches (not past live matches)
+        var now = DateTime.UtcNow;
+        matches = matches.Where(m => m.MatchDateUTC > now.AddMinutes(-120)).ToList();
+
+        // Generate sitemap.xml
+        var sitemap = GenerateSitemapXml(baseUrl, matches);
+        // Use UTF-8 with BOM for better compatibility
+        var utf8WithBom = new UTF8Encoding(true);
+        await File.WriteAllTextAsync(sitemapPath, sitemap, utf8WithBom, stoppingToken);
+
+        // Generate llms.txt
+        var llmsTxt = GenerateLlmsTxt(baseUrl);
+        // Use UTF-8 with BOM for better compatibility
+        await File.WriteAllTextAsync(llmsTxtPath, llmsTxt, utf8WithBom, stoppingToken);
     }
 
     private string GenerateSitemapXml(string baseUrl, List<important_game.infrastructure.Contexts.Matches.Data.Entities.MatchDto> matches)
@@ -244,30 +212,6 @@ public class SitemapGeneratorService : BackgroundService
         sb.AppendLine("- **Favorites System**: Users can save matches for quick access (requires Google authentication)");
         sb.AppendLine("- **Responsive Design**: Optimized for desktop and mobile viewing");
         sb.AppendLine();
-
-        // Optional section
-        sb.AppendLine("## Optional");
-        sb.AppendLine();
-        sb.AppendLine("### Match Detail Pages");
-        sb.AppendLine();
-        sb.AppendLine("Each match has a dedicated detail page accessible via URL pattern:");
-        sb.AppendLine($"`{baseUrl}/match/{{home-team-slug}}-vs-{{away-team-slug}}`");
-        sb.AppendLine();
-        sb.AppendLine("Match pages include:");
-        sb.AppendLine("- Excitement Score breakdown and explanation");
-        sb.AppendLine("- Team statistics and current form");
-        sb.AppendLine("- Head-to-head history between teams");
-        sb.AppendLine("- Competition context and standings relevance");
-        sb.AppendLine("- Match date and time in UTC");
-        sb.AppendLine();
-
-        sb.AppendLine("### Technical Information");
-        sb.AppendLine();
-        sb.AppendLine("- Built with ASP.NET Core 8.0 and Razor Pages");
-        sb.AppendLine("- Uses SQLite database for match data storage");
-        sb.AppendLine("- Integrates with football data APIs for match information");
-        sb.AppendLine("- Google OAuth for user authentication");
-        sb.AppendLine("- Responsive SCSS-based styling with Bootstrap Icons");
 
         return sb.ToString();
     }

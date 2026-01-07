@@ -8,6 +8,16 @@ ENV ASPNETCORE_URLS=http://+:80
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Install Node.js for asset minification (Terser)
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/important-game.web/important-game.web.csproj", "src/important-game.web/"]
@@ -15,6 +25,11 @@ COPY ["src/important-game.infrastructure/important-game.infrastructure.csproj", 
 RUN dotnet restore "./src/important-game.web/important-game.web.csproj"
 COPY . .
 WORKDIR "/src/src/important-game.web"
+
+# Install npm packages for build process
+RUN npm install
+
+# Build with minification
 RUN dotnet build "./important-game.web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

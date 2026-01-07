@@ -18,7 +18,7 @@
     <a href="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))" class="match-card-link">
         <div class="card-header match-header">
             <div>
-                <img src="@("images/competition/" + Model.CompetitionId + ".png")" alt="@Model.CompetitionName" width="1.2rem" />
+                <img src="@("images/competition/" + Model.CompetitionId + ".webp")" alt="@Model.CompetitionName" width="1.2rem" />
             </div>
             <div class="match-header-title">
                 @Model.CompetitionName
@@ -42,7 +42,7 @@
             <div class="match-card-content">
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("images/team/" + Model.HomeTeamId + ".png")" alt="@(Model.HomeTeamName)" width="80px" />
+                        <img src="@("images/team/" + Model.HomeTeamId + ".webp")" alt="@(Model.HomeTeamName)" width="80px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.HomeTeamName</span>
@@ -64,7 +64,7 @@
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">
-                        <img src="@("images/team/" + Model.AwayTeamId + ".png")" alt="@(Model.AwayTeamName)" width="80px" />
+                        <img src="@("images/team/" + Model.AwayTeamId + ".webp")" alt="@(Model.AwayTeamName)" width="80px" />
                     </div>
                     <div class="match-card-team-name">
                         <span>@Model.AwayTeamName</span>
@@ -96,29 +96,9 @@
             <span class="action-like-count">0</span>
         </button>
 
-        @* Broadcast Channels (Center) *@
-        @if (Model.Broadcasts != null && Model.Broadcasts.Count > 0)
-        {
-            <div class="match-card-broadcast-channels">
-                @{
-                    var maxChannelsToShow = 3;
-                    var channelsToDisplay = Model.Broadcasts.Take(maxChannelsToShow).ToList();
-                    var remainingCount = Model.Broadcasts.Count - maxChannelsToShow;
-                }
-                @foreach (var broadcast in channelsToDisplay)
-                {
-                    <div class="broadcast-channel-logo" title="@broadcast.ChannelName (@broadcast.CountryCode)">
-                        <span class="broadcast-channel-text">@broadcast.ChannelCode</span>
-                    </div>
-                }
-                @if (remainingCount > 0)
-                {
-                    <div class="broadcast-channel-more" title="@remainingCount more channel(s)">
-                        +@remainingCount
-                    </div>
-                }
-            </div>
-        }
+        <div class="match-card-broadcast-channels">
+               
+        </div>
 
         @* Share Button (Right) *@
         <button class="match-card-action-share"

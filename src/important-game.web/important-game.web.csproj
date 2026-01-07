@@ -12,33 +12,11 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\css\site.scss" />
-    <Content Remove="wwwroot\images\competition\17.png" />
-    <Content Remove="wwwroot\images\competition\8.png" />
-    <Content Remove="wwwroot\images\team\17.png" />
-    <Content Remove="wwwroot\images\team\2672.png" />
-    <Content Remove="wwwroot\images\team\2817.png" />
-    <Content Remove="wwwroot\images\team\2819.png" />
-    <Content Remove="wwwroot\images\team\2825.png" />
-    <Content Remove="wwwroot\images\team\2826.png" />
-    <Content Remove="wwwroot\images\team\2829.png" />
-    <Content Remove="wwwroot\images\team\2846.png" />
-    <Content Remove="wwwroot\images\team\2849.png" />
-    <Content Remove="wwwroot\images\team\3.png" />
-    <Content Remove="wwwroot\images\team\3001.png" />
-    <Content Remove="wwwroot\images\team\3002.png" />
-    <Content Remove="wwwroot\images\team\3006.png" />
-    <Content Remove="wwwroot\images\team\34.png" />
-    <Content Remove="wwwroot\images\team\35.png" />
-    <Content Remove="wwwroot\images\team\38.png" />
-    <Content Remove="wwwroot\images\team\40.png" />
-    <Content Remove="wwwroot\images\team\41.png" />
-    <Content Remove="wwwroot\images\team\42.png" />
-    <Content Remove="wwwroot\images\team\44.png" />
-    <Content Remove="wwwroot\images\team\60.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.SassCompiler" Version="1.97.1" />
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
@@ -63,416 +41,479 @@
     <Content Update="wwwroot\ads.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\23.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\17.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\238.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\23.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\34.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\238.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\35.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\34.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\37.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\35.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\competition\7.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\37.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\br.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\7.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\de.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\competition\8.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\es.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\br.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\fr.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\de.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\gb.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\es.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\it.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\fr.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\pt.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\gb.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\country\tr.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\it.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\14.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\pt.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1641.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\country\tr.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1643.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\14.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1644.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1641.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1646.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1643.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1647.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1644.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1648.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1646.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1649.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1647.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1653.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1648.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1658.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1649.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1659.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1653.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1661.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1658.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1662.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1659.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1681.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1661.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\1715.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1662.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\24264.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1681.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2524.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\17.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2526.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\1715.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2527.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\24264.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2534.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2524.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2538.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2526.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2547.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2527.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2556.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2534.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2569.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2538.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\25777.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2547.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2600.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2556.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2673.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2569.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2674.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\25777.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2677.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2600.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2681.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2672.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2685.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2673.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2686.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2674.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2687.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2677.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2689.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2681.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2690.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2685.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2692.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2686.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2693.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2687.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2695.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2689.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2696.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2690.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2697.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2692.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2699.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2693.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2701.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2695.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2702.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2696.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2713.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2697.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2714.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2699.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2719.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2701.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2814.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2702.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2816.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2713.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2818.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2714.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2820.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2719.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2821.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2814.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2824.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2816.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2828.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2817.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2833.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2818.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2836.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2819.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2859.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2820.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2885.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2821.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2888.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2824.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2953.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2825.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2959.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2826.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\2999.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2828.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\30.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2829.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3009.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2833.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3010.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2836.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3011.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2859.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3013.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2885.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3014.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2888.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3035.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2953.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3036.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2959.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3061.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\2999.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\3245.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\33.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\30.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\36360.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3001.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\36365.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3002.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\37.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3006.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\39.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3009.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\43.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3010.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\4500.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3011.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\48.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3013.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483089.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3014.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483090.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3035.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483091.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3036.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483092.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3061.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483093.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\3245.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483094.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\33.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483095.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\34.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483098.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\35.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483099.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\36360.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483100.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\36365.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483101.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\37.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483102.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\38.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483103.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\39.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483104.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\40.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483105.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\41.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483106.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\42.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483107.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\43.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483108.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\44.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483109.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\4500.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483110.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\48.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483114.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483089.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483115.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483090.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483119.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483091.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483120.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483092.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483128.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483093.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483129.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483094.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483130.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483095.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483131.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483098.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483132.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483099.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483133.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483100.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483134.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483101.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483135.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483102.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483136.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483103.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483137.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483104.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483138.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483105.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483139.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483106.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483140.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483107.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483141.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483108.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\483142.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483109.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\49531.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483110.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\50.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483114.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\5885.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483115.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\6.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483119.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\team\7.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Update="wwwroot\images\team\483120.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483128.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483129.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483130.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483131.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483132.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483133.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483134.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483135.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483136.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483137.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483138.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483139.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483140.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483141.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\483142.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\49531.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\50.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\5885.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\6.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\60.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\team\7.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -512,70 +553,14 @@
     <UpToDateCheckInput Remove="Styles\_about.scss" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\images\competition\17.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\competition\8.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\17.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2672.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2817.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2819.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2825.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2826.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\2829.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\3.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\3001.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\3002.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\3006.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\34.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\35.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\38.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\40.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\41.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\42.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\44.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\images\team\60.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <!-- Custom Target: Minify JavaScript using Terser (only when Node.js is available) -->
+  <Target Name="MinifyJavaScript" AfterTargets="Build" Condition="'$(SkipMinification)' != 'true'">
+    <!-- Check if npx exists before trying to run it -->
+    <Exec Command="npx terser wwwroot/js/site.js -o wwwroot/js/site.min.js -c -m"
+          WorkingDirectory="$(ProjectDir)"
+          ContinueOnError="true"
+          IgnoreExitCode="true" />
+    <Message Text="JavaScript minification completed (or skipped if Node.js not available)" Importance="high" />
+  </Target>
 
 </Project>

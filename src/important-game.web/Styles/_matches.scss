@@ -15,8 +15,10 @@
     .filter-section {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
 
         &.quick-presets-section {
             margin-left: auto;
@@ -37,17 +39,16 @@
             }
         }
     }
-
     // ES Tier Filters
     .es-tier-filters {
         display: flex;
-        gap: 8px;
+        gap: 16px;
         flex-wrap: wrap;
 
         .es-tier-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 12px;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -79,52 +80,62 @@
             }
 
             &.tier-unmissable {
-                background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(96, 165, 250, 0.15));
-                border-color: rgba(59, 130, 246, 0.3);
+                background: linear-gradient(135deg, #33b5e520, #33b5e550);
+                border-color: #33b5e530;
 
                 &:hover {
-                    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(96, 165, 250, 0.2));
-                    border-color: rgba(59, 130, 246, 0.5);
+                    background: linear-gradient(135deg, #33b5e530, #33b5e570);
+                    border-color: #33b5e550;
                 }
 
                 &.active {
-                    background: linear-gradient(135deg, #3b82f6, #60a5fa);
-                    border-color: #60a5fa;
+                    background: #33b5e5;
                 }
             }
 
             &.tier-great {
-                background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15));
-                border-color: rgba(16, 185, 129, 0.3);
+                background: linear-gradient(135deg, #00C85120, #00C85150);
+                border-color: #00C85130;
 
                 &:hover {
-                    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(52, 211, 153, 0.2));
-                    border-color: rgba(16, 185, 129, 0.5);
+                    background: linear-gradient(135deg, #00C85130, #00C85170);
+                    border-color: #00C85150;
                 }
 
                 &.active {
-                    background: linear-gradient(135deg, #10b981, #34d399);
-                    border-color: #34d399;
+                    background: #00C851;
                 }
             }
 
             &.tier-good {
-                background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.15));
-                border-color: rgba(245, 158, 11, 0.3);
+                background: linear-gradient(135deg, #7D4D0020, #7D4D0050);
+                border-color: #7D4D0030;
 
                 &:hover {
-                    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.2));
-                    border-color: rgba(245, 158, 11, 0.5);
+                    background: linear-gradient(135deg, #7D4D0030, #7D4D0070);
+                    border-color: #7D4D0050;
                 }
 
                 &.active {
-                    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-                    border-color: #fbbf24;
+                    background: #7D4D00;
+                }
+            }
+
+            &.tier-decent {
+                background: linear-gradient(135deg, #ff444420, #ff444450);
+                border-color: #ff444430;
+
+                &:hover {
+                    background: linear-gradient(135deg, #ff444430, #ff444470);
+                    border-color: #ff444450;
+                }
+
+                &.active {
+                    background: #ff4444;
                 }
             }
         }
     }
-
     // Sort Dropdown
     .sort-dropdown {
         padding: 10px 16px;
@@ -154,7 +165,6 @@
             color: #ffffff;
         }
     }
-
     // Quick Presets
     .quick-presets {
         display: flex;
@@ -405,6 +415,7 @@
                 flex: 1;
                 justify-content: center;
                 padding: 10px 12px;
+                gap:12px;
                 font-size: 0.75rem;
 
                 .tier-count {
