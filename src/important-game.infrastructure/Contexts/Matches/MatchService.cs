@@ -161,6 +161,24 @@ internal class MatchService(
         return matchDetail;
     }
 
+    public async Task<MatchDetailViewModel?> GetMatchOfTheDayAsync(CancellationToken cancellationToken = default)
+    {
+        var matchDetailDto = memoryCache.Get<MatchDetailDto>("match_of_the_day");
+        if (matchDetailDto == null)
+        {
+            matchDetailDto = await matchesRepository.GetMatchOfTheDayAsync();
+            if (matchDetailDto != null)
+                memoryCache.Set("match_of_the_day", matchDetailDto, TimeSpan.FromMinutes(30));
+        }
+
+        if (matchDetailDto == null)
+            return default;
+
+        var matchDetail = MatchMapper.MapToMatchDetail(matchDetailDto);
+
+        return matchDetail;
+    }
+
     private async Task PopulateLeagueTableAsync(MatchDetailViewModel matchDetail)
     {
         if (matchDetail.SeasonId == null)

@@ -179,6 +179,13 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         return result.ToList();
     }
 
+    public async Task<MatchDetailDto?> GetMatchOfTheDayAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryFirstOrDefaultAsync<MatchDetailDto>(MatchesQueries.SelectMatchOfTheDay);
+        return result;
+    }
+
     #region Head To Head
     public async Task<List<HeadToHeadDto>> GetHeadToHeadMatchesAsync(int teamOneId, int teamTwoId)
     {

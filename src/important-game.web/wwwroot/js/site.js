@@ -389,63 +389,6 @@
 
     // Share Functionality
     (function initShareButtons() {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'share-notification';
-        document.body.appendChild(notification);
-
-        function showNotification(message) {
-            notification.innerHTML = `<i class="bi bi-check-circle"></i> ${message}`;
-            notification.classList.add('show');
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function shareWhatsApp(title, score, url) {
-            const text = `${title} - Excitement Score: ${score}\nCheck out this match on Match to Watch!`;
-            const fullUrl = window.location.origin + url;
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + fullUrl)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        function shareTwitter(title, score, url) {
-            const text = `${title} - Excitement Score: ${score}`;
-            const fullUrl = window.location.origin + url;
-            const hashtags = 'matchtowatch,football,soccer';
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}&hashtags=${hashtags}`;
-            window.open(twitterUrl, '_blank');
-        }
-
-        function shareFacebook(url) {
-            const fullUrl = window.location.origin + url;
-            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`;
-            window.open(facebookUrl, '_blank');
-        }
-
-        function copyLink(url) {
-            const fullUrl = window.location.origin + url;
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                showNotification('Link copied to clipboard!');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = fullUrl;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showNotification('Link copied to clipboard!');
-                } catch (err) {
-                    showNotification('Failed to copy link');
-                }
-                document.body.removeChild(textArea);
-            });
-        }
-
         // Handle share buttons (Match Detail Page)
         document.addEventListener('click', function(e) {
             const shareBtn = e.target.closest('.share-btn');
@@ -470,16 +413,16 @@
 
             switch(shareType) {
                 case 'whatsapp':
-                    shareWhatsApp(matchTitle, matchScore, matchUrl);
+                    window.shareWhatsApp(matchTitle, matchScore, matchUrl);
                     break;
                 case 'twitter':
-                    shareTwitter(matchTitle, matchScore, matchUrl);
+                    window.shareTwitter(matchTitle, matchScore, matchUrl);
                     break;
                 case 'facebook':
-                    shareFacebook(matchUrl);
+                    window.shareFacebook(matchUrl);
                     break;
                 case 'copy':
-                    copyLink(matchUrl);
+                    window.copyLink(matchUrl);
                     break;
             }
         });
@@ -1156,6 +1099,59 @@
     })();
 
     // =============================================================================
+    // SHARE FUNCTIONS - GLOBAL SCOPE
+    // =============================================================================
+    // These functions are used by both the old share system and new match card share
+    window.shareWhatsApp = function(title, score, url) {
+        const text = `${title} - Excitement Score: ${score}\nCheck out this match on Match to Watch!`;
+        const fullUrl = window.location.origin + url;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + fullUrl)}`;
+        window.open(whatsappUrl, '_blank');
+    };
+
+    window.shareTwitter = function(title, score, url) {
+        const text = `${title} - Excitement Score: ${score}`;
+        const fullUrl = window.location.origin + url;
+        const hashtags = 'matchtowatch,football,soccer';
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}&hashtags=${hashtags}`;
+        window.open(twitterUrl, '_blank');
+    };
+
+    window.shareFacebook = function(url) {
+        const fullUrl = window.location.origin + url;
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`;
+        window.open(facebookUrl, '_blank');
+    };
+
+    window.copyLink = function(url) {
+        const fullUrl = window.location.origin + url;
+        navigator.clipboard.writeText(fullUrl).then(() => {
+            if (window.timezoneManager) {
+                window.timezoneManager.showNotification('Link copied to clipboard!');
+            }
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = fullUrl;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('Link copied to clipboard!');
+                }
+            } catch (err) {
+                if (window.timezoneManager) {
+                    window.timezoneManager.showNotification('Failed to copy link');
+                }
+            }
+            document.body.removeChild(textArea);
+        });
+    };
+
+    // =============================================================================
     // MATCH CARD ACTIONS - NEW IMPLEMENTATION
     // =============================================================================
     (function () {
@@ -1291,23 +1287,34 @@
             const modalContent = shareModal.querySelector('.share-modal-content');
             if (modalContent && buttonElement) {
                 const rect = buttonElement.getBoundingClientRect();
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
-                // Position to the right of the button, or left if not enough space
-                let left = rect.right + scrollLeft + 8;
-                let top = rect.top + scrollTop;
+                // Since modal has position: fixed, use viewport coordinates (no scroll offset)
+                const modalWidth = 230; // Approximate width
+                const modalHeight = 60; // Approximate height
+
+                // Default: position to the right of the button
+                let left = rect.right + 8;
+                let top = rect.top;
 
                 // Check if there's enough space on the right
-                const modalWidth = 230; // Approximate width
                 if (left + modalWidth > window.innerWidth) {
                     // Position to the left instead
-                    left = rect.left + scrollLeft - modalWidth - 8;
+                    left = rect.left - modalWidth - 8;
+                }
+
+                // Ensure it doesn't go beyond left edge
+                if (left < 8) {
+                    left = 8;
                 }
 
                 // Ensure it doesn't go off top
-                if (top < scrollTop) {
-                    top = scrollTop + 8;
+                if (top < 8) {
+                    top = 8;
+                }
+
+                // Ensure it doesn't go off bottom
+                if (top + modalHeight > window.innerHeight) {
+                    top = window.innerHeight - modalHeight - 8;
                 }
 
                 modalContent.style.left = left + 'px';
@@ -1369,16 +1376,16 @@
 
                     switch(shareType) {
                         case 'whatsapp':
-                            shareWhatsApp(currentShareData.title, currentShareData.score, currentShareData.url);
+                            window.shareWhatsApp(currentShareData.title, currentShareData.score, currentShareData.url);
                             break;
                         case 'twitter':
-                            shareTwitter(currentShareData.title, currentShareData.score, currentShareData.url);
+                            window.shareTwitter(currentShareData.title, currentShareData.score, currentShareData.url);
                             break;
                         case 'facebook':
-                            shareFacebook(currentShareData.url);
+                            window.shareFacebook(currentShareData.url);
                             break;
                         case 'copy':
-                            copyLink(currentShareData.url);
+                            window.copyLink(currentShareData.url);
                             break;
                     }
 

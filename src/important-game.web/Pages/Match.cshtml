@@ -48,6 +48,10 @@
         var homeSlug = SlugHelper.GenerateSlug(matchInfo.HomeTeamName);
         var awaySlug = SlugHelper.GenerateSlug(matchInfo.AwayTeamName);
         var matchUrl = $"{baseUrl}/match/{homeSlug}-vs-{awaySlug}";
+        var teamImageId = matchInfo.TitleHolderId ?? matchInfo.HomeTeamId;
+        if (matchInfo.AwayTeamTablePosition < matchInfo.HomeTeamTablePosition)
+            teamImageId = matchInfo.AwayTeamId;
+        var matchImage = $"{baseUrl}/images/team/{teamImageId}.webp";
         var excitementScore = Math.Round(matchInfo.ExcitmentScore * 100, 0);
         var matchStatus = matchInfo.IsLive ? "EventScheduled" : "EventScheduled";
     }
@@ -60,10 +64,43 @@
             "name": "@Html.Raw(matchInfo.HomeTeamName) vs @Html.Raw(matchInfo.AwayTeamName)",
             "description": "@Html.Raw(matchInfo.Description)",
             "startDate": "@matchInfo.MatchDateUTC.ToString("yyyy-MM-ddTHH:mm:ssZ")",
+            "endDate": "@matchInfo.MatchDateUTC.AddHours(2).ToString("yyyy-MM-ddTHH:mm:ssZ")",
             "eventStatus": "https://schema.org/@matchStatus",
             "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
             "sport": "Football",
+            "image": "@matchImage",
+            "url": "@matchUrl",
+            "location": {
+                "@@type": "VirtualLocation",
+                "name": "Watch Online",
+                "url": "@matchUrl"
+            },
             "competitor": [
+                {
+                    "@@type": "SportsTeam",
+                    "name": "@Html.Raw(matchInfo.HomeTeamName)",
+                    "image": "@(baseUrl)/images/team/@(matchInfo.HomeTeamId).webp"
+                },
+                {
+                    "@@type": "SportsTeam",
+                    "name": "@Html.Raw(matchInfo.AwayTeamName)",
+                    "image": "@(baseUrl)/images/team/@(matchInfo.AwayTeamId).webp"
+                }
+            ],
+            "organizer": {
+                "@@type": "SportsOrganization",
+                "name": "@Html.Raw(matchInfo.CompetitionName)",
+                "url": "@baseUrl"
+            },
+            "offers": {
+                "@@type": "Offer",
+                "availability": "https://schema.org/InStock",
+                "price": "0",
+                "priceCurrency": "USD",
+                "url": "@matchUrl",
+                "name": "Free Match Preview"
+            },
+            "performer": [
                 {
                     "@@type": "SportsTeam",
                     "name": "@Html.Raw(matchInfo.HomeTeamName)"
@@ -72,12 +109,7 @@
                     "@@type": "SportsTeam",
                     "name": "@Html.Raw(matchInfo.AwayTeamName)"
                 }
-            ],
-            "organizer": {
-                "@@type": "SportsOrganization",
-                "name": "@Html.Raw(matchInfo.CompetitionName)"
-            },
-            "url": "@matchUrl"
+            ]
         }
     </script>
 }

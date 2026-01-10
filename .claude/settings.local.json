@@ -13,7 +13,9 @@
       "Bash(Select-Object -First 5)",
       "Bash(npm run sass:*)",
       "Bash(dotnet add package:*)",
-      "Bash(dotnet tool install:*)"
+      "Bash(dotnet tool install:*)",
+      "Bash(npm run build:js:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

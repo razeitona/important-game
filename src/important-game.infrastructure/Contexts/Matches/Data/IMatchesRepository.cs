@@ -35,6 +35,7 @@ public interface IMatchesRepository
     Task<bool> HasRecentFinishedMatchAsync(int competitionId, int seasonId, DateTimeOffset? dateTime);
     Task<List<MatchDto>> GetUserFavoriteUpcomingMatchesAsync(int userId);
     Task<List<MatchBroadcastFinderDto>> GetMatchesToBroadcastInTimeRangeAsync(DateTimeOffset minDate);
+    Task<MatchDetailDto?> GetMatchOfTheDayAsync();
     #endregion
 
     #region Head To Head

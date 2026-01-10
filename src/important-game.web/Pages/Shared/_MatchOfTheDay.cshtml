@@ -1,0 +1,188 @@
+@using System.Globalization
+@using important_game.infrastructure.Contexts.Matches.Models
+@using important_game.infrastructure.Contexts.Matches.Enums
+@using important_game.infrastructure.Extensions
+@model MatchDetailViewModel
+
+<div class="match-of-the-day card match-card-simple"
+     style="--bgcolor: @(Model.CompetitionBackgroundColor);"
+     data-match-id="@Model.MatchId"
+     data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"
+     data-match-score-num="@(Math.Round(Model.ExcitmentScore * 100, 0))"
+     data-match-url="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))">
+
+    @* Header with competition and MOTD badge *@
+    <div class="match-header">
+        <div>
+            <img src="@("/images/competition/" + Model.CompetitionId + ".webp")" alt="@(Model.CompetitionName)" width="1.2rem" />
+        </div>
+        <div class="match-header-title">
+            @Model.CompetitionName
+        </div>
+        <div class="motd-badge">
+            <i class="bi bi-fire"></i>
+            <span>MUST WATCH</span>
+        </div>
+    </div>
+
+    <a href="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))" class="match-card-link">
+        <div class="card-body match-card-body">
+            <div class="motd-two-columns">
+                @* LEFT COLUMN *@
+                <div class="motd-left-column">
+
+                    <div class="motd-time">
+                        <time data-utc-time="@Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)">
+                            @Model.MatchDateUTC.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture)
+                        </time>
+                    </div>
+
+                    @* Row 1: Teams *@
+                    <div class="motd-teams">
+                        <div class="motd-team">
+                            <img src="@("/images/team/" + Model.HomeTeamId + ".webp")" alt="@(Model.HomeTeamName)" />
+                            <div class="motd-team-info">
+                                <span class="motd-team-name">@Model.HomeTeamName</span>
+                                @if (Model.HomeTeamTablePosition.HasValue && Model.HomeTeamTablePosition > 0)
+                                {
+                                    <span class="motd-team-position">#@Model.HomeTeamTablePosition</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="motd-vs">VS</div>
+
+                        <div class="motd-team">
+                            <img src="@("/images/team/" + Model.AwayTeamId + ".webp")" alt="@(Model.AwayTeamName)" />
+                            <div class="motd-team-info">
+                                <span class="motd-team-name">@Model.AwayTeamName</span>
+                                @if (Model.AwayTeamTablePosition.HasValue && Model.AwayTeamTablePosition > 0)
+                                {
+                                    <span class="motd-team-position">#@Model.AwayTeamTablePosition</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Row 2: Team Forms *@
+                    <div class="motd-forms">
+                        <div class="motd-team-form">
+                            @if (Model.HomeTeamForm.Any())
+                            {
+                                @foreach (var form in Model.HomeTeamForm)
+                                {
+                                    var formResult = form switch
+                                    {
+                                        MatchResultType.Win => "W",
+                                        MatchResultType.Draw => "D",
+                                        MatchResultType.Lost => "L",
+                                        _ => ""
+                                    };
+                                    <span class="motd-form-badge" data-form-score="@((int)form)">@formResult</span>
+                                }
+                            }
+                        </div>
+
+                        <div class="motd-team-form">
+                            @if (Model.AwayTeamForm.Any())
+                            {
+                                @foreach (var form in Model.AwayTeamForm)
+                                {
+                                    var formResult = form switch
+                                    {
+                                        MatchResultType.Win => "W",
+                                        MatchResultType.Draw => "D",
+                                        MatchResultType.Lost => "L",
+                                        _ => ""
+                                    };
+                                    <span class="motd-form-badge" data-form-score="@((int)form)">@formResult</span>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    @* Row 3: Description *@
+                    <div class="motd-description">
+                        <p>@Model.Description</p>
+                    </div>
+                </div>
+
+                @* RIGHT COLUMN *@
+                <div class="motd-right-column">
+                    @* Row 1: Excitement Score *@
+                    <div class="motd-score-section">
+                        <div class="motd-es-value" data-es="@(Math.Round(Model.ExcitmentScore, 2).ToString("0.00", CultureInfo.InvariantCulture))">
+                            <i class="bi bi-fire es-fire-icon"></i>
+                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                        </div>
+                        <span class="motd-es-label">Excitment score</span>
+                        @if (Model.IsRivalry || Model.HasTitleHolder)
+                        {
+                            <div class="motd-badges">
+                                @if (Model.IsRivalry)
+                                {
+                                    <span class="badge-rivalry"><i class="bi bi-thermometer-high"></i></span>
+                                }
+                                @if (Model.HasTitleHolder)
+                                {
+                                    <span class="badge-title"><i class="bi bi-trophy"></i></span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @* Row 2: Score Breakdown *@
+                    <div class="motd-breakdown">
+                        @foreach (var item in Model.ExcitmentScoreDetail)
+                        {
+                            if (item.Value.Show)
+                            {
+                                var scoreValue = Math.Round(item.Value.Value * 100, 0);
+                                <div class="motd-breakdown-item">
+                                    <div class="motd-breakdown-header">
+                                        <span class="motd-breakdown-name">@item.Key</span>
+                                        <span class="motd-breakdown-value">@scoreValue</span>
+                                    </div>
+                                    <div class="motd-breakdown-bar">
+                                        <div class="motd-breakdown-fill" style="width: @(scoreValue)%" data-score="@scoreValue"></div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    @* Match Card Actions Bar *@
+    <div class="match-card-actions">
+        <button class="match-alert-btn match-card-action-alert"
+                data-match-id="@Model.MatchId"
+                data-match-title="@Model.HomeTeamName vs @Model.AwayTeamName"
+                data-match-date="@Model.MatchDateUTC.ToString("o")"
+                data-match-url="/match/@(SlugHelper.GenerateSlug(Model.HomeTeamName))-vs-@(SlugHelper.GenerateSlug(Model.AwayTeamName))"
+                data-has-alert="false"
+                title="Set alert (30 min before kickoff)">
+            <i class="bi bi-bell"></i>
+        </button>
+
+        
+        <button class="match-card-action-like"
+                data-match-id="@Model.MatchId"
+                data-liked="false"
+                title="Favorite this match">
+            <i class="bi bi-hand-thumbs-up"></i>
+            <span class="action-like-count">0</span>
+        </button>
+
+        <div class="match-card-broadcast-channels">
+               
+        </div>
+
+        <button class="match-card-action-share"
+                title="Share this match">
+            <i class="bi bi-share-fill"></i>
+        </button>
+    </div>
+</div>

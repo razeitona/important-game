@@ -8,7 +8,6 @@
     margin: 0 auto;
     padding: 32px 20px 48px;
     color: #FFFAFA;
-
     // Back button
     .match-detail-back {
         display: inline-flex;
@@ -31,12 +30,12 @@
             transform: translateX(-4px);
         }
     }
-
     // ========================================
     // HERO SECTION
     // ========================================
     .match-detail-hero {
-        background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);
+        /*background: linear-gradient(135deg, #1a1f2e 0%, #22293b 100%);*/
+        background: #ffffff;
         border-radius: 16px;
         padding: 28px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -70,7 +69,7 @@
                 .competition-name {
                     font-size: 1.1rem;
                     font-weight: 600;
-                    color: #ffffff;
+                    color: $text-color;
                 }
             }
 
@@ -79,7 +78,7 @@
                 align-items: center;
                 gap: 8px;
                 font-size: 0.95rem;
-                color: #a0aec0;
+                color: $text-color;
 
                 i {
                     font-size: 1.1rem;
@@ -112,7 +111,6 @@
             gap: 32px;
             align-items: center;
             margin-bottom: 24px;
-
             // Teams
             .match-hero-team {
                 display: flex;
@@ -144,7 +142,7 @@
                     font-weight: 700;
                     text-align: center;
                     margin: 0;
-                    color: #ffffff;
+                    color: $text-color;
                 }
 
                 .team-favorite-btn {
@@ -162,7 +160,7 @@
                     flex-shrink: 0;
 
                     i {
-                        font-size: 0.9rem;
+                        font-size: 1rem;
                         color: #ffd700;
                     }
 
@@ -195,36 +193,42 @@
                 }
 
                 @keyframes favoriteScale {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.2); }
-                    100% { transform: scale(1); }
+                    0% {
+                        transform: scale(1);
+                    }
+
+                    50% {
+                        transform: scale(1.2);
+                    }
+
+                    100% {
+                        transform: scale(1);
+                    }
                 }
 
                 .team-position {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(255, 255, 255, 0.1);
-                    color: #a0aec0;
+                    display: inline-block;
+                    background: rgba(37, 140, 251, 0.15);
+                    color: var(--color-primary);
+                    padding: 2px 6px;
+                    border-radius: 3px;
                     font-size: 0.85rem;
                     font-weight: 600;
-                    padding: 4px 12px;
-                    border-radius: 12px;
-                    backdrop-filter: blur(10px);
+                    width: fit-content;
                 }
             }
-
             // Excitement Score Center
             .match-hero-score {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                padding: 24px;
                 background: rgba(255, 255, 255, 0.03);
                 border-radius: 12px;
                 border: 1px solid rgba(255, 255, 255, 0.08);
                 min-width: 280px;
+                display: flex;
+                align-items: center;
 
                 .es-label {
                     display: flex;
@@ -232,7 +236,7 @@
                     gap: 8px;
                     font-size: 0.95rem;
                     font-weight: 600;
-                    color: #a0aec0;
+                    color: $text-color;
                     margin-bottom: 16px;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
@@ -248,158 +252,57 @@
 
                 .es-value {
                     font-size: 4.5rem;
+                    text-align: center;
                     font-weight: 800;
                     line-height: 1;
-                    margin-bottom: 12px;
-                    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                    /*text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);*/
                     transition: color 0.3s ease;
+                    /* Ring background based on percentage */
+                    border-radius: 10px;
+                    padding: 8px 16px;
+                    display: flex;
+                    align-items: center;
+                }
 
-                    // Color based on ES value - smooth gradient transitions
-                    // 0-0.09 (0-9): Dark Red
-                    &[data-es^="0.00"],
-                    &[data-es^="0.01"],
-                    &[data-es^="0.02"],
-                    &[data-es^="0.03"],
-                    &[data-es^="0.04"],
-                    &[data-es^="0.05"],
-                    &[data-es^="0.06"],
-                    &[data-es^="0.07"],
-                    &[data-es^="0.08"],
-                    &[data-es^="0.09"] {
-                        color: #dc2626;
-                    }
+                [data-es] {
+                    text-align: center;
+                    color: var(--color);
+                    display: flex;
+                    align-items: center;
 
-                    // 0.10-0.19 (10-19): Red
-                    &[data-es="0.10"],
-                    &[data-es="0.11"],
-                    &[data-es="0.12"],
-                    &[data-es="0.13"],
-                    &[data-es="0.14"],
-                    &[data-es="0.15"],
-                    &[data-es="0.16"],
-                    &[data-es="0.17"],
-                    &[data-es="0.18"],
-                    &[data-es="0.19"] {
-                        color: #ef4444;
+                    &:hover {
+                        color: #ffffff;
+                        background-color: var(--color);
                     }
+                }
+                /* Color variations based on ES value */
+                [data-es^="0.0"],
+                [data-es^="0.1"],
+                [data-es^="0.2"] {
+                    --color: #ff4444; /* Red for ES < 25% */
+                }
 
-                    // 0.20-0.29 (20-29): Red-Orange
-                    &[data-es="0.20"],
-                    &[data-es="0.21"],
-                    &[data-es="0.22"],
-                    &[data-es="0.23"],
-                    &[data-es="0.24"],
-                    &[data-es="0.25"],
-                    &[data-es="0.26"],
-                    &[data-es="0.27"],
-                    &[data-es="0.28"],
-                    &[data-es="0.29"] {
-                        color: #f87171;
-                    }
+                [data-es^="0.3"],
+                [data-es^="0.4"] {
+                    --color: #7D4D00; /* Yellow for ES < 50% */
+                }
 
-                    // 0.30-0.39 (30-39): Orange
-                    &[data-es="0.30"],
-                    &[data-es="0.31"],
-                    &[data-es="0.32"],
-                    &[data-es="0.33"],
-                    &[data-es="0.34"],
-                    &[data-es="0.35"],
-                    &[data-es="0.36"],
-                    &[data-es="0.37"],
-                    &[data-es="0.38"],
-                    &[data-es="0.39"] {
-                        color: #fb923c;
-                    }
+                [data-es^="0.5"],
+                [data-es^="0.6"] {
+                    --color: #00C851; /* Green for ES < 70% */
+                }
 
-                    // 0.40-0.49 (40-49): Yellow
-                    &[data-es="0.40"],
-                    &[data-es="0.41"],
-                    &[data-es="0.42"],
-                    &[data-es="0.43"],
-                    &[data-es="0.44"],
-                    &[data-es="0.45"],
-                    &[data-es="0.46"],
-                    &[data-es="0.47"],
-                    &[data-es="0.48"],
-                    &[data-es="0.49"] {
-                        color: #fbbf24;
-                    }
-
-                    // 0.50-0.59 (50-59): Yellow-Green
-                    &[data-es="0.50"],
-                    &[data-es="0.51"],
-                    &[data-es="0.52"],
-                    &[data-es="0.53"],
-                    &[data-es="0.54"],
-                    &[data-es="0.55"],
-                    &[data-es="0.56"],
-                    &[data-es="0.57"],
-                    &[data-es="0.58"],
-                    &[data-es="0.59"] {
-                        color: #a3e635;
-                    }
-
-                    // 0.60-0.69 (60-69): Green
-                    &[data-es="0.60"],
-                    &[data-es="0.61"],
-                    &[data-es="0.62"],
-                    &[data-es="0.63"],
-                    &[data-es="0.64"],
-                    &[data-es="0.65"],
-                    &[data-es="0.66"],
-                    &[data-es="0.67"],
-                    &[data-es="0.68"],
-                    &[data-es="0.69"] {
-                        color: #34d399;
-                    }
-
-                    // 0.70-0.79 (70-79): Teal-Blue
-                    &[data-es="0.70"],
-                    &[data-es="0.71"],
-                    &[data-es="0.72"],
-                    &[data-es="0.73"],
-                    &[data-es="0.74"],
-                    &[data-es="0.75"],
-                    &[data-es="0.76"],
-                    &[data-es="0.77"],
-                    &[data-es="0.78"],
-                    &[data-es="0.79"] {
-                        color: #2dd4bf;
-                    }
-
-                    // 0.80-0.89 (80-89): Blue
-                    &[data-es="0.80"],
-                    &[data-es="0.81"],
-                    &[data-es="0.82"],
-                    &[data-es="0.83"],
-                    &[data-es="0.84"],
-                    &[data-es="0.85"],
-                    &[data-es="0.86"],
-                    &[data-es="0.87"],
-                    &[data-es="0.88"],
-                    &[data-es="0.89"] {
-                        color: #60a5fa;
-                    }
-
-                    // 0.90-1.00 (90-100): Bright Blue
-                    &[data-es="0.90"],
-                    &[data-es="0.91"],
-                    &[data-es="0.92"],
-                    &[data-es="0.93"],
-                    &[data-es="0.94"],
-                    &[data-es="0.95"],
-                    &[data-es="0.96"],
-                    &[data-es="0.97"],
-                    &[data-es="0.98"],
-                    &[data-es="0.99"],
-                    &[data-es="1.00"] {
-                        color: #3b82f6;
-                    }
+                [data-es^="0.7"],
+                [data-es^="0.8"],
+                [data-es^="0.9"],
+                [data-es="1"] {
+                    --color: #33b5e5; /* Blue for ES >= 70% */
                 }
 
                 .es-description {
                     font-size: 0.9rem;
-                    color: #cbd5e0;
+                    color: #666;
+                    font-weight: 400;
                     line-height: 1.5;
                     margin: 0 0 16px 0;
                     max-width: 300px;
@@ -441,7 +344,6 @@
                 }
             }
         }
-
         // Actions Bar
         .match-hero-actions {
             display: flex;
@@ -513,18 +415,10 @@
                 height: 48px;
                 padding: 0 16px;
                 border-radius: 24px;
-                background-color: rgba(255, 255, 255, 0.08);
-                border: 2px solid rgba(255, 255, 255, 0.15);
                 color: #ffffff;
                 cursor: pointer;
                 transition: all 0.2s ease;
                 font-size: 1.1rem;
-
-                &:hover {
-                    background-color: rgba(255, 255, 255, 0.12);
-                    border-color: rgba(255, 255, 255, 0.25);
-                    transform: translateY(-2px);
-                }
 
                 &.liked {
                     background-color: rgba(220, 38, 38, 0.2);
@@ -546,7 +440,7 @@
                 }
 
                 i {
-                    transition: transform 0.2s ease;
+                    color: #dc2626;
                 }
             }
 
@@ -557,7 +451,7 @@
 
                 .share-label {
                     font-size: 0.9rem;
-                    color: #a0aec0;
+                    color: $text-color;
                     margin-right: 4px;
                 }
 
@@ -567,7 +461,6 @@
                     border-radius: 50%;
                     background-color: rgba(255, 255, 255, 0.08);
                     border: 2px solid rgba(255, 255, 255, 0.15);
-                    color: #ffffff;
                     cursor: pointer;
                     transition: all 0.2s ease;
                     display: flex;
@@ -580,30 +473,49 @@
                         transform: translateY(-2px);
                     }
 
+                    &.share-whatsapp {
+                        color: #25D366;
+                    }
+
                     &.share-whatsapp:hover {
                         background-color: #25D366;
+                        color: #fff;
                         border-color: #25D366;
                     }
 
+                    &.share-twitter {
+                        color: rgb(23, 21, 21);
+                    }
+
                     &.share-twitter:hover {
-                        background-color: #1DA1F2;
-                        border-color: #1DA1F2;
+                        background-color: rgb(23, 21, 21);
+                        color: #fff;
+                        border-color: rgb(23, 21, 21);
+                    }
+
+                    &.share-facebook {
+                        color: #1877F2;
                     }
 
                     &.share-facebook:hover {
                         background-color: #1877F2;
+                        color: #fff;
                         border-color: #1877F2;
+                    }
+
+                    &.share-copy {
+                        color: #8b5cf6;
                     }
 
                     &.share-copy:hover {
                         background-color: #8b5cf6;
+                        color: #fff;
                         border-color: #8b5cf6;
                     }
                 }
             }
         }
     }
-
     // ========================================
     // TWO COLUMN STATS SECTION
     // ========================================
@@ -617,10 +529,9 @@
             flex-direction: column;
             gap: 24px;
         }
-
         // Card base styles
         .match-detail-card {
-            background: #22293b;
+            background: #ffffff;
             border-radius: 12px;
             padding: 24px;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -639,7 +550,7 @@
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                color: #ffffff;
+                color: $text-color;
 
                 i {
                     font-size: 1.2rem;
@@ -647,7 +558,6 @@
                 }
             }
         }
-
         // Excitement Breakdown
         .esdetail-content {
             display: flex;
@@ -662,20 +572,20 @@
 
                     .esdetail-name {
                         font-size: 0.85rem;
-                        color: #a0aec0;
+                        color: $text-color;
                         font-weight: 500;
                     }
 
                     .esdetail-value {
                         font-size: 0.9rem;
                         font-weight: 700;
-                        color: #ffffff;
+                        color: $text-color;
                     }
                 }
 
                 .esdetail-bar {
                     height: 8px;
-                    background: rgba(255, 255, 255, 0.08);
+                    background: rgb(18, 16, 16, 0.10);
                     border-radius: 4px;
                     overflow: hidden;
 
@@ -683,85 +593,37 @@
                         height: 100%;
                         border-radius: 4px;
                         transition: width 0.6s ease, background 0.3s ease;
-
-                        // Simplified 4-tier color system
-                        // 0-24: Red (Low)
-                        &[data-score="0"], &[data-score="1"], &[data-score="2"], &[data-score="3"], &[data-score="4"],
-                        &[data-score="5"], &[data-score="6"], &[data-score="7"], &[data-score="8"], &[data-score="9"],
-                        &[data-score="10"], &[data-score="11"], &[data-score="12"], &[data-score="13"], &[data-score="14"],
-                        &[data-score="15"], &[data-score="16"], &[data-score="17"], &[data-score="18"], &[data-score="19"],
-                        &[data-score="20"], &[data-score="21"], &[data-score="22"], &[data-score="23"], &[data-score="24"] {
-                            background: linear-gradient(90deg, #dc2626, #ef4444);
-                        }
-
-                        // 25-49: Orange (Medium-Low)
-                        &[data-score="25"], &[data-score="26"], &[data-score="27"], &[data-score="28"], &[data-score="29"],
-                        &[data-score="30"], &[data-score="31"], &[data-score="32"], &[data-score="33"], &[data-score="34"],
-                        &[data-score="35"], &[data-score="36"], &[data-score="37"], &[data-score="38"], &[data-score="39"],
-                        &[data-score="40"], &[data-score="41"], &[data-score="42"], &[data-score="43"], &[data-score="44"],
-                        &[data-score="45"], &[data-score="46"], &[data-score="47"], &[data-score="48"], &[data-score="49"] {
-                            background: linear-gradient(90deg, #f59e0b, #fbbf24);
-                        }
-
-                        // 50-74: Green (Medium-High)
-                        &[data-score="50"], &[data-score="51"], &[data-score="52"], &[data-score="53"], &[data-score="54"],
-                        &[data-score="55"], &[data-score="56"], &[data-score="57"], &[data-score="58"], &[data-score="59"],
-                        &[data-score="60"], &[data-score="61"], &[data-score="62"], &[data-score="63"], &[data-score="64"],
-                        &[data-score="65"], &[data-score="66"], &[data-score="67"], &[data-score="68"], &[data-score="69"],
-                        &[data-score="70"], &[data-score="71"], &[data-score="72"], &[data-score="73"], &[data-score="74"] {
-                            background: linear-gradient(90deg, #10b981, #34d399);
-                        }
-
-                        // 75-100: Blue (High)
-                        &[data-score="75"], &[data-score="76"], &[data-score="77"], &[data-score="78"], &[data-score="79"],
-                        &[data-score="80"], &[data-score="81"], &[data-score="82"], &[data-score="83"], &[data-score="84"],
-                        &[data-score="85"], &[data-score="86"], &[data-score="87"], &[data-score="88"], &[data-score="89"],
-                        &[data-score="90"], &[data-score="91"], &[data-score="92"], &[data-score="93"], &[data-score="94"],
-                        &[data-score="95"], &[data-score="96"], &[data-score="97"], &[data-score="98"], &[data-score="99"],
-                        &[data-score="100"] {
-                            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-                        }
+                        background: linear-gradient(90deg, #dc2626 0%, #f59e0b 25%, #10b981 75%, #3b82f6 100%);
                     }
                 }
             }
         }
-
         // Form badges (shared style)
         .form-badge {
-            display: inline-flex;
+            width: 24px;
+            height: 24px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: 0.75rem;
-            font-weight: 800;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-            &:hover {
-                transform: scale(1.1);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            }
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 700;
 
             &[data-form-score="1"] {
                 background-color: #22c55e;
                 color: #ffffff;
-                border: 2px solid #16a34a;
             }
 
             &[data-form-score="0"] {
                 background-color: #eab308;
                 color: #ffffff;
-                border: 2px solid #ca8a04;
             }
 
             &[data-form-score="-1"] {
                 background-color: #ef4444;
                 color: #ffffff;
-                border: 2px solid #dc2626;
             }
         }
-
         // Recent Form
         .form-content {
             display: flex;
@@ -773,18 +635,14 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 12px;
-                background: rgba(255, 255, 255, 0.03);
                 border-radius: 8px;
                 transition: background 0.2s ease;
-
-                &:hover {
-                    background: rgba(255, 255, 255, 0.06);
-                }
+                /*background-color: #21242cc1;*/
+                color: $text-color;
 
                 .form-team-name {
                     font-size: 0.95rem;
                     font-weight: 600;
-                    color: #ffffff;
                 }
 
                 .form-badges {
@@ -793,7 +651,6 @@
                 }
             }
         }
-
         // Head to Head
         .h2h-content {
             display: flex;
@@ -854,7 +711,7 @@
                         font-weight: 500;
 
                         &.winner {
-                            color: #ffffff;
+                            color: #33b5e5;
                             font-weight: 700;
                         }
 
@@ -893,7 +750,6 @@
                 }
             }
         }
-
         // League Table
         .league-table-content {
             .league-table-wrapper {
@@ -933,7 +789,7 @@
                             text-align: left;
                             font-weight: 700;
                             font-size: 0.75rem;
-                            color: #a0aec0;
+                            color: $text-color;
                             text-transform: uppercase;
                             letter-spacing: 0.05em;
                             white-space: nowrap;
@@ -978,29 +834,31 @@
                             }
 
                             td {
-                                font-weight: 600;
-                                color: #ffffff;
-                            }
-
-                            .col-pos {
                                 color: #33b5e5;
-                                font-weight: 800;
-                            }
+                                color: $text-color;
 
-                            .team-name {
-                                color: #ffffff;
-                                font-weight: 700;
-                            }
+                                &.col-pos {
+                                    color: #33b5e5;
+                                    font-weight: 800;
+                                }
 
-                            .col-pts {
-                                color: #33b5e5;
-                                font-weight: 800;
+                                &.col-team {
+                                    .team-name {
+                                        color: #33b5e5;
+                                        font-weight: 800;
+                                    }
+                                }
+
+                                &.col-pts {
+                                    color: #33b5e5;
+                                    font-weight: 800;
+                                }
                             }
                         }
 
                         td {
                             padding: 12px 8px;
-                            color: #cbd5e0;
+                            color: $text-color;
 
                             &.col-pos {
                                 text-align: center;
@@ -1021,7 +879,7 @@
                                 }
 
                                 .team-name {
-                                    color: #ffffff;
+                                    color: $text-color;
                                     font-weight: 500;
                                     white-space: nowrap;
                                     overflow: hidden;
@@ -1037,7 +895,7 @@
                             &.col-pts {
                                 text-align: center;
                                 font-weight: 800;
-                                color: #ffffff;
+                                color: $text-color;
                                 font-size: 0.9rem;
                             }
                         }
@@ -1045,7 +903,6 @@
                 }
             }
         }
-
         // Ad container
         .ad-container {
             background: rgba(255, 255, 255, 0.02);

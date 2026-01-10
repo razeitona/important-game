@@ -23,7 +23,16 @@ public class MatchDetailViewModel
     public double ExcitmentScore { get; set; }
     public bool IsRivalry { get; set; } = false;
     public bool HasTitleHolder { get; set; } = false;
-    public bool IsLive { get; set; } = false;
+    public bool IsLive
+    {
+        get
+        {
+            var now = DateTimeOffset.UtcNow;
+            var matchEnd = MatchDateUTC.AddMinutes(120);
+            return now >= MatchDateUTC && now <= matchEnd;
+        }
+    }
+
     public Dictionary<string, (bool Show, double Value)> ExcitmentScoreDetail { get; set; } = new();
     public string? Description { get; set; }
     public List<HeadToHeadDto> HeadToHead { get; set; } = new();

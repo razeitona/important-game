@@ -30,11 +30,8 @@ internal static class MatchMapper
 
         matchDetail.ExcitmentScoreDetail = SetupExcitmentScoreDetail(matchDetailDto);
         matchDetail.Description = BuildSentence(matchDetail.ExcitmentScoreDetail);
-
-        // Calculate IsLive based on match start time (within last 90 minutes)
-        var now = DateTimeOffset.UtcNow;
-        var matchEnd = matchDetailDto.MatchDateUTC.AddMinutes(90);
-        matchDetail.IsLive = now >= matchDetailDto.MatchDateUTC && now <= matchEnd;
+        matchDetail.IsRivalry = matchDetailDto.RivalryScore > 0d;
+        matchDetail.HasTitleHolder = matchDetailDto.TitleHolderScore > 0d;
 
         return matchDetail;
     }

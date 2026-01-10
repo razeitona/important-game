@@ -9,4 +9,5 @@ public interface IMatchService
     Task<MatchesViewModel> GetAllMatchesAsync(CancellationToken cancellationToken = default);
     Task<MatchDetailViewModel?> GetMatchByIdAsync(int matchId, CancellationToken cancellationToken = default);
     Task<MatchDetailViewModel?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug, CancellationToken cancellationToken = default);
+    Task<MatchDetailViewModel?> GetMatchOfTheDayAsync(CancellationToken cancellationToken = default);
 }

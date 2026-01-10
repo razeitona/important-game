@@ -20,6 +20,18 @@
     </script>
 </div>
 
+@* Match of the Day Section *@
+@if (Model.MatchOfTheDay != null)
+{
+    <div class="matches-section" id="match-of-the-day-section">
+        <div class="matches-section-title">
+            <h1><i class="bi bi-fire" style="color: #ff6b35;"></i> Match of the day</h1>
+            <a href="/matches">See all</a>
+        </div>
+        <partial name="_MatchOfTheDay" for="@Model.MatchOfTheDay" />
+    </div>
+}
+
 @if (Model.LiveMatches.Count > 0)
 {
     <div class="matches-section live-matches-section" id="live-matches-section">
@@ -41,7 +53,7 @@
 {
     <div class="matches-section" id="trending-matches-section">
         <div class="matches-section-title">
-            <h1>Match of the week</h1>
+            <h1><i class="bi bi-trophy-fill" style="color: #f7931e;"></i> Match of the week</h1>
             <a href="/matches">See all</a>
         </div>
 
@@ -81,7 +93,7 @@
 
 <div class="matches-section" id="upcoming-matches-section">
     <div class="matches-section-title">
-        <h1>Upcoming matches</h1>
+        <h1><i class="bi bi-calendar-event-fill" style="color: #258cfb;"></i> Upcoming matches</h1>
         <a href="/matches">See all</a>
     </div>
 
