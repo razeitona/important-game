@@ -49,18 +49,25 @@
                     </div>
                 </div>
                 <div class="match-card-score">
-                    <div class="match-card-score-value" title="Excitement Score" data-es="@(Math.Round(Model.ExcitmentScore, 2).ToString().Replace(",", "."))">
-                        @if (false)
+                    @{
+                        var displayScore = Model.IsLive && Model.LiveExcitementScore.HasValue
+                            ? Model.LiveExcitementScore.Value
+                            : Model.ExcitmentScore;
+                        var scoreDifference = Model.IsLive && Model.LiveExcitementScore.HasValue
+                            ? (int)Math.Round((Model.LiveExcitementScore.Value - Model.ExcitmentScore) * 100, 0)
+                            : 0;
+                        var trendIcon = scoreDifference > 5 ? "↗" : scoreDifference < -5 ? "↘" : "━";
+                        var trendClass = scoreDifference > 5 ? "trend-up" : scoreDifference < -5 ? "trend-down" : "trend-stable";
+                    }
+                    <div class="match-card-score-value" title="@(Model.IsLive ? "Live Excitement Score" : "Excitement Score")" data-es="@(Math.Round(displayScore, 2).ToString().Replace(",", "."))">
+                        <i class="bi bi-fire es-fire-icon"></i>
+                        @(Math.Round(displayScore * 100, 0))
+                        @if (Model.IsLive && Model.LiveExcitementScore.HasValue)
                         {
-                            @(Math.Round(Model.ExcitmentScore * 100, 0))
-                        }
-                        else
-                        {
-                            <i class="bi bi-fire es-fire-icon"></i> 
-                            @(Math.Round(Model.ExcitmentScore * 100, 0))
+                            <span class="score-trend @trendClass" title="@(scoreDifference > 0 ? "+" : "")@scoreDifference from baseline">@trendIcon</span>
                         }
                     </div>
-                    <span>Excitment score</span>
+                    <span>@(Model.IsLive && Model.LiveExcitementScore.HasValue ? "Live score" : "Excitment score")</span>
                 </div>
                 <div class="match-card-team">
                     <div class="match-card-team-logo">

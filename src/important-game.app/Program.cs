@@ -23,10 +23,11 @@ builder.ConfigureServices((context, services) =>
 
     // Register all background jobs
     services.AddHostedService<MatchCalculatorJob>();
+    services.AddHostedService<LiveScoreCalculatorJob>();
     services.AddHostedService<SyncCompetitionJob>();
     services.AddHostedService<SyncFinishedMatchesJob>();
     services.AddHostedService<SyncUpcomingMatchesJob>();
-    services.AddHostedService<BroadcastFinderJob>();
+    //services.AddHostedService<BroadcastFinderJob>();
 });
 
 // Add Dapper type handlers
@@ -37,7 +38,7 @@ var host = builder.Build();
 
 // Log startup information
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Application started successfully with {JobCount} background jobs registered.", 4);
+logger.LogInformation("Application started successfully with {JobCount} background jobs registered.", 6);
 logger.LogInformation("Press Ctrl+C to stop the application.");
 
 try

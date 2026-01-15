@@ -52,9 +52,11 @@ body {
 
 @import "_main.scss";
 @import "_about.scss";
+@import "_terms.scss";
 @import "_matches_section.scss";
 @import "_matches.scss";
 @import "_match_detail.scss";
+@import "_match_stream.scss";
 @import "_league.scss";
 @import "_match_card.scss";
 @import "_match_card_simple.scss";
@@ -69,3 +71,4 @@ body {
 @import "_favorites.scss";
 @import "_broadcast_channels.scss";
 @import "_settings.scss";
+@import "_live_score.scss";

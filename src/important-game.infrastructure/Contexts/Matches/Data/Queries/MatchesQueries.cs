@@ -75,7 +75,7 @@ internal static class MatchesQueries
         WHERE m.IsFinished = 0";
 
     internal const string SelectAllUnfinishedMatches = @"
-        SELECT 
+        SELECT
             m.MatchId,
             c.CompetitionId,
             c.Name as 'CompetitionName',
@@ -86,7 +86,14 @@ internal static class MatchesQueries
             ht.Name as 'HomeTeamName',
             at.Name as 'AwayTeamName',
             at.Id as 'AwayTeamId',
-            m.ExcitmentScore
+            m.ExcitmentScore,
+            m.LiveExcitementScore,
+            m.ScoreLineScore,
+            m.XGoalsScore,
+            m.TotalFoulsScore,
+            m.TotalCardsScore,
+            m.PossessionScore,
+            m.BigChancesScore
         FROM Matches m
         INNER JOIN Teams ht
             ON m.HomeTeamId = ht.Id
@@ -94,9 +101,47 @@ internal static class MatchesQueries
             ON m.AwayTeamId = at.Id
         INNER JOIN Competitions c
 	        ON c.CompetitionId = m.CompetitionId
-        WHERE 
+        WHERE
             m.IsFinished = 0
         ORDER BY datetime(m.MatchDateUTC) ASC";
+
+    internal const string SelectLiveMatches = @"
+        SELECT
+            m.MatchId,
+            m.HomeTeamId,
+            m.AwayTeamId,
+            ht.Name as 'HomeTeamName',
+            ht.ShortName as 'HomeTeamShortName',
+            at.Name as 'AwayTeamName',
+            at.ShortName as 'AwayTeamShortName',
+            m.MatchDateUTC as 'StartTime',
+            m.ExcitmentScore as 'CurrentExcitementScore',
+            m.LiveExcitementScore as 'CurrentLiveExcitementScore',
+            m.CompetitionId,
+            c.Name as 'CompetitionName',
+            COALESCE(hct.Position, 999) as 'HomeTeamPosition',
+            COALESCE(act.Position, 999) as 'AwayTeamPosition'
+        FROM Matches m
+        INNER JOIN Teams ht ON m.HomeTeamId = ht.Id
+        INNER JOIN Teams at ON m.AwayTeamId = at.Id
+        INNER JOIN Competitions c ON c.CompetitionId = m.CompetitionId
+        LEFT JOIN CompetitionTable hct ON hct.CompetitionId = m.CompetitionId AND hct.TeamId = m.HomeTeamId
+        LEFT JOIN CompetitionTable act ON act.CompetitionId = m.CompetitionId AND act.TeamId = m.AwayTeamId
+        WHERE m.IsFinished = 0
+          AND datetime(m.MatchDateUTC) <= datetime('now')
+        ORDER BY m.ExcitmentScore DESC, m.MatchDateUTC ASC";
+
+    internal const string UpdateLiveExcitementScore = @"
+        UPDATE Matches
+        SET LiveExcitementScore = @LiveExcitementScore,
+            ScoreLineScore = @ScoreLineScore,
+            XGoalsScore = @XGoalsScore,
+            TotalFoulsScore = @TotalFoulsScore,
+            TotalCardsScore = @TotalCardsScore,
+            PossessionScore = @PossessionScore,
+            BigChancesScore = @BigChancesScore,
+            UpdatedDateUTC = @UpdatedDateUTC
+        WHERE MatchId = @MatchId";
 
 
     internal const string SelectMatchById = @"
@@ -117,6 +162,7 @@ internal static class MatchesQueries
            act.Position as 'AwayTeamTablePosition',
 	       m.AwayForm as 'AwayTeamForm',
            m.ExcitmentScore,
+           m.LiveExcitementScore,
 	       m.CompetitionScore,
 	       m.CompetitionStandingScore,
 	       m.FixtureScore,
@@ -124,7 +170,13 @@ internal static class MatchesQueries
 	       m.GoalsScore,
 	       m.HeadToHeadScore,
 	       m.RivalryScore,
-	       m.TitleHolderScore
+	       m.TitleHolderScore,
+           m.ScoreLineScore,
+           m.XGoalsScore,
+           m.TotalFoulsScore,
+           m.TotalCardsScore,
+           m.PossessionScore,
+           m.BigChancesScore
        FROM Matches m
        INNER JOIN Teams ht
            ON m.HomeTeamId = ht.Id
@@ -158,6 +210,7 @@ internal static class MatchesQueries
            act.Position as 'AwayTeamTablePosition',
 	       m.AwayForm as 'AwayTeamForm',
            m.ExcitmentScore,
+           m.LiveExcitementScore,
 	       m.CompetitionScore,
 	       m.CompetitionStandingScore,
 	       m.FixtureScore,
@@ -165,7 +218,13 @@ internal static class MatchesQueries
 	       m.GoalsScore,
 	       m.HeadToHeadScore,
 	       m.RivalryScore,
-	       m.TitleHolderScore
+	       m.TitleHolderScore,
+           m.ScoreLineScore,
+           m.XGoalsScore,
+           m.TotalFoulsScore,
+           m.TotalCardsScore,
+           m.PossessionScore,
+           m.BigChancesScore
        FROM Matches m
        INNER JOIN Teams ht
            ON m.HomeTeamId = ht.Id

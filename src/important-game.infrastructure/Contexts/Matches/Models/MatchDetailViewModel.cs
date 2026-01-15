@@ -21,6 +21,13 @@ public class MatchDetailViewModel
     public List<MatchResultType> AwayTeamForm { get; set; } = [];
     public int? AwayTeamTablePosition { get; set; }
     public double ExcitmentScore { get; set; }
+    public double? LiveExcitementScore { get; set; }
+    public double ScoreLineScore { get; set; }
+    public double XGoalsScore { get; set; }
+    public double TotalFoulsScore { get; set; }
+    public double TotalCardsScore { get; set; }
+    public double PossessionScore { get; set; }
+    public double BigChancesScore { get; set; }
     public bool IsRivalry { get; set; } = false;
     public bool HasTitleHolder { get; set; } = false;
     public bool IsLive

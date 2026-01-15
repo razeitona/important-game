@@ -23,7 +23,7 @@ internal class MatchService(
         {
             upcomingMatches = await matchesRepository.GetAllUnfinishedMatchesAsync();
             if (upcomingMatches != null && upcomingMatches.Count > 0)
-                memoryCache.Set("upcoming_matches", upcomingMatches, TimeSpan.FromMinutes(10));
+                memoryCache.Set("upcoming_matches", upcomingMatches, TimeSpan.FromMinutes(5));
         }
         return upcomingMatches?.OrderBy(c => c.MatchDateUTC).ToList() ?? [];
     }
@@ -89,7 +89,7 @@ internal class MatchService(
         {
             matchDetailDto = await matchesRepository.GetMatchByIdAsync(matchId);
             if (matchDetailDto != null)
-                memoryCache.Set($"match_{matchId}", matchDetailDto, TimeSpan.FromMinutes(10));
+                memoryCache.Set($"match_{matchId}", matchDetailDto, TimeSpan.FromMinutes(5));
         }
 
         if (matchDetailDto == null)
@@ -168,7 +168,7 @@ internal class MatchService(
         {
             matchDetailDto = await matchesRepository.GetMatchOfTheDayAsync();
             if (matchDetailDto != null)
-                memoryCache.Set("match_of_the_day", matchDetailDto, TimeSpan.FromMinutes(30));
+                memoryCache.Set("match_of_the_day", matchDetailDto, TimeSpan.FromMinutes(2));
         }
 
         if (matchDetailDto == null)

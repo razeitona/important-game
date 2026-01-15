@@ -15,7 +15,8 @@
       "Bash(dotnet add package:*)",
       "Bash(dotnet tool install:*)",
       "Bash(npm run build:js:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(del:*)"
     ]
   }
 }

@@ -11,4 +11,12 @@ public interface IMatchCalculatorOrchestrator
     /// Processes matches in parallel with thread-safe semaphore control.
     /// </summary>
     Task CalculateExcitmentScoreAsync(bool skipDateCondition = false, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Calculates excitement scores for currently live matches using SofaScore data.
+    /// Updates scores based on live match events (goals, cards, shots, etc.).
+    /// Maps SofaScore event IDs to internal match IDs using fuzzy matching.
+    /// Processes top priority matches to stay within API rate limits.
+    /// </summary>
+    Task CalculateLiveScoreAsync(CancellationToken cancellationToken = default);
 }

@@ -4,6 +4,11 @@ namespace important_game.infrastructure.Contexts.Providers.ExternalServices.Sofa
 {
     public interface ISofaScoreIntegration
     {
+        /// <summary>
+        /// Retrieves all currently live football matches.
+        /// This is the most efficient endpoint for discovering live matches.
+        /// </summary>
+        Task<SSLiveEventsResponse> GetAllLiveMatchesAsync();
         Task<SSTournament> GetTournamentAsync(string tournamentId);
         Task<SSTournamentSeasons> GetTournamentSeasonsAsync(string tournamentId);
         Task<SSTournamentStandings> GetTournamentSeasonsTableAsync(string tournamentId, int seasonId);

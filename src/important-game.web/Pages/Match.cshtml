@@ -56,6 +56,10 @@
         var matchStatus = matchInfo.IsLive ? "EventScheduled" : "EventScheduled";
     }
 
+    <!-- Video.js CSS and JS for HLS Streaming -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
     <!-- Schema.org SportsEvent structured data -->
     <script type="application/ld+json">
         {
@@ -165,12 +169,28 @@
 
             @* EXCITEMENT SCORE CENTER *@
             <div class="match-hero-score">
+                @{
+                    var heroDisplayScore = matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue
+                        ? matchInfo.LiveExcitementScore.Value
+                        : matchInfo.ExcitmentScore;
+                    var heroScoreDifference = matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue
+                        ? (int)Math.Round((matchInfo.LiveExcitementScore.Value - matchInfo.ExcitmentScore) * 100, 0)
+                        : 0;
+                    var heroTrendIcon = heroScoreDifference > 5 ? "↗" : heroScoreDifference < -5 ? "↘" : "━";
+                    var heroTrendClass = heroScoreDifference > 5 ? "trend-up" : heroScoreDifference < -5 ? "trend-down" : "trend-stable";
+                }
                 <div class="es-label">
                     <i class="bi bi-fire"></i>
-                    <span>Excitement Score</span>
+                    <span>@(matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue ? "Live Excitement Score" : "Excitement Score")</span>
                 </div>
-                <div class="es-value" data-es="@(Math.Round(matchInfo.ExcitmentScore, 2).ToString("0.00", CultureInfo.InvariantCulture))">
-                    @(Math.Round(matchInfo.ExcitmentScore * 100, 0))
+                <div class="es-value" data-es="@(Math.Round(heroDisplayScore, 2).ToString("0.00", CultureInfo.InvariantCulture))">
+                    @(Math.Round(heroDisplayScore * 100, 0))
+                    @if (matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue)
+                    {
+                        <span class="score-trend-hero @heroTrendClass" title="@(heroScoreDifference > 0 ? "+" : "")@heroScoreDifference from pre-match baseline">
+                            @heroTrendIcon @(heroScoreDifference > 0 ? "+" : "")@heroScoreDifference
+                        </span>
+                    }
                 </div>
                 <p class="es-description">@matchInfo.Description</p>
                 @if (matchInfo.IsRivalry || matchInfo.HasTitleHolder)
@@ -264,25 +284,88 @@
 
     </div>
 
+    @* BROADCAST STREAMERS - INLINE *@
+    @* if (matchInfo.BroadcastsByCountry != null && matchInfo.BroadcastsByCountry.Count > 0) *@
+    @* {
+    //     <div class="match-broadcasters-inline">
+    //         <div class="broadcasters-header">
+    //             <h3><i class="bi bi-tv-fill"></i> Watch Live</h3>
+    //             <span class="broadcasters-count">Available Streams</span>
+    //         </div>
+    //         <div class="broadcasters-list">
+    //             <button class="broadcaster-btn" data-stream-url="https://trkvz-live.ercdn.net/asporhd/asporhd_720p.m3u8">
+    //                 <i class="bi bi-play-circle-fill"></i>
+    //                 <span>A Spor HD</span>
+    //             </button>
+    //             <button class="broadcaster-btn" data-stream-url="https://trkvz-live.ercdn.net/asporhd/asporhd_720p.m3u8">
+    //                 <i class="bi bi-play-circle-fill"></i>
+    //                 <span>Stream 2</span>
+    //             </button>
+    //             <button class="broadcaster-btn" data-stream-url="https://trkvz-live.ercdn.net/asporhd/asporhd_720p.m3u8">
+    //                 <i class="bi bi-play-circle-fill"></i>
+    //                 <span>Stream 3</span>
+    //             </button>
+    //         </div>
+    //         <div class="broadcast-disclaimer">
+    //             <i class="bi bi-exclamation-triangle-fill"></i>
+    //             <p><strong>Disclaimer:</strong> We do not host any content. All streams are provided by third-party sources. Match to Watch is not responsible for the availability or content of external streams.</p>
+    //         </div>
+    //     </div>
+    // } *@
+
+    @* STREAM PLAYER *@
+    @* <partial name="_MatchStreamPlayer" /> *@
+
     @* TWO COLUMN LAYOUT - STATS *@
     <div class="match-detail-stats">
         <div class="match-detail-column">
             @* EXCITEMENT BREAKDOWN *@
             <div class="match-detail-card">
-                <h3><i class="bi bi-bar-chart-line"></i>Excitement Score Breakdown</h3>
+                <h3><i class="bi bi-bar-chart-line"></i>@(matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue ? "Live Score Breakdown" : "Excitement Score Breakdown")</h3>
                 <div class="esdetail-content">
-                    @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
+                    @if (matchInfo.IsLive && matchInfo.LiveExcitementScore.HasValue)
                     {
-                        var scoreValue = Math.Round(item.Value.Value * 100, 0);
-                        <div class="esdetail-item">
-                            <div class="esdetail-header">
-                                <span class="esdetail-name">@item.Key</span>
-                                <span class="esdetail-value">@scoreValue</span>
+                        @* Show Live Score Components *@
+                        var liveComponents = new Dictionary<string, double>
+                        {
+                            { "Score Line", matchInfo.ScoreLineScore },
+                            { "Expected Goals (xG)", matchInfo.XGoalsScore },
+                            { "Ball Possession", matchInfo.PossessionScore },
+                            { "Big Chances", matchInfo.BigChancesScore },
+                            { "Fouls", matchInfo.TotalFoulsScore },
+                            { "Cards (Yellow/Red)", matchInfo.TotalCardsScore }
+                        };
+
+                        foreach (var item in liveComponents.OrderByDescending(c => c.Value))
+                        {
+                            var scoreValue = Math.Round(item.Value * 100, 0);
+                            <div class="esdetail-item">
+                                <div class="esdetail-header">
+                                    <span class="esdetail-name">@item.Key</span>
+                                    <span class="esdetail-value">@scoreValue</span>
+                                </div>
+                                <div class="esdetail-bar">
+                                    <div class="esdetail-bar-fill" style="width: @(scoreValue)%" data-score="@scoreValue"></div>
+                                </div>
                             </div>
-                            <div class="esdetail-bar">
-                                <div class="esdetail-bar-fill" style="width: @(scoreValue)%" data-score="@scoreValue"></div>
+                        }
+                    }
+                    else
+                    {
+                        @* Show Pre-Match Score Components *@
+                        @foreach (var item in matchInfo.ExcitmentScoreDetail.Where(c => c.Value.Show))
+                        {
+                            var scoreValue = Math.Round(item.Value.Value * 100, 0);
+                            <div class="esdetail-item">
+                                <div class="esdetail-header">
+                                    <span class="esdetail-name">@item.Key</span>
+                                    <span class="esdetail-value">@scoreValue</span>
+                                </div>
+                                <div class="esdetail-bar">
+                                    <div class="esdetail-bar-fill" style="width: @(scoreValue)%" data-score="@scoreValue"></div>
+                                </div>
                             </div>
-                        </div>
+                        }
                     }
                 </div>
             </div>
@@ -497,6 +580,86 @@
         $(document).ready(function () {
             $(".match-detail-back").on("click", function () {
                 history.back();
+            });
+
+            // Stream Player Logic
+            let player = null;
+            const streamPlayerContainer = $("#streamPlayerContainer");
+            const broadcasterButtons = $(".broadcaster-btn");
+            const closeStreamButton = $("#closeStreamPlayer");
+
+            // Handle broadcaster button click
+            broadcasterButtons.on("click", function() {
+                const streamUrl = $(this).data("stream-url");
+
+                // Remove active class from all buttons
+                broadcasterButtons.removeClass("active");
+
+                // Add active class to clicked button
+                $(this).addClass("active");
+
+                // Show player container
+                streamPlayerContainer.fadeIn(300);
+
+                // Scroll to player smoothly
+                $('html, body').animate({
+                    scrollTop: streamPlayerContainer.offset().top - 20
+                }, 500);
+
+                // Initialize or update Video.js player
+                if (player) {
+                    player.src({
+                        src: streamUrl,
+                        type: 'application/x-mpegURL'
+                    });
+                    player.play();
+                } else {
+                    player = videojs('streamPlayer', {
+                        controls: true,
+                        autoplay: true,
+                        preload: 'auto',
+                        fluid: true,
+                        aspectRatio: '16:9',
+                        responsive: true,
+                        sources: [{
+                            src: streamUrl,
+                            type: 'application/x-mpegURL'
+                        }]
+                    });
+
+                    // Error handling
+                    player.on('error', function() {
+                        const error = player.error();
+                        console.error('Video.js Error:', error);
+                        alert('Failed to load stream. Please try another broadcaster.');
+                    });
+
+                    // Auto-quality selection for HLS
+                    player.on('loadedmetadata', function() {
+                        console.log('Stream loaded successfully');
+                    });
+                }
+            });
+
+            // Handle close player button
+            closeStreamButton.on("click", function() {
+                if (player) {
+                    player.pause();
+                }
+                streamPlayerContainer.fadeOut(300);
+                broadcasterButtons.removeClass("active");
+
+                // Scroll back to broadcasters
+                $('html, body').animate({
+                    scrollTop: $(".match-broadcasters-inline").offset().top - 20
+                }, 500);
+            });
+
+            // Cleanup on page unload
+            $(window).on('beforeunload', function() {
+                if (player) {
+                    player.dispose();
+                }
             });
 
             // Handle country dropdown for broadcasts

@@ -6,6 +6,8 @@ using important_game.infrastructure.Contexts.Matches.Data;
 using important_game.infrastructure.Contexts.Providers.Data;
 using important_game.infrastructure.Contexts.Providers.ExternalServices;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Utils;
 using important_game.infrastructure.Contexts.ScoreCalculator;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Users;
@@ -15,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using System.Net;
 
 namespace important_game.infrastructure;
 
@@ -22,7 +25,11 @@ public static class DependencyInjectionSetup
 {
     public static IServiceCollection MatchImportanceInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Add memory cache for SofaScore integration
+        services.AddMemoryCache();
+
         services.Configure<FootballDataOptions>(configuration.GetSection("FootballData"));
+        services.Configure<LiveScoreCalculatorOptions>(configuration.GetSection("LiveScoreCalculator"));
         services.AddHttpClient<IExternalIntegrationProvider, FootballDataProvider>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<FootballDataOptions>>().Value;
@@ -81,6 +88,7 @@ public static class DependencyInjectionSetup
         // Registar match calculators
         services.AddScoped<IMatchCalculatorOrchestrator, MatchCalculatorOrchestrator>();
         services.AddScoped<IMatchCalculator, MatchCalculator>();
+        services.AddScoped<LiveScoreCalculator>();
 
         // Register matches services
         services.AddScoped<IMatchService, MatchService>();
@@ -93,6 +101,40 @@ public static class DependencyInjectionSetup
         services.AddScoped<IBroadcastOrchestrator, BroadcastOrchestrator>();
         services.AddScoped<ITvGuideMatcher, TvGuideMatcher>();
 
+        // Register SofaScore integration with optimized HttpClient
+        services.AddSingleton<SofaScoreRateLimiter>();
+        services.AddHttpClient<ISofaScoreIntegration, SofaScoreIntegration>((sp, client) =>
+        {
+            // Configure base settings
+            client.Timeout = TimeSpan.FromSeconds(20);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            // Critical headers to simulate a real browser and avoid Cloudflare blocking
+            client.DefaultRequestHeaders.Add("User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+            client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,pt;q=0.8");
+            client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            client.DefaultRequestHeaders.Add("Referer", "https://www.sofascore.com/");
+            client.DefaultRequestHeaders.Add("Origin", "https://www.sofascore.com");
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("Pragma", "no-cache");
+
+            // Sec-Fetch headers to simulate CORS requests from the browser
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
+            client.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-origin");
+        })
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            // Connection pooling and automatic decompression
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+
+            // Keep connection alive to reduce overhead
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
+            MaxConnectionsPerServer = 2
+        });
 
         return services;
     }

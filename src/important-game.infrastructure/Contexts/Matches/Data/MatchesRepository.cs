@@ -211,4 +211,39 @@ public class MatchesRepository(IDbConnectionFactory connectionFactory) : IMatche
         return result;
     }
     #endregion
+
+    #region Live Matches
+    /// <summary>
+    /// Gets all matches that are currently live (started but not finished).
+    /// Live matches are determined by: IsFinished = 0 AND StartTime &lt;= NOW.
+    /// Results are ordered by ExcitementScore (descending) for priority processing.
+    /// </summary>
+    public async Task<List<LiveMatchDto>> GetLiveMatchesAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var result = await connection.QueryAsync<LiveMatchDto>(MatchesQueries.SelectLiveMatches);
+        return result.ToList();
+    }
+
+    /// <summary>
+    /// Updates the live excitement score and all its components for a specific match.
+    /// Also updates the UpdatedDateUTC timestamp.
+    /// </summary>
+    public async Task UpdateLiveExcitementScoreAsync(int matchId, double liveExcitementScore, LiveScoreComponents components)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        await connection.ExecuteAsync(MatchesQueries.UpdateLiveExcitementScore, new
+        {
+            MatchId = matchId,
+            LiveExcitementScore = liveExcitementScore,
+            ScoreLineScore = components.ScoreLineScore,
+            XGoalsScore = components.XGoalsScore,
+            TotalFoulsScore = components.TotalFoulsScore,
+            TotalCardsScore = components.TotalCardsScore,
+            PossessionScore = components.PossessionScore,
+            BigChancesScore = components.BigChancesScore,
+            UpdatedDateUTC = DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
+        });
+    }
+    #endregion
 }

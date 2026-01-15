@@ -17,6 +17,7 @@ public class MatchDetailDto
     public string? AwayTeamForm { get; set; }
     public int? AwayTeamTablePosition { get; set; }
     public double ExcitmentScore { get; set; }
+    public double? LiveExcitementScore { get; set; }
     public double CompetitionScore { get; set; }
     public double CompetitionStandingScore { get; set; }
     public double FixtureScore { get; set; }
@@ -25,5 +26,11 @@ public class MatchDetailDto
     public double HeadToHeadScore { get; set; }
     public double RivalryScore { get; set; }
     public double TitleHolderScore { get; set; }
+    public double ScoreLineScore { get; set; }
+    public double XGoalsScore { get; set; }
+    public double TotalFoulsScore { get; set; }
+    public double TotalCardsScore { get; set; }
+    public double PossessionScore { get; set; }
+    public double BigChancesScore { get; set; }
 
 }

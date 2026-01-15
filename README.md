@@ -9,7 +9,6 @@ Important Game surfaces the most exciting football fixtures of the day by combin
 - Trending matches section that highlights the top fixtures for the current week alongside other noteworthy games.
 - Match detail view with head-to-head history, team form, excitement factor explanations, and shareable metadata.
 - Telegram notification hook that broadcasts high-priority matches to a configured channel.
-- SofaScore integration that uses a throttled HttpClient with browser-like headers to fetch tournament, standings, fixture, and live event data directly from the public site.
 
 ## Solution Overview
 

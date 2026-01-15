@@ -1,0 +1,90 @@
+// Live Score Trend Indicators
+// Styles for showing if live score is trending up/down compared to baseline
+
+.score-trend {
+    display: inline-block;
+    margin-left: 0.3rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    vertical-align: middle;
+    transition: all 0.3s ease;
+
+    &.trend-up {
+        color: #10b981; // Green for trending up
+        animation: pulse-green 2s infinite;
+    }
+
+    &.trend-down {
+        color: #ef4444; // Red for trending down
+        animation: pulse-red 2s infinite;
+    }
+
+    &.trend-stable {
+        color: #f59e0b; // Amber for stable
+        opacity: 0.6;
+    }
+}
+
+.score-trend-hero {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &.trend-up {
+        color: #10b981; // Green
+        animation: pulse-green 2s infinite;
+    }
+
+    &.trend-down {
+        color: #ef4444; // Red
+        animation: pulse-red 2s infinite;
+    }
+
+    &.trend-stable {
+        color: #f59e0b; // Amber
+        opacity: 0.7;
+    }
+}
+
+// Pulse animations for trending scores
+@keyframes pulse-green {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes pulse-red {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+// Enhanced LIVE badge with animation
+.match-card-live {
+    span {
+        animation: live-pulse 2s infinite;
+    }
+}
+
+.match-detail-live-badge {
+    animation: live-pulse 2s infinite;
+}
+
+@keyframes live-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}

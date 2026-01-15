@@ -28,6 +28,18 @@ public interface IMatchesRepository
     /// Gets all unfinished matches (IsFinished = 0) with team information.
     /// </summary>
     Task<List<MatchDto>> GetAllUnfinishedMatchesAsync();
+
+    /// <summary>
+    /// Gets all matches that are currently live (started but not finished).
+    /// Live matches are those where StartTime &lt;= NOW and IsFinished = 0.
+    /// </summary>
+    Task<List<LiveMatchDto>> GetLiveMatchesAsync();
+
+    /// <summary>
+    /// Updates the live excitement bonus for a specific match.
+    /// </summary>
+    Task UpdateLiveExcitementScoreAsync(int matchId, double liveExcitementScore, LiveScoreComponents components);
+
     Task<MatchDetailDto?> GetMatchByIdAsync(int matchId);
     Task<MatchDetailDto?> GetMatchByTeamSlugsAsync(string homeSlug, string awaySlug);
     Task<DateTimeOffset?> GetTeamLastFinishedMatchDateAsync(int teamId);

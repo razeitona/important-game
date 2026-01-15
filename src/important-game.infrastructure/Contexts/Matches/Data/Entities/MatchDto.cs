@@ -16,6 +16,13 @@ public class MatchDto
     public required string AwayTeamName { get; set; }
     public int? AwayTeamScore { get; set; }
     public double ExcitmentScore { get; set; }
+    public double? LiveExcitementScore { get; set; }
+    public double? ScoreLineScore { get; set; }
+    public double? XGoalsScore { get; set; }
+    public double? TotalFoulsScore { get; set; }
+    public double? TotalCardsScore { get; set; }
+    public double? PossessionScore { get; set; }
+    public double? BigChancesScore { get; set; }
     public List<MatchBroadcastViewModel> Broadcasts { get; set; } = new();
 
     // Computed property - match is live if started within last 90 minutes
