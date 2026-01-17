@@ -27,6 +27,7 @@ builder.ConfigureServices((context, services) =>
     services.AddHostedService<SyncCompetitionJob>();
     services.AddHostedService<SyncFinishedMatchesJob>();
     services.AddHostedService<SyncUpcomingMatchesJob>();
+    services.AddHostedService<SyncTwitterPostJob>();
     //services.AddHostedService<BroadcastFinderJob>();
 });
 

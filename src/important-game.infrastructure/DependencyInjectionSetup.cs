@@ -8,6 +8,8 @@ using important_game.infrastructure.Contexts.Providers.ExternalServices;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.FootballData;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI;
 using important_game.infrastructure.Contexts.Providers.ExternalServices.SofaScoreAPI.Utils;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.TwitterAPI;
+using important_game.infrastructure.Contexts.Providers.ExternalServices.TwitterAPI.Data;
 using important_game.infrastructure.Contexts.ScoreCalculator;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Users;
@@ -100,6 +102,19 @@ public static class DependencyInjectionSetup
         services.AddScoped<IBroadcastChannelService, BroadcastChannelService>();
         services.AddScoped<IBroadcastOrchestrator, BroadcastOrchestrator>();
         services.AddScoped<ITvGuideMatcher, TvGuideMatcher>();
+
+        // Register Twitter integration
+        services.Configure<TwitterOptions>(configuration.GetSection("Twitter"));
+        services.AddHttpClient<ITwitterIntegration, TwitterIntegration>((sp, client) =>
+        {
+            client.BaseAddress = new Uri(TwitterConstants.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        });
+        services.AddScoped<ITwitterPostRepository, TwitterPostRepository>();
+        services.AddScoped<ITwitterPostGenerator, TwitterPostGenerator>();
+        services.AddScoped<ITwitterOrchestrator, TwitterOrchestrator>();
 
         // Register SofaScore integration with optimized HttpClient
         services.AddSingleton<SofaScoreRateLimiter>();
