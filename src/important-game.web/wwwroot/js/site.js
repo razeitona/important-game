@@ -1823,4 +1823,130 @@
         console.log('Google Ads dimension checker initialized');
     })();
 
+    // =============================================================================
+    // NEWSLETTER SUBSCRIPTION SYSTEM
+    // =============================================================================
+    (function initNewsletterSubscription() {
+        'use strict';
+
+        const form = document.getElementById('newsletterForm');
+        const emailInput = document.getElementById('newsletterEmail');
+        const submitBtn = document.getElementById('newsletterSubmitBtn');
+        const messageEl = document.getElementById('newsletterMessage');
+        const banner = document.getElementById('newsletterBanner');
+
+        if (!form || !emailInput || !submitBtn) return;
+
+        // Email validation regex (matches server-side)
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Validate email format
+        function isValidEmail(email) {
+            return emailRegex.test(email.trim());
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            if (!messageEl) return;
+
+            messageEl.textContent = message;
+            messageEl.className = 'newsletter-message ' + type;
+            messageEl.style.display = 'block';
+
+            // Auto-hide after 5 seconds for non-success messages
+            if (type !== 'success') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Set loading state
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+
+            if (btnText && btnLoading) {
+                btnText.style.display = isLoading ? 'none' : 'inline';
+                btnLoading.style.display = isLoading ? 'inline' : 'none';
+            }
+        }
+
+        // Handle form submission
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            // Client-side validation
+            if (!email) {
+                showMessage('Please enter your email address.', 'error');
+                emailInput.focus();
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address.', 'error');
+                emailInput.focus();
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch('/api/newslettersubscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessage(data.message, data.alreadySubscribed ? 'info' : 'success');
+
+                    if (!data.alreadySubscribed) {
+                        // Clear input and add success state
+                        emailInput.value = '';
+                        banner.classList.add('subscribed');
+
+                        // Show notification if available
+                        if (window.timezoneManager) {
+                            window.timezoneManager.showNotification(data.message);
+                        }
+
+                        // Store subscription state in localStorage
+                        localStorage.setItem('newsletter_subscribed', 'true');
+                    }
+                } else {
+                    showMessage(data.message || 'Failed to subscribe. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Newsletter subscription error:', error);
+                showMessage('An error occurred. Please try again later.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Real-time email validation feedback
+        emailInput.addEventListener('input', function() {
+            const email = this.value.trim();
+
+            if (email && !isValidEmail(email)) {
+                this.classList.add('invalid');
+            } else {
+                this.classList.remove('invalid');
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', handleSubmit);
+
+        console.log('Newsletter subscription system initialized');
+    })();
+
 })();

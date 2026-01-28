@@ -14,6 +14,9 @@ using important_game.infrastructure.Contexts.ScoreCalculator;
 using important_game.infrastructure.Contexts.Teams.Data;
 using important_game.infrastructure.Contexts.Users;
 using important_game.infrastructure.Contexts.Users.Data;
+using important_game.infrastructure.Contexts.Newsletter;
+using important_game.infrastructure.Contexts.Newsletter.Data;
+using important_game.infrastructure.Contexts.Newsletter.Email;
 using important_game.infrastructure.Data.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,6 +100,16 @@ public static class DependencyInjectionSetup
 
         // Register user services
         services.AddScoped<IUserService, UserService>();
+
+        // Register newsletter services
+        services.AddScoped<INewsletterRepository, NewsletterRepository>();
+        services.AddScoped<INewsletterService, NewsletterService>();
+
+        // Register newsletter email services
+        services.Configure<EmailOptions>(configuration.GetSection("Email"));
+        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<INewsletterTemplateGenerator, NewsletterTemplateGenerator>();
+        services.AddScoped<INewsletterOrchestrator, NewsletterOrchestrator>();
 
         // Register broadcast channel services
         services.AddScoped<IBroadcastChannelService, BroadcastChannelService>();

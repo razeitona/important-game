@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using important_game.app.Handlers;
+using important_game.app.Services;
 using important_game.infrastructure;
+using important_game.infrastructure.Contexts.Newsletter.Email;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,6 +23,9 @@ builder.ConfigureServices((context, services) =>
 
     services.MatchImportanceInfrastructure(context.Configuration);
 
+    // Configure Email options for the newsletter job
+    services.Configure<EmailOptions>(context.Configuration.GetSection("Email"));
+
     // Register all background jobs
     services.AddHostedService<MatchCalculatorJob>();
     services.AddHostedService<LiveScoreCalculatorJob>();
@@ -28,6 +33,7 @@ builder.ConfigureServices((context, services) =>
     services.AddHostedService<SyncFinishedMatchesJob>();
     services.AddHostedService<SyncUpcomingMatchesJob>();
     services.AddHostedService<SyncTwitterPostJob>();
+    services.AddHostedService<SendNewsletterJob>();
     //services.AddHostedService<BroadcastFinderJob>();
 });
 
@@ -39,7 +45,7 @@ var host = builder.Build();
 
 // Log startup information
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Application started successfully with {JobCount} background jobs registered.", 6);
+logger.LogInformation("Application started successfully with {JobCount} background jobs registered.", 7);
 logger.LogInformation("Press Ctrl+C to stop the application.");
 
 try

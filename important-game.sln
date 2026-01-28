@@ -41,6 +41,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "general", "general", "{F80A
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{103F7F69-2702-4D5A-8AD2-6D1D7B64BA81}"
+	ProjectSection(SolutionItems) = preProject
+		migrations\001_add_broadcast_channels.sql = migrations\001_add_broadcast_channels.sql
+		migrations\001_create_user_tables.sql = migrations\001_create_user_tables.sql
+		migrations\002_create_user_favorite_teams.sql = migrations\002_create_user_favorite_teams.sql
+		migrations\002_update_broadcast_channels_schema.sql = migrations\002_update_broadcast_channels_schema.sql
+		migrations\003_add_live_excitement_score.sql = migrations\003_add_live_excitement_score.sql
+		migrations\004_alter_live_scores_to_real.sql = migrations\004_alter_live_scores_to_real.sql
+		migrations\004_alter_live_scores_to_real_simple.sql = migrations\004_alter_live_scores_to_real_simple.sql
+		migrations\004_alter_live_scores_to_real_v2.sql = migrations\004_alter_live_scores_to_real_v2.sql
+		migrations\005_add_twitter_posts_table.sql = migrations\005_add_twitter_posts_table.sql
+		migrations\006_add_newsletter_subscribers.sql = migrations\006_add_newsletter_subscribers.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

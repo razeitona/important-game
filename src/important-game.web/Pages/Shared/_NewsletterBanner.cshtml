@@ -1,0 +1,29 @@
+@* Newsletter Subscription Banner *@
+<div class="newsletter-banner" id="newsletterBanner">
+    <div class="newsletter-content">
+        <div class="newsletter-icon">
+            <i class="bi bi-envelope-heart"></i>
+        </div>
+        <div class="newsletter-text">
+            <h3>Never miss an exciting match!</h3>
+            <p>Get weekly updates with top matches and their excitement scores delivered to your inbox.</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm">
+            <div class="newsletter-input-group">
+                <input type="email"
+                       id="newsletterEmail"
+                       placeholder="Enter your email"
+                       required
+                       autocomplete="email"
+                       aria-label="Email address for newsletter" />
+                <button type="submit" class="newsletter-submit-btn" id="newsletterSubmitBtn">
+                    <span class="btn-text">Subscribe</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </span>
+                </button>
+            </div>
+            <div class="newsletter-message" id="newsletterMessage" style="display: none;"></div>
+        </form>
+    </div>
+</div>

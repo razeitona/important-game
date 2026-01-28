@@ -1,0 +1,219 @@
+@page
+@model important_game.web.Pages.UnsubscribeModel
+@{
+    ViewData["Title"] = "Unsubscribe";
+    Layout = "_Layout";
+}
+
+<div class="unsubscribe-container">
+    <div class="unsubscribe-card">
+        @if (Model.IsSuccess)
+        {
+            <div class="unsubscribe-icon success">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1>Successfully Unsubscribed</h1>
+            <p class="unsubscribe-message">
+                You have been successfully unsubscribed from our newsletter.
+                You will no longer receive weekly match updates.
+            </p>
+            <p class="unsubscribe-note">
+                Changed your mind? You can always
+                <a href="/">subscribe again</a> from our homepage.
+            </p>
+        }
+        else if (Model.IsAlreadyUnsubscribed)
+        {
+            <div class="unsubscribe-icon info">
+                <i class="bi bi-info-circle-fill"></i>
+            </div>
+            <h1>Already Unsubscribed</h1>
+            <p class="unsubscribe-message">
+                This email address has already been unsubscribed from our newsletter.
+            </p>
+            <p class="unsubscribe-note">
+                Want to receive updates again?
+                <a href="/">Subscribe here</a>.
+            </p>
+        }
+        else if (Model.IsInvalidToken)
+        {
+            <div class="unsubscribe-icon error">
+                <i class="bi bi-exclamation-circle-fill"></i>
+            </div>
+            <h1>Invalid Link</h1>
+            <p class="unsubscribe-message">
+                This unsubscribe link is invalid or has expired.
+            </p>
+            <p class="unsubscribe-note">
+                If you're having trouble unsubscribing, please contact us at
+                <a href="mailto:support@matchtowatch.net">support@matchtowatch.net</a>.
+            </p>
+        }
+        else
+        {
+            <div class="unsubscribe-icon warning">
+                <i class="bi bi-envelope-x-fill"></i>
+            </div>
+            <h1>Unsubscribe from Newsletter</h1>
+            <p class="unsubscribe-message">
+                Are you sure you want to unsubscribe from our weekly newsletter?
+                You'll miss out on the most exciting matches of the week!
+            </p>
+
+            <form method="post" class="unsubscribe-form">
+                <input type="hidden" name="token" value="@Model.Token" />
+                <button type="submit" class="unsubscribe-btn">
+                    Yes, Unsubscribe Me
+                </button>
+            </form>
+
+            <p class="unsubscribe-note">
+                <a href="/">No, take me back</a>
+            </p>
+        }
+
+        <div class="unsubscribe-footer">
+            <a href="/" class="back-home-link">
+                <i class="bi bi-arrow-left"></i> Back to Match to Watch
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .unsubscribe-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-xl);
+    }
+
+    .unsubscribe-card {
+        background-color: var(--color-background-light);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-2xl);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .unsubscribe-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--spacing-lg);
+    }
+
+    .unsubscribe-icon i {
+        font-size: 2.5rem;
+        color: var(--color-text-white);
+    }
+
+    .unsubscribe-icon.success {
+        background: linear-gradient(135deg, var(--color-success) 0%, #00A043 100%);
+    }
+
+    .unsubscribe-icon.error {
+        background: linear-gradient(135deg, var(--color-danger) 0%, #cc0000 100%);
+    }
+
+    .unsubscribe-icon.warning {
+        background: linear-gradient(135deg, var(--color-warning) 0%, #ff9800 100%);
+    }
+
+    .unsubscribe-icon.info {
+        background: linear-gradient(135deg, var(--color-info) 0%, #0099CC 100%);
+    }
+
+    .unsubscribe-card h1 {
+        color: var(--color-text-white);
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-bold);
+        margin: 0 0 var(--spacing-md);
+    }
+
+    .unsubscribe-message {
+        color: var(--color-text-light);
+        font-size: var(--font-size-md);
+        line-height: var(--line-height-relaxed);
+        margin: 0 0 var(--spacing-lg);
+    }
+
+    .unsubscribe-note {
+        color: var(--color-text-light);
+        font-size: var(--font-size-sm);
+        margin: 0 0 var(--spacing-lg);
+    }
+
+    .unsubscribe-note a {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: var(--font-weight-medium);
+    }
+
+    .unsubscribe-note a:hover {
+        text-decoration: underline;
+    }
+
+    .unsubscribe-form {
+        margin: var(--spacing-lg) 0;
+    }
+
+    .unsubscribe-btn {
+        padding: var(--spacing-md) var(--spacing-xl);
+        background: var(--color-danger);
+        color: var(--color-text-white);
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+    }
+
+    .unsubscribe-btn:hover {
+        background: var(--color-danger-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+    }
+
+    .unsubscribe-footer {
+        margin-top: var(--spacing-xl);
+        padding-top: var(--spacing-lg);
+        border-top: 1px solid var(--color-border-dark);
+    }
+
+    .back-home-link {
+        color: var(--color-text-light);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        transition: color var(--transition-normal);
+    }
+
+    .back-home-link:hover {
+        color: var(--color-primary);
+    }
+
+    @@media (max-width: 480px) {
+        .unsubscribe-container {
+            padding: var(--spacing-md);
+        }
+
+        .unsubscribe-card {
+            padding: var(--spacing-xl);
+        }
+
+        .unsubscribe-card h1 {
+            font-size: var(--font-size-xl);
+        }
+    }
+</style>
